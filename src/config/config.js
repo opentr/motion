@@ -1,14 +1,39 @@
 const config = {
+  /**
+   * API KEYS
+   */
+  api: {
+    openTransport: {
+      key: "otpfda798e7403e4ceaaf1431a5dd58007a",
+      url: "https://opentransport.com",
+      apiPrefix: "/api/beta",
+      /* radius API will use to find vehicles */
+      searchRadius: 15000,
+      refreshInterval: 5000
+    }
+  },
+  /**
+   * MAP CONFIGURATION
+   */
   map: {
+    /* Should map initialize with a start location */
     forceStartLocation: true,
+    /* Start location for the map, if forceStartLocation is true */
     startLocation: {
-      latitude: 51.5074,
-      longitude: 0.1277,
+      latitude: 51.531,
+      longitude: -0.177,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421
     }
   },
-  colors: {}
+  /**
+   * Colors used in the app interface
+   */
+  colors: {
+    primary: "#0076ff",
+    secondary: "#44db5e",
+    text: "#44db5e"
+  }
 };
 
 export default config;
