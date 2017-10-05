@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import { Dimensions } from "react-native";
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
 
@@ -78,6 +79,10 @@ class Map extends PureComponent {
 
   render() {
     console.log("render", this.state);
+
+    var width = Dimensions.get("window").width; //full width
+    var height = Dimensions.get("window").height; //full height
+
     return (
       <MapView
         style={styles.map}
@@ -88,6 +93,9 @@ class Map extends PureComponent {
           <MapView.Marker
             key={index}
             style={{
+              flex: 1,
+              width: width,
+              height: height,
               transform: [
                 { scale: (0.2, 0.2) },
                 { rotateZ: vehicle.heading + "deg" }
