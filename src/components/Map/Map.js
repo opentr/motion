@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, InteractionManager } from "react-native";
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
 
@@ -26,20 +26,35 @@ class Map extends PureComponent {
 
     this.onRegionChange = this.onRegionChange.bind(this);
     this.loadVehicles = this.loadVehicles.bind(this);
+    this.startUpdating = this.startUpdating.bind(this);
+    this.stopUpdating = this.stopUpdating.bind(this);
+    this.restartUpdating = this.restartUpdating.bind(this);
   }
 
   componentDidMount() {
+    this.startUpdating();
+  }
+  componentWillUnmount() {
+    this.stopUpdating();
+  }
+
+  startUpdating(region = false) {
+    this.loadVehicles(region);
     timer.setInterval(
       this,
       "getVehicles",
       this.loadVehicles,
       config.api.openTransport.refreshInterval
     );
-    // this.loadVehicles();
   }
 
-  componentWillUnmount() {
+  stopUpdating() {
     timer.clearInterval(this);
+  }
+
+  restartUpdating(region) {
+    this.stopUpdating();
+    this.startUpdating(region);
   }
 
   async loadVehicles(region = false) {
@@ -64,21 +79,23 @@ class Map extends PureComponent {
         }
       );
       let responseJson = await response.json();
-      console.log("vehicles", responseJson);
-      this.setState({ vehicles: responseJson.vehicles || [] });
+      // console.log("vehicles", responseJson);
+      InteractionManager.runAfterInteractions(() => {
+        this.setState({ vehicles: responseJson.vehicles || [] });
+      });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 
   onRegionChange(region) {
-    console.log("updated region", region);
-    // this.loadVehicles(region);
-    // this.setState({ location: region });
+    // console.log("updated region", region);
+    this.restartUpdating(region);
+    this.setState({ location: region });
   }
 
   render() {
-    console.log("render", this.state);
+    // console.log("render", this.state);
 
     var width = Dimensions.get("window").width; //full width
     var height = Dimensions.get("window").height; //full height
@@ -92,14 +109,9 @@ class Map extends PureComponent {
         {this.state.vehicles.map((vehicle, index) => (
           <MapView.Marker
             key={index}
+            anchor={{ x: 0.5, y: 0.5 }}
             style={{
-              flex: 1,
-              width: width,
-              height: height,
-              transform: [
-                { scale: (0.2, 0.2) },
-                { rotateZ: vehicle.heading + "deg" }
-              ]
+              transform: [{ rotateZ: vehicle.heading + "deg" }]
             }}
             coordinate={{
               latitude: vehicle.position.lat,
