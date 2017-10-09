@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
-import { Dimensions, InteractionManager } from "react-native";
+import { Dimensions, InteractionManager, View, Image } from "react-native";
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
+import { findWithAttr } from "../../utils/search";
 
 const timer = require("react-native-timer");
 
@@ -39,7 +40,7 @@ class Map extends PureComponent {
   }
 
   startUpdating(region = false) {
-    this.loadVehicles(region);
+    //this.loadVehicles(region);
     timer.setInterval(
       this,
       "getVehicles",
@@ -61,12 +62,14 @@ class Map extends PureComponent {
     if (!region) {
       region = this.state.location;
     }
+
     try {
+      const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000); //config.api.openTransport.searchRadius;
       let response = await fetch(
         config.api.openTransport.url +
           config.api.openTransport.apiPrefix +
           "/vehicles?radius=" +
-          config.api.openTransport.searchRadius +
+          radius +
           "&position=" +
           region.latitude +
           "," +
@@ -79,9 +82,12 @@ class Map extends PureComponent {
         }
       );
       let responseJson = await response.json();
-      // console.log("vehicles", responseJson);
+      console.log("vehicles", responseJson);
       InteractionManager.runAfterInteractions(() => {
-        this.setState({ vehicles: responseJson.vehicles || [] });
+        const vehicles = this.state.vehicles.slice(0);
+        const reponseVehicles = responseJson.vehicles || [];
+
+        this.setState({ vehicles: reponseVehicles });
       });
     } catch (error) {
       // console.log(error);
@@ -90,37 +96,64 @@ class Map extends PureComponent {
 
   onRegionChange(region) {
     // console.log("updated region", region);
-    this.restartUpdating(region);
     this.setState({ location: region });
+    this.restartUpdating(region);
   }
 
   render() {
-    // console.log("render", this.state);
+    console.log("render", this.state);
 
-    var width = Dimensions.get("window").width; //full width
-    var height = Dimensions.get("window").height; //full height
+    const width = Dimensions.get("window").width; //full width
+    const height = Dimensions.get("window").height; //full height
+
+    styles.map.height = height * (1 - config.ordering.height);
 
     return (
-      <MapView
-        style={styles.map}
-        initialRegion={this.state.location}
-        onRegionChange={this.onRegionChange}
-      >
-        {this.state.vehicles.map((vehicle, index) => (
-          <MapView.Marker
-            key={index}
-            anchor={{ x: 0.5, y: 0.5 }}
-            style={{
-              transform: [{ rotateZ: vehicle.heading + "deg" }]
-            }}
-            coordinate={{
-              latitude: vehicle.position.lat,
-              longitude: vehicle.position.lng
-            }}
-            image={require("../../assets/car.png")}
+      <View style={styles.map}>
+        <MapView
+          style={styles.map}
+          initialRegion={this.state.location}
+          showsCompass={false}
+          showsBuildings={false}
+          onRegionChange={this.onRegionChange}
+          rotateEnabled={false}
+        >
+          {this.state.vehicles.map((vehicle, index) => (
+            <MapView.Marker
+              key={index}
+              anchor={{ x: 0.5, y: 0.5 }}
+              style={{
+                transform: [{ rotateZ: vehicle.heading + "deg" }]
+              }}
+              coordinate={{
+                latitude: vehicle.position.lat,
+                longitude: vehicle.position.lng
+              }}
+              image={require("../../assets/car.png")}
+            />
+          ))}
+        </MapView>
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 0.6 * height,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "transparent"
+          }}
+        >
+          <Image
+            style={{ transform: [{ scale: 0.04 }] }}
+            pointerEvents="none"
+            source={require("../../assets/pin.png")}
           />
-        ))}
-      </MapView>
+        </View>
+      </View>
     );
   }
 }

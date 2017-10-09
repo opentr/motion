@@ -8,7 +8,7 @@ const config = {
       url: "https://opentransport.com",
       apiPrefix: "/api/beta",
       /* radius API will use to find vehicles */
-      searchRadius: 15000,
+      searchRadius: 10000,
       refreshInterval: 5000
     }
   },
@@ -26,13 +26,17 @@ const config = {
       longitudeDelta: 0.0421
     }
   },
+  /** ordering steps UI config */
+  ordering: {
+    height: 0.4 // height 40%
+  },
   /**
    * Colors used in the app interface
    */
   colors: {
     primary: "#0076ff",
     secondary: "#44db5e",
-    text: "#44db5e"
+    text: "#8e8e93"
   }
 };
 
