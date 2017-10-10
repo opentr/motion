@@ -35,6 +35,7 @@ class Map extends PureComponent {
   componentDidMount() {
     this.startUpdating();
   }
+
   componentWillUnmount() {
     this.stopUpdating();
   }
@@ -44,12 +45,15 @@ class Map extends PureComponent {
     timer.setInterval(
       this,
       "getVehicles",
-      this.loadVehicles,
+      () => {
+        this.loadVehicles(region);
+      },
       config.api.openTransport.refreshInterval
     );
   }
 
   stopUpdating() {
+    console.log("stop updateing");
     timer.clearInterval(this);
   }
 
@@ -59,6 +63,8 @@ class Map extends PureComponent {
   }
 
   async loadVehicles(region = false) {
+    console.log("load vehicles");
+
     if (!region) {
       region = this.state.location;
     }

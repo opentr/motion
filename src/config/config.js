@@ -10,6 +10,10 @@ const config = {
       /* radius API will use to find vehicles */
       searchRadius: 10000,
       refreshInterval: 5000
+    },
+    google: {
+      url: "https://maps.googleapis.com/maps/api/place/textsearch/json",
+      key: "AIzaSyCmYvf5VBGELkRiZSp4Ef0LVeRBUfcm9jg"
     }
   },
   /**
@@ -23,7 +27,8 @@ const config = {
       latitude: 51.531,
       longitude: -0.177,
       latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
+      longitudeDelta: 0.0421,
+      address: "23e Grove End Rd"
     }
   },
   /** ordering steps UI config */
