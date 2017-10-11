@@ -27,17 +27,25 @@ class OrderVehicle extends PureComponent {
     super(props);
 
     this.state = {
-      inputText: "",
+      /* current step of the ordering process, values can be : from, to, vehicleList, summary */
+      step: "from",
+      /* is panel open/expanded for input */
       inputOpen: false,
+      /* ordering from address */
+      fromAddress: config.map.forceStartLocation
+        ? config.map.startLocation.address
+        : "Type in address",
+      /* list of Google returned addresses for search */
       addresses: [],
+      /**
+       * Animation values to be used on panel open/close
+       */
       titleTranslate: new Animated.Value(0),
       inputTranslate: new Animated.Value(0),
       panelTranslate: new Animated.Value(0),
       buttonOpacity: new Animated.Value(1),
-      panelHeight: Dimensions.get("window").height * config.ordering.height,
-      fromAddress: config.map.forceStartLocation
-        ? config.map.startLocation.address
-        : "Type in address"
+      /* height of the ordering panel */
+      panelHeight: Dimensions.get("window").height * config.ordering.height
     };
 
     this.openPanelForInput = this.openPanelForInput.bind(this);
@@ -49,32 +57,47 @@ class OrderVehicle extends PureComponent {
   }
 
   componentWillUnmount() {
-    timer.clearTimeout(this);
+    timer.clearTimeout("fetchAddresses");
   }
 
+  /** fetch search addresses using Google API */
   async fetchAddress(text) {
-    this.setState({ inputText: text });
+    // form the url for API call
     const url =
       config.api.google.url +
       "?query=" +
       text +
       "&key=" +
       config.api.google.key;
+
+    // call Google API
     let response = await fetch(url, {
       method: "get"
     });
+
+    // get JSON of the result
     const responseJson = await response.json();
+
     if (responseJson.results) {
+      // if any addresses in result add them to state
       this.setState({ addresses: responseJson.results.slice(0) });
+    } else {
+      // no addresses in result then set empty list so the interface does not show old results
+      this.setState({ addresses: [] });
     }
     console.log("geocode", responseJson);
   }
 
   onInputChange(text) {
-    console.log("change text", text);
-
     // debounce search
-    this.fetchAddress(text);
+    timer.clearTimeout("fetchAddresses");
+    timer.setTimeout(
+      "fetchAddresses",
+      () => {
+        this.fetchAddress(text);
+      },
+      300
+    );
   }
 
   openPanelForInput() {
