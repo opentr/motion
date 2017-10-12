@@ -8,9 +8,7 @@ const styles = {
   fullScreen: {
     ...StyleSheet.absoluteFillObject
   },
-  map: {
-    ...StyleSheet.absoluteFillObject
-  },
+  map: {},
   marker: {
     width: 10,
     height: 20

@@ -7,7 +7,9 @@ import {
   Keyboard,
   Animated,
   Easing,
-  Platform
+  Image,
+  Platform,
+  TouchableHighlight
 } from "react-native";
 import PropTypes from "prop-types";
 
@@ -17,7 +19,9 @@ import styles from "../../styles/styles";
 const timer = require("react-native-timer");
 
 class OrderVehicle extends PureComponent {
-  static propTypes = {};
+  static propTypes = {
+    onRegionChange: PropTypes.func.isRequired
+  };
 
   static defaultProps = {
     ...PureComponent.defaultProps
@@ -28,7 +32,8 @@ class OrderVehicle extends PureComponent {
 
     this.state = {
       /* current step of the ordering process, values can be : from, to, vehicleList, summary */
-      step: "from",
+      steps: ["from", "to", "time", "vehicle", "confirmation"],
+      currStep: 0,
       /* is panel open/expanded for input */
       inputOpen: false,
       /* ordering from address */
@@ -44,6 +49,7 @@ class OrderVehicle extends PureComponent {
       inputTranslate: new Animated.Value(0),
       panelTranslate: new Animated.Value(0),
       buttonOpacity: new Animated.Value(1),
+      backButtonOpacity: new Animated.Value(0),
       /* height of the ordering panel */
       panelHeight: Dimensions.get("window").height * config.ordering.height
     };
@@ -54,6 +60,7 @@ class OrderVehicle extends PureComponent {
     this.onInputChange = this.onInputChange.bind(this);
     this.fetchAddress = this.fetchAddress.bind(this);
     this.onSelectAddress = this.onSelectAddress.bind(this);
+    this.onBack = this.onBack.bind(this);
   }
 
   componentWillUnmount() {
@@ -65,11 +72,14 @@ class OrderVehicle extends PureComponent {
     // form the url for API call
     const url =
       config.api.google.url +
-      "?query=" +
-      text +
-      "&key=" +
-      config.api.google.key;
-
+      ("?query=" + text) +
+      ("&location=" +
+        config.map.startLocation.latitude +
+        "," +
+        config.map.startLocation.longitude) +
+      ("&radius=" + config.api.google.radius) +
+      ("&key=" + config.api.google.key);
+    console.log(url);
     // call Google API
     let response = await fetch(url, {
       method: "get"
@@ -137,6 +147,16 @@ class OrderVehicle extends PureComponent {
           useNativeDriver: true,
           duration: 500
         }
+      ),
+      Animated.timing(
+        // Animate over time
+        this.state.backButtonOpacity, // The animated value to drive
+        {
+          toValue: 1,
+          easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
+          useNativeDriver: true,
+          duration: 500
+        }
       )
     ]).start(this.onOpenPanel);
   }
@@ -174,6 +194,16 @@ class OrderVehicle extends PureComponent {
           useNativeDriver: true,
           duration: 500
         }
+      ),
+      Animated.timing(
+        // Animate over time
+        this.state.backButtonOpacity, // The animated value to drive
+        {
+          toValue: 0,
+          easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
+          useNativeDriver: true,
+          duration: 500
+        }
       )
     ]).start();
   }
@@ -184,24 +214,57 @@ class OrderVehicle extends PureComponent {
 
   onSelectAddress(text, index) {
     Keyboard.dismiss();
+
+    // get data for the clicked address
+    const data = this.state.addresses[index];
+
+    // update map location
+    this.props.onRegionChange({
+      latitude: data.geometry.location.lat,
+      longitude: data.geometry.location.lng,
+      latitudeDelta: config.map.startLocation.latitudeDelta,
+      longitudeDelta: config.map.startLocation.longitudeDelta
+    });
+
     this.setState({
       inputOpen: false,
-      addressData: this.state.addresses[index],
+      addressData: data,
       fromAddress: text
     });
     this.closePanelForInput();
   }
 
+  onBack() {
+    Keyboard.dismiss();
+    this.setState({
+      inputOpen: false
+    });
+    this.closePanelForInput();
+  }
+
+  nextStep() {}
+
   render() {
     const width = Dimensions.get("window").width; //full width
+    const height = Dimensions.get("window").height; //full width
+
+    // get variables based on screen
+    const currStep = this.state.steps[this.state.currStep];
+    switch (currStep) {
+      case "from":
+        break;
+
+      default:
+        break;
+    }
 
     return (
       <Animated.View
         style={{
           position: "absolute",
-          top: Dimensions.get("window").height * 0.6,
+          top: Dimensions.get("window").height * 0.55,
           zIndex: 1000,
-          backgroundColor: "white",
+          backgroundColor: "rgba(0,0,0,0)",
           width: width,
           height: this.state.panelHeight,
           flexDirection: "column",
@@ -210,6 +273,44 @@ class OrderVehicle extends PureComponent {
           transform: [{ translateY: this.state.panelTranslate }]
         }}
       >
+        {this.state.inputOpen ? (
+          <TouchableHighlight
+            onPress={this.onBack}
+            style={{ marginRight: "auto", marginLeft: 20 }}
+          >
+            <Animated.Image
+              pointerEvents="none"
+              source={require("../../assets/back.png")}
+              style={{
+                width: 32,
+                height: 32,
+
+                opacity: this.state.backButtonOpacity
+              }}
+            />
+          </TouchableHighlight>
+        ) : (
+          <Animated.Image
+            pointerEvents="none"
+            source={require("../../assets/back.png")}
+            style={{
+              width: 32,
+              marginLeft: 20,
+              height: 32,
+              marginRight: "auto",
+              opacity: this.state.backButtonOpacity
+            }}
+          />
+        )}
+        <View
+          style={{
+            height: height,
+            backgroundColor: "white",
+            width: width,
+            position: "absolute",
+            top: 40
+          }}
+        />
         <Animated.Text
           style={[
             styles.baseText,
@@ -235,7 +336,10 @@ class OrderVehicle extends PureComponent {
                 styles.actionText,
                 {
                   width: 0.9 * width,
-                  paddingTop: 10
+                  paddingTop: 10,
+                  height: Platform.OS === "ios" ? 40 : 60,
+                  textAlign: "left",
+                  textAlignVertical: "center"
                 }
               ]}
             />
@@ -243,7 +347,10 @@ class OrderVehicle extends PureComponent {
               <View
                 style={[
                   styles.inputUnderline,
-                  { width: 0.86 * width, marginTop: 4 }
+                  {
+                    width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
+                    marginTop: 4
+                  }
                 ]}
               />
             )}
@@ -262,10 +369,11 @@ class OrderVehicle extends PureComponent {
                   style={[
                     styles.baseText,
                     {
-                      width: 0.8 * width,
+                      width: 0.9 * width,
                       paddingLeft: 4,
-                      fontSize: 20,
-                      marginTop: index === 0 ? 10 : 5,
+                      fontSize: 16,
+                      marginTop:
+                        index === 0 ? (Platform.OS === "ios" ? 20 : 10) : 10,
                       marginBottom: 5
                     }
                   ]}
@@ -282,16 +390,22 @@ class OrderVehicle extends PureComponent {
           onPress={() => {
             this.openPanelForInput();
           }}
-          numberOfLines={1}
           ellipsizeMode={"tail"}
+          numberOfLines={1}
           style={[
             styles.baseText,
             styles.actionText,
             {
-              width: 0.8 * width,
+              width: 0.9 * width,
               textAlign: "center",
+              textAlignVertical: "center",
               paddingTop: 10,
-              opacity: this.state.buttonOpacity
+
+              opacity: this.state.buttonOpacity,
+              fontSize:
+                this.state.fromAddress.length > 30
+                  ? 18
+                  : this.state.fromAddress.length > 20 ? 20 : 24
             }
           ]}
         >

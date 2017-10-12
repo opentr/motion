@@ -10,22 +10,23 @@ import config from "../../config/config";
 import styles from "../../styles/styles";
 
 class Map extends PureComponent {
-  static propTypes = {};
+  static propTypes = {
+    onRegionChange: PropTypes.func.isRequired,
+    region: PropTypes.object.isRequired
+  };
 
   static defaultProps = {
     ...PureComponent.defaultProps
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
-    const { forceStartLocation, startLocation } = config.map;
     this.state = {
-      location: forceStartLocation && startLocation,
       vehicles: []
     };
 
-    this.onRegionChange = this.onRegionChange.bind(this);
+    this.updateRegion = this.updateRegion.bind(this);
     this.loadVehicles = this.loadVehicles.bind(this);
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
@@ -53,7 +54,7 @@ class Map extends PureComponent {
   }
 
   stopUpdating() {
-    console.log("stop updateing");
+    // console.log("stop updateing");
     timer.clearInterval(this);
   }
 
@@ -63,10 +64,10 @@ class Map extends PureComponent {
   }
 
   async loadVehicles(region = false) {
-    console.log("load vehicles");
+    // console.log("load vehicles");
 
     if (!region) {
-      region = this.state.location;
+      region = this.props.region;
     }
 
     try {
@@ -88,7 +89,7 @@ class Map extends PureComponent {
         }
       );
       let responseJson = await response.json();
-      console.log("vehicles", responseJson);
+      // console.log("vehicles", responseJson);
       InteractionManager.runAfterInteractions(() => {
         const vehicles = this.state.vehicles.slice(0);
         const reponseVehicles = responseJson.vehicles || [];
@@ -100,28 +101,36 @@ class Map extends PureComponent {
     }
   }
 
-  onRegionChange(region) {
-    // console.log("updated region", region);
-    this.setState({ location: region });
+  updateRegion(region) {
+    console.log("updated region !!!", region);
+    this.props.onRegionChange(region);
     this.restartUpdating(region);
   }
 
   render() {
-    console.log("render", this.state);
+    // console.log("render", this.state);
 
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full height
+    const mapStyle = {
+      position: "absolute",
+      top: 0,
+      width: width,
+      height: height * (1 - config.ordering.height)
+    };
 
-    styles.map.height = height * (1 - config.ordering.height);
+    console.log("render", this.props.region);
 
     return (
-      <View style={styles.map}>
+      <View style={mapStyle}>
         <MapView
-          style={styles.map}
-          initialRegion={this.state.location}
+          style={mapStyle}
+          initialRegion={this.props.region}
+          region={this.props.region}
           showsCompass={false}
           showsBuildings={false}
-          onRegionChange={this.onRegionChange}
+          onRegionChange={this.updateRegion}
+          onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
         >
           {this.state.vehicles.map((vehicle, index) => (

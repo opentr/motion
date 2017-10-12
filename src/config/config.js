@@ -13,7 +13,9 @@ const config = {
     },
     google: {
       url: "https://maps.googleapis.com/maps/api/place/textsearch/json",
-      key: "AIzaSyCmYvf5VBGELkRiZSp4Ef0LVeRBUfcm9jg"
+      key: "AIzaSyCmYvf5VBGELkRiZSp4Ef0LVeRBUfcm9jg",
+      location: "start-location",
+      radius: 50000
     }
   },
   /**

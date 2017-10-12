@@ -1,16 +1,27 @@
 import React, { PureComponent } from "react";
 import { View } from "react-native";
-import Map from "./components/Map/Map";
-import OrderVehicle from "./components/OrderVehicle/OrderVehicle";
+import { Provider } from "react-redux";
+
 import styles from "./styles/styles";
 
+import Map from "./components/Map/index";
+import OrderVehicle from "./components/OrderVehicle/index";
+
+import store from "./store/createStore";
+
 class App extends PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
-      <View style={styles.app}>
-        <Map />
-        <OrderVehicle />
-      </View>
+      <Provider store={store}>
+        <View style={styles.app}>
+          <Map />
+          <OrderVehicle />
+        </View>
+      </Provider>
     );
   }
 }
