@@ -12,7 +12,9 @@ import styles from "../../styles/styles";
 class Map extends PureComponent {
   static propTypes = {
     onRegionChange: PropTypes.func.isRequired,
-    region: PropTypes.object.isRequired
+    onLoadVehicles: PropTypes.func.isRequired,
+    region: PropTypes.object.isRequired,
+    vehicles: PropTypes.array.isRequired
   };
 
   static defaultProps = {
@@ -21,13 +23,7 @@ class Map extends PureComponent {
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      vehicles: []
-    };
-
     this.updateRegion = this.updateRegion.bind(this);
-    this.loadVehicles = this.loadVehicles.bind(this);
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
     this.restartUpdating = this.restartUpdating.bind(this);
@@ -43,11 +39,16 @@ class Map extends PureComponent {
 
   startUpdating(region = false) {
     //this.loadVehicles(region);
+
+    if (region === false) {
+      region = this.props.region;
+    }
+
     timer.setInterval(
       this,
       "getVehicles",
       () => {
-        this.loadVehicles(region);
+        this.props.onLoadVehicles(region);
       },
       config.api.openTransport.refreshInterval
     );
@@ -61,44 +62,6 @@ class Map extends PureComponent {
   restartUpdating(region) {
     this.stopUpdating();
     this.startUpdating(region);
-  }
-
-  async loadVehicles(region = false) {
-    // console.log("load vehicles");
-
-    if (!region) {
-      region = this.props.region;
-    }
-
-    try {
-      const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000); //config.api.openTransport.searchRadius;
-      let response = await fetch(
-        config.api.openTransport.url +
-          config.api.openTransport.apiPrefix +
-          "/vehicles?radius=" +
-          radius +
-          "&position=" +
-          region.latitude +
-          "," +
-          region.longitude,
-        {
-          method: "get",
-          headers: {
-            Authorization: "Bearer " + config.api.openTransport.key
-          }
-        }
-      );
-      let responseJson = await response.json();
-      // console.log("vehicles", responseJson);
-      InteractionManager.runAfterInteractions(() => {
-        const vehicles = this.state.vehicles.slice(0);
-        const reponseVehicles = responseJson.vehicles || [];
-
-        this.setState({ vehicles: reponseVehicles });
-      });
-    } catch (error) {
-      // console.log(error);
-    }
   }
 
   updateRegion(region) {
@@ -133,7 +96,7 @@ class Map extends PureComponent {
           onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
         >
-          {this.state.vehicles.map((vehicle, index) => (
+          {this.props.vehicles.map((vehicle, index) => (
             <MapView.Marker
               key={index}
               anchor={{ x: 0.5, y: 0.5 }}

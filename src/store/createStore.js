@@ -1,4 +1,5 @@
-import { combineReducers, createStore } from "redux";
+import { combineReducers, createStore, applyMiddleware } from "redux";
+import thunkMiddleware from "redux-thunk";
 
 import mapReducer from "./mapReducer";
 import orderingReducer from "./orderingReducer";
@@ -8,6 +9,6 @@ const reducers = combineReducers({
   ordering: orderingReducer
 });
 
-const store = createStore(reducers);
+const store = createStore(reducers, {}, applyMiddleware(thunkMiddleware));
 
 export default store;
