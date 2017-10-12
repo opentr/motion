@@ -7,7 +7,7 @@ import styles from "./styles/styles";
 import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
 
-import store from "./store/createStore";
+import store from "./store/";
 
 class App extends PureComponent {
   constructor(props) {
