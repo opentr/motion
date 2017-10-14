@@ -2,11 +2,21 @@ import { connect } from "react-redux";
 
 import OrderVehicle from "./OrderVehicle";
 import { onRegionChange } from "../../store/mapReducer";
+import {
+  onUpdateOrderingData,
+  onNextStep,
+  onPrevStep
+} from "../../store/orderingReducer";
 
 const mapDispatchToProps = {
-  onRegionChange
+  onRegionChange,
+  onUpdateOrderingData,
+  onNextStep,
+  onPrevStep
 };
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  ordering: state.ordering
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderVehicle);

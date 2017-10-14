@@ -15,12 +15,15 @@ import PropTypes from "prop-types";
 
 import config from "../../config/config";
 import styles from "../../styles/styles";
+import { ORDERING_STEPS } from "../../store/orderingReducer";
 
 const timer = require("react-native-timer");
 
 class OrderVehicle extends PureComponent {
   static propTypes = {
-    onRegionChange: PropTypes.func.isRequired
+    ordering: PropTypes.object.isRequired,
+    onRegionChange: PropTypes.func.isRequired,
+    onNextStep: PropTypes.func.isRequired
   };
 
   static defaultProps = {
@@ -31,15 +34,10 @@ class OrderVehicle extends PureComponent {
     super(props);
 
     this.state = {
-      /* current step of the ordering process, values can be : from, to, vehicleList, summary */
-      steps: ["from", "to", "time", "vehicle", "confirmation"],
-      currStep: 0,
       /* is panel open/expanded for input */
       inputOpen: false,
-      /* ordering from address */
-      fromAddress: config.map.forceStartLocation
-        ? config.map.startLocation.address
-        : "Type in address",
+      /* is panel opening/closing */
+      panelAnimating: false,
       /* list of Google returned addresses for search */
       addresses: [],
       /**
@@ -54,13 +52,15 @@ class OrderVehicle extends PureComponent {
       panelHeight: Dimensions.get("window").height * config.ordering.height
     };
 
-    this.openPanelForInput = this.openPanelForInput.bind(this);
+    this.openPanelAddressInput = this.openPanelAddressInput.bind(this);
     this.closePanelForInput = this.closePanelForInput.bind(this);
     this.onOpenPanel = this.onOpenPanel.bind(this);
+    this.onClosePanel = this.onClosePanel.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.fetchAddress = this.fetchAddress.bind(this);
     this.onSelectAddress = this.onSelectAddress.bind(this);
     this.onBack = this.onBack.bind(this);
+    this.onNextStep = this.onNextStep.bind(this);
   }
 
   componentWillUnmount() {
@@ -71,7 +71,7 @@ class OrderVehicle extends PureComponent {
   async fetchAddress(text) {
     // form the url for API call
     const url =
-      config.api.google.url +
+      config.api.google.urlTextSearch +
       ("?query=" + text) +
       ("&location=" +
         config.map.startLocation.latitude +
@@ -110,10 +110,19 @@ class OrderVehicle extends PureComponent {
     );
   }
 
-  openPanelForInput() {
-    console.log("open panel for input");
-    //const toHeight = Dimensions.get("window").height * 0.8;
-    this.setState({ panelHeight: Dimensions.get("window").height });
+  openPanelAddressInput() {
+    // check if panel is on from or to step, if not do not open address input
+    if (
+      this.props.ordering.currStep.id !== "from" &&
+      this.props.ordering.currStep.id !== "to"
+    ) {
+      return false;
+    }
+
+    this.setState({
+      panelAnimating: true,
+      panelHeight: Dimensions.get("window").height
+    });
 
     const targetTranslatePanel = -0.5 * Dimensions.get("window").height;
 
@@ -162,7 +171,11 @@ class OrderVehicle extends PureComponent {
   }
 
   closePanelForInput() {
-    //const toHeight = Dimensions.get("window").height * 0.8;
+    // set closed state
+    this.setState({
+      inputOpen: false,
+      panelAnimating: true
+    });
 
     Animated.parallel([
       Animated.timing(
@@ -205,11 +218,15 @@ class OrderVehicle extends PureComponent {
           duration: 500
         }
       )
-    ]).start();
+    ]).start(this.onClosePanel);
   }
 
   onOpenPanel() {
-    this.setState({ inputOpen: true, addresses: [] });
+    this.setState({ inputOpen: true, panelAnimating: false, addresses: [] });
+  }
+
+  onClosePanel() {
+    this.setState({ panelAnimating: false });
   }
 
   onSelectAddress(text, index) {
@@ -226,14 +243,29 @@ class OrderVehicle extends PureComponent {
       longitudeDelta: config.map.startLocation.longitudeDelta
     });
 
-    this.setState({
-      inputOpen: false,
-      addressData: data,
-      fromAddress: text
-    });
+    // call redux action for updating ordering state
+    switch (this.props.ordering.currStep.id) {
+      case "from":
+        this.props.onUpdateOrderingData({
+          fromAddress: text,
+          fromData: data
+        });
+        break;
+      case "to":
+        this.props.onUpdateOrderingData({
+          toAddress: text,
+          toData: data
+        });
+        break;
+    }
+
+    // close input panel
     this.closePanelForInput();
   }
 
+  /** 
+   * Back from input panel click 
+   */
   onBack() {
     Keyboard.dismiss();
     this.setState({
@@ -242,19 +274,165 @@ class OrderVehicle extends PureComponent {
     this.closePanelForInput();
   }
 
-  nextStep() {}
+  /**
+   * Next button click
+   */
+  onNextStep() {
+    // if (this.props.ordering.currStep.id === "from") {
+    //   // next step will be to, so we are opening input panel immediately
+    //   this.openPanelAddressInput();
+    // }
+    if (this.props.ordering.currStep.id === "time") return;
+    this.props.onNextStep();
+  }
+
+  getExpandedAddressInput(width) {
+    return (
+      this.state.inputOpen && (
+        <View style={{ flexDirection: "column" }}>
+          <TextInput
+            autoFocus={true}
+            multiline={false}
+            clearButtonMode={"while-editing"}
+            underlineColorAndroid={config.colors.secondary}
+            spellCheck={false}
+            onChangeText={this.onInputChange}
+            style={[
+              styles.baseText,
+              styles.actionText,
+              {
+                width: 0.9 * width,
+                paddingTop: 10,
+                height: Platform.OS === "ios" ? 40 : 60,
+                textAlign: "left",
+                textAlignVertical: "center"
+              }
+            ]}
+          />
+          {Platform.OS === "ios" && (
+            <View
+              style={[
+                styles.inputUnderline,
+                {
+                  width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
+                  marginTop: 4
+                }
+              ]}
+            />
+          )}
+          {this.state.addresses.slice(0, 5).map((addr, index) => {
+            console.log("render", addr, index);
+
+            const types = addr.types.join(",");
+            const text =
+              types.indexOf("street_address") === -1
+                ? addr.name + ", " + addr.formatted_address
+                : add.formatted_address;
+            return (
+              <Text
+                key={index}
+                onPress={() => this.onSelectAddress(text, index)}
+                style={[
+                  styles.baseText,
+                  {
+                    width: 0.9 * width,
+                    paddingLeft: 4,
+                    fontSize: 16,
+                    marginTop:
+                      index === 0 ? (Platform.OS === "ios" ? 20 : 10) : 10,
+                    marginBottom: 5
+                  }
+                ]}
+                numberOfLines={1}
+                ellipsizeMode={"tail"}
+              >
+                {text}
+              </Text>
+            );
+          })}
+        </View>
+      )
+    );
+  }
+
+  getPrevStepButton() {
+    return (
+      !this.state.inputOpen &&
+      this.props.ordering.currStepNo > 0 && (
+        <TouchableHighlight
+          onPress={this.props.onPrevStep}
+          style={{
+            position: "absolute",
+            top: 50,
+            left: 8,
+            zIndex: 20
+          }}
+        >
+          <Animated.Image
+            source={require("../../assets/prev-step.png")}
+            style={{
+              width: 32,
+              height: 32,
+              opacity: this.state.buttonOpacity
+            }}
+          />
+        </TouchableHighlight>
+      )
+    );
+  }
+
+  getBackPanelButton() {
+    return this.state.inputOpen ? (
+      <TouchableHighlight
+        onPress={this.onBack}
+        style={{ marginRight: "auto", marginLeft: 20 }}
+      >
+        <Animated.Image
+          pointerEvents="none"
+          source={require("../../assets/back.png")}
+          style={{
+            width: 32,
+            height: 32,
+            opacity: this.state.backButtonOpacity
+          }}
+        />
+      </TouchableHighlight>
+    ) : (
+      <Animated.Image
+        pointerEvents="none"
+        source={require("../../assets/back.png")}
+        style={{
+          width: 32,
+          marginLeft: 20,
+          height: 32,
+          marginRight: "auto",
+          opacity: this.state.backButtonOpacity
+        }}
+      />
+    );
+  }
 
   render() {
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full width
 
-    // get variables based on screen
-    const currStep = this.state.steps[this.state.currStep];
-    switch (currStep) {
-      case "from":
-        break;
+    let title, value, action;
 
-      default:
+    switch (this.props.ordering.currStep.id) {
+      case "from":
+        title = this.props.ordering.currStep.title;
+        value = this.props.ordering.fromAddress;
+        action = this.props.ordering.currStep.action;
+        break;
+      case "to":
+        title = this.props.ordering.currStep.title;
+        value = this.props.ordering.toAddress;
+        action = this.props.ordering.currStep.action;
+        break;
+      case "time":
+        title = this.props.ordering.currStep.title;
+        value = this.props.ordering.time;
+        action = this.props.ordering.currStep.action;
         break;
     }
 
@@ -273,35 +451,13 @@ class OrderVehicle extends PureComponent {
           transform: [{ translateY: this.state.panelTranslate }]
         }}
       >
-        {this.state.inputOpen ? (
-          <TouchableHighlight
-            onPress={this.onBack}
-            style={{ marginRight: "auto", marginLeft: 20 }}
-          >
-            <Animated.Image
-              pointerEvents="none"
-              source={require("../../assets/back.png")}
-              style={{
-                width: 32,
-                height: 32,
+        {/* Back button for previous steps */}
+        {this.getPrevStepButton()}
 
-                opacity: this.state.backButtonOpacity
-              }}
-            />
-          </TouchableHighlight>
-        ) : (
-          <Animated.Image
-            pointerEvents="none"
-            source={require("../../assets/back.png")}
-            style={{
-              width: 32,
-              marginLeft: 20,
-              height: 32,
-              marginRight: "auto",
-              opacity: this.state.backButtonOpacity
-            }}
-          />
-        )}
+        {/* Back icon for closing input panel */}
+        {this.getBackPanelButton()}
+
+        {/* White background of the panel */}
         <View
           style={{
             height: height,
@@ -311,6 +467,8 @@ class OrderVehicle extends PureComponent {
             top: 40
           }}
         />
+
+        {/* Title of the panel */}
         <Animated.Text
           style={[
             styles.baseText,
@@ -320,75 +478,16 @@ class OrderVehicle extends PureComponent {
             }
           ]}
         >
-          Pick me up from
+          {title}
         </Animated.Text>
-        {this.state.inputOpen && (
-          <View style={{ flexDirection: "column" }}>
-            <TextInput
-              autoFocus={true}
-              multiline={false}
-              clearButtonMode={"while-editing"}
-              underlineColorAndroid={config.colors.secondary}
-              spellCheck={false}
-              onChangeText={this.onInputChange}
-              style={[
-                styles.baseText,
-                styles.actionText,
-                {
-                  width: 0.9 * width,
-                  paddingTop: 10,
-                  height: Platform.OS === "ios" ? 40 : 60,
-                  textAlign: "left",
-                  textAlignVertical: "center"
-                }
-              ]}
-            />
-            {Platform.OS === "ios" && (
-              <View
-                style={[
-                  styles.inputUnderline,
-                  {
-                    width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
-                    marginTop: 4
-                  }
-                ]}
-              />
-            )}
-            {this.state.addresses.slice(0, 5).map((addr, index) => {
-              console.log("render", addr, index);
 
-              const types = addr.types.join(",");
-              const text =
-                types.indexOf("street_address") === -1
-                  ? addr.name + ", " + addr.formatted_address
-                  : add.formatted_address;
-              return (
-                <Text
-                  key={index}
-                  onPress={() => this.onSelectAddress(text, index)}
-                  style={[
-                    styles.baseText,
-                    {
-                      width: 0.9 * width,
-                      paddingLeft: 4,
-                      fontSize: 16,
-                      marginTop:
-                        index === 0 ? (Platform.OS === "ios" ? 20 : 10) : 10,
-                      marginBottom: 5
-                    }
-                  ]}
-                  numberOfLines={1}
-                  ellipsizeMode={"tail"}
-                >
-                  {text}
-                </Text>
-              );
-            })}
-          </View>
-        )}
+        {/* Expanded address input view */}
+        {this.getExpandedAddressInput(width)}
+
+        {/* Value text for from, to address, time etc. ... can be clicked in steps that need action */}
         <Animated.Text
           onPress={() => {
-            this.openPanelForInput();
+            this.openPanelAddressInput();
           }}
           ellipsizeMode={"tail"}
           numberOfLines={1}
@@ -402,14 +501,11 @@ class OrderVehicle extends PureComponent {
               paddingTop: 10,
 
               opacity: this.state.buttonOpacity,
-              fontSize:
-                this.state.fromAddress.length > 30
-                  ? 18
-                  : this.state.fromAddress.length > 20 ? 20 : 24
+              fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
             }
           ]}
         >
-          {this.state.fromAddress}
+          {value}
         </Animated.Text>
         <Animated.Text
           style={[
@@ -417,8 +513,9 @@ class OrderVehicle extends PureComponent {
             styles.buttonText,
             { paddingTop: 30, opacity: this.state.buttonOpacity }
           ]}
+          onPress={this.onNextStep}
         >
-          Next
+          {action}
         </Animated.Text>
       </Animated.View>
     );

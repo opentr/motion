@@ -37,18 +37,23 @@ class Map extends PureComponent {
     this.stopUpdating();
   }
 
-  startUpdating(region = false) {
-    //this.loadVehicles(region);
+  startUpdating() {
+    // debounce loading of vehicles for 300ms
+    timer.setTimeout(
+      this,
+      "getVehiclesFirst",
+      () => {
+        this.props.onLoadVehicles();
+      },
+      300
+    );
 
-    if (region === false) {
-      region = this.props.region;
-    }
-
+    // add regular interval updating of vehicles
     timer.setInterval(
       this,
       "getVehicles",
       () => {
-        this.props.onLoadVehicles(region);
+        this.props.onLoadVehicles();
       },
       config.api.openTransport.refreshInterval
     );
@@ -56,18 +61,38 @@ class Map extends PureComponent {
 
   stopUpdating() {
     // console.log("stop updateing");
+
+    // clear updating of vehicles
+    timer.clearTimeout(this);
     timer.clearInterval(this);
   }
 
-  restartUpdating(region) {
+  restartUpdating() {
+    // stop / clear updating
     this.stopUpdating();
-    this.startUpdating(region);
+
+    // start new updating
+    this.startUpdating();
   }
 
   updateRegion(region) {
     console.log("updated region !!!", region);
+    // call action for region change
     this.props.onRegionChange(region);
-    this.restartUpdating(region);
+
+    // restart vehicle updating
+    this.restartUpdating();
+
+    // update address if from or to steps in ordering
+
+    timer.setTimeout(
+      this,
+      "findNewAddress",
+      () => {
+        this.props.reverseGeocodeLocation();
+      },
+      300
+    );
   }
 
   render() {
@@ -79,7 +104,7 @@ class Map extends PureComponent {
       position: "absolute",
       top: 0,
       width: width,
-      height: height * (1 - config.ordering.height)
+      height: height * (1 - config.ordering.height) + 10
     };
 
     console.log("render", this.props.region);
@@ -110,27 +135,53 @@ class Map extends PureComponent {
               image={require("../../assets/car.png")}
             />
           ))}
+          {this.props.ordering.currStepNo > 0 && (
+            <MapView.Marker
+              key={"fromMarker"}
+              anchor={{ x: 0.5, y: 0.5 }}
+              coordinate={{
+                latitude: this.props.ordering.fromData.geometry.location.lat,
+                longitude: this.props.ordering.fromData.geometry.location.lng
+              }}
+              image={require("../../assets/pinMap.png")}
+            />
+          )}
+
+          {this.props.ordering.currStepNo > 1 && (
+            <MapView.Marker
+              key={"toMarker"}
+              anchor={{ x: 0.5, y: 0.5 }}
+              coordinate={{
+                latitude: this.props.ordering.toData.geometry.location.lat,
+                longitude: this.props.ordering.toData.geometry.location.lng
+              }}
+              image={require("../../assets/pinMap.png")}
+            />
+          )}
         </MapView>
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 0.6 * height,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "transparent"
-          }}
-        >
-          <Image
-            style={{ transform: [{ scale: 0.04 }] }}
+        {/* Show overlay map cursor only if you are choosing location, like from and to steps */}
+        {(this.props.ordering.currStep.id === "from" ||
+          this.props.ordering.currStep.id === "to") && (
+          <View
             pointerEvents="none"
-            source={require("../../assets/pin.png")}
-          />
-        </View>
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: mapStyle.height,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "transparent"
+            }}
+          >
+            <Image
+              pointerEvents="none"
+              source={require("../../assets/pinScaled.png")}
+            />
+          </View>
+        )}
       </View>
     );
   }

@@ -12,7 +12,9 @@ const config = {
       refreshInterval: 5000
     },
     google: {
-      url: "https://maps.googleapis.com/maps/api/place/textsearch/json",
+      urlTextSearch:
+        "https://maps.googleapis.com/maps/api/place/textsearch/json",
+      urlReverseGeocode: "https://maps.googleapis.com/maps/api/geocode/json",
       key: "AIzaSyCmYvf5VBGELkRiZSp4Ef0LVeRBUfcm9jg",
       location: "start-location",
       radius: 50000
