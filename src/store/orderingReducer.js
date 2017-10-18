@@ -7,6 +7,7 @@ import { onRegionChange } from "./mapReducer";
  * CONSTANTS USED
  */
 
+// ordering steps, feel free to change titles but DO NOT CHANGE the ids
 export const ORDERING_STEPS = [
   /* Pick up location */
   { id: "from", title: "Pick me up from", action: "Next" },
@@ -15,7 +16,7 @@ export const ORDERING_STEPS = [
   /* Time of ride */
   { id: "time", title: "When?", action: "Next" },
   /* Choose vehicle */
-  { id: "vehicle" },
+  { id: "vehicleSelect" },
   /* Confirm order */
   { id: "confirmation", action: "Confirm and book" }
 ];
@@ -23,7 +24,6 @@ export const ORDERING_STEPS = [
 /**
  * ACTION TYPES
  */
-
 // update ordering state data
 export const UPDATE_ORDERING_DATA = "UPDATE_ORDERING_DATA";
 // update from or to address, this action reducer is dispatch by map reducer
@@ -32,6 +32,113 @@ export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 /**
  * ACTIONS
  */
+
+/**
+ * search for vehicles that are close to our from address, so we can display results
+ */
+export function onSearchForVehicle() {
+  return (dispatch, getState) => {
+    // get starting point data from state
+    const fromData = getState().ordering.fromData;
+
+    // get search radius from config
+    const radius = config.api.openTransport.searchRadius;
+
+    // url for API
+    const url =
+      config.api.openTransport.url +
+      config.api.openTransport.apiPrefix +
+      "/vehicles?radius=" +
+      radius +
+      "&position=" +
+      fromData.geometry.location.lat +
+      "," +
+      fromData.geometry.location.lng;
+
+    console.log("fetch search results ", url);
+
+    fetch(url, {
+      method: "get",
+      headers: {
+        Authorization: "Bearer " + config.api.openTransport.key
+      }
+    })
+      .then(
+        response => response.json(),
+        error =>
+          console.log("An error occured loading search vehicle results.", error)
+      )
+      .then(json => {
+        console.log("search vehicles", json);
+
+        // get vehicles from returned JSON
+        const responseVehicles = json.vehicles || [];
+
+        // dispatch map update with vehicles update
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            availableVehicles: responseVehicles.filter(
+              v => v.status === "available"
+            )
+          }
+        });
+      });
+  };
+}
+
+/**
+ * load vehicles list from API for the region we are in, this only displays vehicles on the map
+ */
+export function onLoadVehicles() {
+  // vehicle format
+
+  console.log("load vehicles");
+  return (dispatch, getState) => {
+    // get current region
+    const region = getState().map.region;
+
+    // calculate radius based on map region data
+    // formula is - delta * 111 = radius in miles
+    // we multiply by 1.60936 to get kilometers
+    // and multiply by 1000 to get meters
+    const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000);
+
+    // fetch data from API
+    fetch(
+      config.api.openTransport.url +
+        config.api.openTransport.apiPrefix +
+        "/vehicles?radius=" +
+        radius +
+        "&position=" +
+        region.latitude +
+        "," +
+        region.longitude,
+      {
+        method: "get",
+        headers: {
+          Authorization: "Bearer " + config.api.openTransport.key
+        }
+      }
+    )
+      .then(
+        response => response.json(),
+        error => console.log("An error occured.", error)
+      )
+      .then(json => {
+        console.log("vehicles", json);
+
+        // get vehicles from returned JSON
+        const responseVehicles = json.vehicles || [];
+
+        // dispatch map update with vehicles update
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: { vehicles: responseVehicles }
+        });
+      });
+  };
+}
 
 export function onNextStep() {
   return (dispatch, getState) => {
@@ -143,6 +250,7 @@ export function onUpdateOrderingData(data = {}) {
 const ACTION_HANDLERS = {
   // update from or to address that changed
   [UPDATE_ADDRESS]: (state, action) => {
+    // console.log("UPDATE ADDRESS ");
     if (state.currStep.id === "from") {
       // return updated from address on map move
       return {
@@ -183,7 +291,10 @@ const initialState = {
       }
     }
   },
-
+  /* vehicles displated on the map */
+  vehicles: [],
+  /* vehicles returned from search when ordering, avialable for booking */
+  availableVehicles: [],
   time: "Now"
 };
 

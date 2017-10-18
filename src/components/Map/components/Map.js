@@ -2,12 +2,12 @@ import React, { PureComponent } from "react";
 import { Dimensions, InteractionManager, View, Image } from "react-native";
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
-import { findWithAttr } from "../../utils/search";
+import { findWithAttr } from "../../../utils/search";
 
 const timer = require("react-native-timer");
 
-import config from "../../config/config";
-import styles from "../../styles/styles";
+import config from "../../../config/config";
+import styles from "../../../styles/styles";
 
 class Map extends PureComponent {
   static propTypes = {
@@ -39,14 +39,16 @@ class Map extends PureComponent {
 
   startUpdating() {
     // debounce loading of vehicles for 300ms
-    timer.setTimeout(
-      this,
-      "getVehiclesFirst",
-      () => {
-        this.props.onLoadVehicles();
-      },
-      300
-    );
+    this.props.onLoadVehicles();
+
+    // timer.setTimeout(
+    //   this,
+    //   "getVehiclesFirst",
+    //   () => {
+    //     this.props.onLoadVehicles();
+    //   },
+    //   300
+    // );
 
     // add regular interval updating of vehicles
     timer.setInterval(
@@ -104,7 +106,7 @@ class Map extends PureComponent {
       position: "absolute",
       top: 0,
       width: width,
-      height: height * (1 - config.ordering.height) + 10
+      height: height - config.ordering.height
     };
 
     console.log("render", this.props.region);
@@ -121,6 +123,31 @@ class Map extends PureComponent {
           onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
         >
+          {this.props.ordering.currStepNo > 0 && (
+            <MapView.Marker
+              key={"fromMarker"}
+              anchor={{ x: 0.5, y: 0.5 }}
+              coordinate={{
+                latitude: this.props.ordering.fromData.geometry.location.lat,
+                longitude: this.props.ordering.fromData.geometry.location.lng
+              }}
+              style={{ zIndex: 1000 }}
+              image={require("../../../assets/pinMap.png")}
+            />
+          )}
+
+          {this.props.ordering.currStepNo > 1 && (
+            <MapView.Marker
+              key={"toMarker"}
+              anchor={{ x: 0.5, y: 0.5 }}
+              style={{ zIndex: 1000 }}
+              coordinate={{
+                latitude: this.props.ordering.toData.geometry.location.lat,
+                longitude: this.props.ordering.toData.geometry.location.lng
+              }}
+              image={require("../../../assets/pinMap.png")}
+            />
+          )}
           {this.props.vehicles.map((vehicle, index) => (
             <MapView.Marker
               key={index}
@@ -132,32 +159,9 @@ class Map extends PureComponent {
                 latitude: vehicle.position.lat,
                 longitude: vehicle.position.lng
               }}
-              image={require("../../assets/car.png")}
+              image={require("../../../assets/car.png")}
             />
           ))}
-          {this.props.ordering.currStepNo > 0 && (
-            <MapView.Marker
-              key={"fromMarker"}
-              anchor={{ x: 0.5, y: 0.5 }}
-              coordinate={{
-                latitude: this.props.ordering.fromData.geometry.location.lat,
-                longitude: this.props.ordering.fromData.geometry.location.lng
-              }}
-              image={require("../../assets/pinMap.png")}
-            />
-          )}
-
-          {this.props.ordering.currStepNo > 1 && (
-            <MapView.Marker
-              key={"toMarker"}
-              anchor={{ x: 0.5, y: 0.5 }}
-              coordinate={{
-                latitude: this.props.ordering.toData.geometry.location.lat,
-                longitude: this.props.ordering.toData.geometry.location.lng
-              }}
-              image={require("../../assets/pinMap.png")}
-            />
-          )}
         </MapView>
         {/* Show overlay map cursor only if you are choosing location, like from and to steps */}
         {(this.props.ordering.currStep.id === "from" ||
@@ -178,7 +182,7 @@ class Map extends PureComponent {
           >
             <Image
               pointerEvents="none"
-              source={require("../../assets/pinScaled.png")}
+              source={require("../../../assets/pinScaled.png")}
             />
           </View>
         )}

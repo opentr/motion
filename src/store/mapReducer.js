@@ -48,57 +48,6 @@ export function reverseGeocodeLocation() {
 }
 
 /**
- * load vehicles list from API for the region we are in
- */
-export function onLoadVehicles() {
-  console.log("load vehicles");
-  return (dispatch, getState) => {
-    // get current region
-    const region = getState().map.region;
-
-    // calculate radius based on map region data
-    // formula is - delta * 111 = radius in miles
-    // we multiply by 1.60936 to get kilometers
-    // and multiply by 1000 to get meters
-    const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000);
-
-    // fetch data from API
-    fetch(
-      config.api.openTransport.url +
-        config.api.openTransport.apiPrefix +
-        "/vehicles?radius=" +
-        radius +
-        "&position=" +
-        region.latitude +
-        "," +
-        region.longitude,
-      {
-        method: "get",
-        headers: {
-          Authorization: "Bearer " + config.api.openTransport.key
-        }
-      }
-    )
-      .then(
-        response => response.json(),
-        error => console.log("An error occured.", error)
-      )
-      .then(json => {
-        console.log("vehicles", json);
-
-        // get vehicles from returned JSON
-        const responseVehicles = json.vehicles || [];
-
-        // dispatch map update with vehicles update
-        dispatch({
-          type: UPDATE_MAP_DATA,
-          payload: { vehicles: responseVehicles }
-        });
-      });
-  };
-}
-
-/**
  * REDUCER
  */
 
@@ -115,8 +64,7 @@ const initialState = {
     longitude: config.map.startLocation.longitude,
     latitudeDelta: config.map.startLocation.latitudeDelta,
     longitudeDelta: config.map.startLocation.longitudeDelta
-  },
-  vehicles: []
+  }
 };
 
 export default function mapReducer(state = initialState, action) {

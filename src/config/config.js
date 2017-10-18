@@ -9,7 +9,7 @@ const config = {
       apiPrefix: "/api/beta",
       /* radius API will use to find vehicles */
       searchRadius: 10000,
-      refreshInterval: 5000
+      refreshInterval: 15000
     },
     google: {
       urlTextSearch:
@@ -37,7 +37,7 @@ const config = {
   },
   /** ordering steps UI config */
   ordering: {
-    height: 0.4 // height 40%
+    height: 270
   },
   /**
    * Colors used in the app interface
