@@ -33,58 +33,9 @@ export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
  * ACTIONS
  */
 
-/**
- * search for vehicles that are close to our from address, so we can display results
- */
-export function onSearchForVehicle() {
-  return (dispatch, getState) => {
-    // get starting point data from state
-    const fromData = getState().ordering.fromData;
-
-    // get search radius from config
-    const radius = config.api.openTransport.searchRadius;
-
-    // url for API
-    const url =
-      config.api.openTransport.url +
-      config.api.openTransport.apiPrefix +
-      "/vehicles?radius=" +
-      radius +
-      "&position=" +
-      fromData.geometry.location.lat +
-      "," +
-      fromData.geometry.location.lng;
-
-    console.log("fetch search results ", url);
-
-    fetch(url, {
-      method: "get",
-      headers: {
-        Authorization: "Bearer " + config.api.openTransport.key
-      }
-    })
-      .then(
-        response => response.json(),
-        error =>
-          console.log("An error occured loading search vehicle results.", error)
-      )
-      .then(json => {
-        console.log("search vehicles", json);
-
-        // get vehicles from returned JSON
-        const responseVehicles = json.vehicles || [];
-
-        // dispatch map update with vehicles update
-        dispatch({
-          type: UPDATE_ORDERING_DATA,
-          payload: {
-            availableVehicles: responseVehicles.filter(
-              v => v.status === "available"
-            )
-          }
-        });
-      });
-  };
+/** simple action to update ordering data */
+export function onUpdateOrderingData(data = {}) {
+  return { type: UPDATE_ORDERING_DATA, payload: data };
 }
 
 /**
@@ -140,6 +91,7 @@ export function onLoadVehicles() {
   };
 }
 
+/** handles click on the next step */
 export function onNextStep() {
   return (dispatch, getState) => {
     // check if prev step is from or to, to recenter map
@@ -196,6 +148,7 @@ export function onNextStep() {
   };
 }
 
+/** handles click on the prev step */
 export function onPrevStep() {
   return (dispatch, getState) => {
     // check if prev step is from or to, to recenter map
@@ -239,8 +192,87 @@ export function onPrevStep() {
   };
 }
 
-export function onUpdateOrderingData(data = {}) {
-  return { type: UPDATE_ORDERING_DATA, payload: data };
+/**
+ * search for vehicles that are close to our from address, so we can display results
+ */
+export function onSearchForVehicle() {
+  return (dispatch, getState) => {
+    // get starting point data from state
+    const fromData = getState().ordering.fromData;
+
+    // get search radius from config
+    const radius = config.api.openTransport.searchRadius;
+
+    // url for API
+    const url =
+      config.api.openTransport.url +
+      config.api.openTransport.apiPrefix +
+      "/vehicles?radius=" +
+      radius +
+      "&position=" +
+      fromData.geometry.location.lat +
+      "," +
+      fromData.geometry.location.lng;
+
+    console.log("fetch search results ", url);
+
+    fetch(url, {
+      method: "get",
+      headers: {
+        Authorization: "Bearer " + config.api.openTransport.key
+      }
+    })
+      .then(
+        response => response.json(),
+        error =>
+          console.log("An error occured loading search vehicle results.", error)
+      )
+      .then(json => {
+        console.log("search vehicles", json);
+
+        // get vehicles from returned JSON
+        const responseVehicles = json.vehicles || [];
+
+        // dispatch map update with vehicles update
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            availableVehicles: responseVehicles
+          }
+        });
+        // dispatch({
+        //   type: UPDATE_ORDERING_DATA,
+        //   payload: {
+        //     availableVehicles: responseVehicles.filter(
+        //       v => v.status === "available"
+        //     )
+        //   }
+        // });
+      });
+  };
+}
+
+/** 
+ * handles selecting a vehicle for booking 
+ */
+export function onSelectVehicle(index) {
+  return (dispatch, getState) => {
+    // set selected vehicle
+
+    const ordering = getState().ordering;
+
+    console.log("select vehicle", ordering, index);
+
+    dispatch({
+      type: UPDATE_ORDERING_DATA,
+      payload: {
+        selectedVehicle: ordering.availableVehicles[index]
+      }
+    });
+
+    // go to next step
+    dispatch(onNextStep());
+  };
 }
 
 /**
@@ -295,6 +327,7 @@ const initialState = {
   vehicles: [],
   /* vehicles returned from search when ordering, avialable for booking */
   availableVehicles: [],
+  selectedVehicle: {},
   time: "Now"
 };
 

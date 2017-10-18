@@ -34,8 +34,12 @@ class SelectVehicle extends PureComponent {
 
   keyExtractor = (item, index) => index;
 
-  renderItem = ({ item }) => (
-    <SelectVehicleItem data={item} />
+  renderItem = ({ item, index }) => (
+    <SelectVehicleItem
+      data={item}
+      index={index}
+      onPressItem={this.props.onSelectVehicle}
+    />
     //  id={item.id}
     //  onPressItem={this._onPressItem}
     //  selected={!!this.state.selected.get(item.id)}

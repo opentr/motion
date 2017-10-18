@@ -15,13 +15,14 @@ import PropTypes from "prop-types";
 
 import SelectFromToTime from "./SelectFromToTime";
 import SelectVehicle from "./SelectVehicle";
+import Confirmation from "./Confirmation";
 
 import config from "../../../config/config";
 import styles from "../../../styles/styles";
 
 import { ORDERING_STEPS } from "../../../store/orderingReducer";
 
-class OrderVehicle extends PureComponent {
+class Ordering extends PureComponent {
   static propTypes = {
     ordering: PropTypes.object.isRequired,
     onRegionChange: PropTypes.func.isRequired,
@@ -37,7 +38,7 @@ class OrderVehicle extends PureComponent {
 
     this.state = {
       /* is panel open/expanded for input */
-      inputOpen: false,
+      panelOpen: false,
       /* is panel opening/closing */
       panelAnimating: false,
 
@@ -53,8 +54,8 @@ class OrderVehicle extends PureComponent {
       panelHeight: config.ordering.height + 40
     };
 
-    this.openPanelAddressInput = this.openPanelAddressInput.bind(this);
-    this.closePanelForInput = this.closePanelForInput.bind(this);
+    this.openPanel = this.openPanel.bind(this);
+    this.closePanel = this.closePanel.bind(this);
     this.onOpenPanel = this.onOpenPanel.bind(this);
     this.onClosePanel = this.onClosePanel.bind(this);
 
@@ -66,11 +67,23 @@ class OrderVehicle extends PureComponent {
     this.orderingStep = false;
   }
 
-  openPanelAddressInput() {
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.ordering.currStep.id === "confirmation") {
+      this.openPanel(true);
+    } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
+      this.closePanel(true);
+    }
+  }
+
+  openPanel(force) {
     // check if panel is on from or to step, if not do not open address input
     if (
-      this.props.ordering.currStep.id !== "from" &&
-      this.props.ordering.currStep.id !== "to"
+      !force &&
+      !this.state.panelAnimating &&
+      !this.state.openPanel &&
+      (this.props.ordering.currStep.id !== "from" &&
+        this.props.ordering.currStep.id !== "to" &&
+        this.props.ordering.currStep.id !== "confirmation")
     ) {
       return false;
     }
@@ -80,56 +93,81 @@ class OrderVehicle extends PureComponent {
       panelHeight: Dimensions.get("window").height
     });
 
-    const targetTranslatePanel = -(Dimensions.get("window").height - 270) + 80;
+    // determine top position for the panel
+    // slightly closer to the top on address input
+    // and bit more far away from top for confirmation step
+    const targetTranslatePanel =
+      -(Dimensions.get("window").height - 270) +
+      (this.props.ordering.currStep.id === "confirmation" ? 180 : 80);
 
-    Animated.parallel([
-      Animated.timing(
-        // Animate over time
-        this.state.panelTranslate, // The animated value to drive
-        {
-          toValue: targetTranslatePanel,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-          duration: 500
-        }
-      ),
-      Animated.timing(
-        // Animate over time
-        this.state.titleTranslate, // The animated value to drive
-        {
-          toValue: -20,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-          duration: 500
-        }
-      ),
-      Animated.timing(
-        // Animate over time
-        this.state.buttonOpacity, // The animated value to drive
-        {
-          toValue: 0,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-          duration: 500
-        }
-      ),
-      Animated.timing(
-        // Animate over time
-        this.state.backButtonOpacity, // The animated value to drive
-        {
-          toValue: 1,
-          easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
-          useNativeDriver: true,
-          duration: 500
-        }
-      )
-    ]).start(this.onOpenPanel);
+    if (this.props.ordering.currStep.id === "confirmation") {
+      // open panel for confirmation
+      Animated.parallel([
+        Animated.timing(
+          // Animate over time
+          this.state.panelTranslate, // The animated value to drive
+          {
+            toValue: targetTranslatePanel,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            duration: 500
+          }
+        )
+      ]).start(this.onOpenPanel);
+    } else {
+      // open panel for inputing address
+
+      Animated.parallel([
+        Animated.timing(
+          // Animate over time
+          this.state.panelTranslate, // The animated value to drive
+          {
+            toValue: targetTranslatePanel,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            duration: 500
+          }
+        ),
+        Animated.timing(
+          // Animate over time
+          this.state.titleTranslate, // The animated value to drive
+          {
+            toValue: -20,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            duration: 500
+          }
+        ),
+        Animated.timing(
+          // Animate over time
+          this.state.buttonOpacity, // The animated value to drive
+          {
+            toValue: 0,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            duration: 500
+          }
+        ),
+        Animated.timing(
+          // Animate over time
+          this.state.backButtonOpacity, // The animated value to drive
+          {
+            toValue: 1,
+            easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
+            useNativeDriver: true,
+            duration: 500
+          }
+        )
+      ]).start(this.onOpenPanel);
+    }
   }
 
-  closePanelForInput() {
+  closePanel() {
+    if (this.state.panelAnimating || this.state.openPanel) return false;
+
     // set closed state
     this.setState({
-      inputOpen: false,
+      panelOpen: false,
       panelAnimating: true
     });
 
@@ -178,7 +216,7 @@ class OrderVehicle extends PureComponent {
   }
 
   onOpenPanel() {
-    this.setState({ inputOpen: true, panelAnimating: false });
+    this.setState({ panelOpen: true, panelAnimating: false });
 
     // reset addresses list when panel is opened, call component method for reset
     if (
@@ -222,7 +260,7 @@ class OrderVehicle extends PureComponent {
     }
 
     // close input panel
-    this.closePanelForInput();
+    this.closePanel();
   }
 
   /** 
@@ -231,9 +269,9 @@ class OrderVehicle extends PureComponent {
   onBack() {
     Keyboard.dismiss();
     this.setState({
-      inputOpen: false
+      panelOpen: false
     });
-    this.closePanelForInput();
+    this.closePanel();
   }
 
   /**
@@ -245,7 +283,8 @@ class OrderVehicle extends PureComponent {
 
   getPrevStepButton() {
     return (
-      !this.state.inputOpen &&
+      (!this.state.panelOpen ||
+        this.props.ordering.currStep.id === "confirmation") &&
       this.props.ordering.currStepNo > 0 && (
         <TouchableOpacity
           onPress={this.props.onPrevStep}
@@ -271,7 +310,7 @@ class OrderVehicle extends PureComponent {
   }
 
   getBackPanelButton() {
-    return this.state.inputOpen ? (
+    return this.state.panelOpen ? (
       <TouchableOpacity
         activeOpacity={1}
         onPress={this.onBack}
@@ -317,7 +356,7 @@ class OrderVehicle extends PureComponent {
           <SelectFromToTime
             width={width}
             ordering={this.props.ordering}
-            inputOpen={this.state.inputOpen}
+            panelOpen={this.state.panelOpen}
             /* passing down animated props */
             animated={{
               titleTranslate: this.state.titleTranslate,
@@ -325,7 +364,7 @@ class OrderVehicle extends PureComponent {
               buttonOpacity: this.state.buttonOpacity
             }}
             onNextStep={this.onNextStep}
-            openPanelAddressInput={this.openPanelAddressInput}
+            openPanel={this.openPanel}
             onSelectAddress={this.onSelectAddress}
             ref={instance => {
               this.orderingStep = instance;
@@ -340,6 +379,19 @@ class OrderVehicle extends PureComponent {
             width={width}
             availableVehicles={this.props.availableVehicles}
             onSearchForVehicle={this.props.onSearchForVehicle}
+            onSelectVehicle={this.props.onSelectVehicle}
+          />
+        );
+        break;
+
+      case "confirmation":
+        return (
+          <Confirmation
+            fromAddress={this.props.ordering.fromAddress}
+            toAddress={this.props.ordering.toAddress}
+            vehicle={this.props.ordering.selectedVehicle}
+            onConfirmBooking={() => {}}
+            price={15}
           />
         );
         break;
@@ -395,4 +447,4 @@ class OrderVehicle extends PureComponent {
   }
 }
 
-export default OrderVehicle;
+export default Ordering;

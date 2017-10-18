@@ -6,7 +6,8 @@ import {
   onUpdateOrderingData,
   onNextStep,
   onPrevStep,
-  onSearchForVehicle
+  onSearchForVehicle,
+  onSelectVehicle
 } from "../../store/orderingReducer";
 
 const mapDispatchToProps = {
@@ -14,7 +15,8 @@ const mapDispatchToProps = {
   onUpdateOrderingData,
   onNextStep,
   onPrevStep,
-  onSearchForVehicle
+  onSearchForVehicle,
+  onSelectVehicle
 };
 
 const mapStateToProps = state => ({

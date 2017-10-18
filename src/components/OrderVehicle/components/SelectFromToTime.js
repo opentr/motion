@@ -92,7 +92,7 @@ class SelectFromToTime extends PureComponent {
     const width = this.props.width;
 
     return (
-      this.props.inputOpen && (
+      this.props.panelOpen && (
         <View style={{ flexDirection: "column" }}>
           <TextInput
             autoFocus={true}
@@ -212,7 +212,7 @@ class SelectFromToTime extends PureComponent {
         {/* Value text for from, to address, time etc. ... can be clicked in steps that need action */}
         <Animated.Text
           onPress={() => {
-            this.props.openPanelAddressInput();
+            this.props.openPanel();
           }}
           ellipsizeMode={"tail"}
           numberOfLines={1}
