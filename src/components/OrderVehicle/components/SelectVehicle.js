@@ -52,7 +52,7 @@ class SelectVehicle extends PureComponent {
       <View
         style={{
           flex: 1,
-          paddingTop: 50
+          paddingTop: 48
         }}
       >
         <FlatList

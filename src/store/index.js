@@ -1,5 +1,7 @@
-import { combineReducers, createStore, applyMiddleware } from "redux";
+import { compose, combineReducers, createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
+import { persistStore, autoRehydrate } from "redux-persist";
+import { AsyncStorage } from "react-native";
 
 // reducer connected to map state
 import mapReducer from "./mapReducer";
@@ -13,6 +15,13 @@ const reducers = combineReducers({
 });
 
 // create redux store with combined reducers and middleware
-const store = createStore(reducers, {}, applyMiddleware(thunkMiddleware));
+const store = createStore(
+  reducers,
+  {},
+  compose(applyMiddleware(thunkMiddleware), autoRehydrate())
+);
+
+// react-native
+persistStore(store, { storage: AsyncStorage });
 
 export default store;

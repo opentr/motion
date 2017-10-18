@@ -57,7 +57,7 @@ class SelectVehicleItem extends PureComponent {
         <Text
           style={{
             fontSize: 15,
-            lineHeight: 26,
+            lineHeight: 24,
             width: 85,
             color: config.colors.text,
             textAlignVertical: "center",
@@ -79,6 +79,43 @@ class SelectVehicleItem extends PureComponent {
         >
           £15.30
         </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            width: 105,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 10
+          }}
+        >
+          <Image
+            source={require("../../../assets/heart.png")}
+            style={{
+              width: 24,
+              height: 20,
+              marginRight: 5
+            }}
+          />
+          <View
+            style={{
+              paddingTop: 2,
+              paddingBottom: 4,
+              paddingLeft: 6,
+              paddingRight: 6,
+              backgroundColor: config.colors.secondary
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                lineHeight: 18,
+                fontSize: 18
+              }}
+            >
+              8.4
+            </Text>
+          </View>
+        </View>
       </View>
     );
   }

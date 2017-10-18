@@ -223,7 +223,8 @@ class SelectFromToTime extends PureComponent {
               width: 0.9 * this.props.width,
               textAlign: "center",
               textAlignVertical: "center",
-              paddingTop: 30,
+              marginTop: 15,
+              height: 60,
 
               opacity: this.props.animated.buttonOpacity,
               fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
@@ -236,7 +237,7 @@ class SelectFromToTime extends PureComponent {
           style={[
             styles.baseText,
             styles.buttonText,
-            { paddingTop: 40, opacity: this.props.animated.buttonOpacity }
+            { paddingTop: 25, opacity: this.props.animated.buttonOpacity }
           ]}
           onPress={this.props.onNextStep}
         >
