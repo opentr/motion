@@ -183,7 +183,13 @@ class Map extends PureComponent {
               key={index}
               anchor={{ x: 0.5, y: 0.5 }}
               style={{
-                transform: [{ rotateZ: vehicle.heading + "deg" }]
+                transform: [{ rotateZ: vehicle.heading + "deg" }],
+                opacity:
+                  !this.state.mapExpanded ||
+                  (this.state.mapExpanded &&
+                    vehicle.id === this.props.ordering.selectedVehicle.id)
+                    ? 1
+                    : 0.1
               }}
               coordinate={{
                 latitude: vehicle.position.lat,

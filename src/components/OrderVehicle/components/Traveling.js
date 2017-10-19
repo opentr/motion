@@ -60,6 +60,7 @@ class Traveling extends PureComponent {
             textAlignVertical: "center",
             textAlign: "left"
           }}
+          numberOfLines={1}
         >
           {this.props.toAddress}
         </Text>

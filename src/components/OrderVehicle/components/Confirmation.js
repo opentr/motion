@@ -64,6 +64,7 @@ class Confirmation extends PureComponent {
             textAlignVertical: "center",
             textAlign: "left"
           }}
+          numberOfLines={1}
         >
           {this.props.fromAddress}
         </Text>
@@ -86,6 +87,7 @@ class Confirmation extends PureComponent {
             textAlignVertical: "center",
             textAlign: "left"
           }}
+          numberOfLines={1}
         >
           {this.props.toAddress}
         </Text>
