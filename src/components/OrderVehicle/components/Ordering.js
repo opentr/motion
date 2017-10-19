@@ -16,6 +16,7 @@ import PropTypes from "prop-types";
 import SelectFromToTime from "./SelectFromToTime";
 import SelectVehicle from "./SelectVehicle";
 import Confirmation from "./Confirmation";
+import Traveling from "./Traveling";
 
 import config from "../../../config/config";
 import styles from "../../../styles/styles";
@@ -72,6 +73,8 @@ class Ordering extends PureComponent {
       this.openPanel(true);
     } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
       this.closePanel(true);
+    } else if (nextProps.ordering.currStep.id === "traveling") {
+      this.closePanel(true);
     }
   }
 
@@ -98,7 +101,7 @@ class Ordering extends PureComponent {
     // and bit more far away from top for confirmation step
     const targetTranslatePanel =
       -(Dimensions.get("window").height - 270) +
-      (this.props.ordering.currStep.id === "confirmation" ? 180 : 80);
+      (this.props.ordering.currStep.id === "confirmation" ? 100 : 80);
 
     if (this.props.ordering.currStep.id === "confirmation") {
       // open panel for confirmation
@@ -165,6 +168,8 @@ class Ordering extends PureComponent {
   closePanel() {
     if (this.state.panelAnimating || this.state.openPanel) return false;
 
+    const toValue = this.props.ordering.currStep.id === "traveling" ? 100 : 0;
+
     // set closed state
     this.setState({
       panelOpen: false,
@@ -176,7 +181,7 @@ class Ordering extends PureComponent {
         // Animate over time
         this.state.panelTranslate, // The animated value to drive
         {
-          toValue: 0,
+          toValue: toValue,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
           duration: 500
@@ -387,15 +392,21 @@ class Ordering extends PureComponent {
       case "confirmation":
         return (
           <Confirmation
+            width={width}
             fromAddress={this.props.ordering.fromAddress}
             toAddress={this.props.ordering.toAddress}
             vehicle={this.props.ordering.selectedVehicle}
-            onConfirmBooking={() => {}}
-            price={15}
+            actionText={this.props.ordering.currStep.action}
+            onConfirmBooking={this.props.onConfirmBooking}
+            price="£17"
           />
         );
         break;
-
+      case "traveling":
+        return (
+          <Traveling width={width} toAddress={this.props.ordering.toAddress} />
+        );
+        break;
       default:
         break;
     }

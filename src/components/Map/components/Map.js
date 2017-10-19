@@ -27,6 +27,36 @@ class Map extends PureComponent {
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
     this.restartUpdating = this.restartUpdating.bind(this);
+
+    this.state = {
+      mapExpanded: false
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.ordering.currStep.id === "traveling") {
+      // expand map while user is traveling
+      this.expandMap();
+    } else {
+      // return map back to normal
+      this.contractMap();
+    }
+  }
+
+  expandMap() {
+    if (this.state.mapExpanded) return false;
+
+    this.setState({
+      mapExpanded: true
+    });
+  }
+
+  contractMap() {
+    if (!this.state.mapExpanded) return false;
+
+    this.setState({
+      mapExpanded: false
+    });
   }
 
   componentDidMount() {
@@ -102,14 +132,14 @@ class Map extends PureComponent {
 
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full height
+
     const mapStyle = {
       position: "absolute",
       top: 0,
       width: width,
-      height: height - config.ordering.height
+      height:
+        height - config.ordering.height + (this.state.mapExpanded ? 100 : 0)
     };
-
-    console.log("render", this.props.region);
 
     return (
       <View style={mapStyle}>

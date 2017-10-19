@@ -10,8 +10,10 @@ import OrderVehicle from "./components/OrderVehicle/index";
 
 class AppView extends PureComponent {
   render() {
-    console.log("appview ", this.props);
+    // wait for local storage data to load, like user if he is logged in and other options
     if (!this.props.rehydrate.done) return null;
+
+    // if data is loaded proceed with rendering
     return (
       <View style={styles.app}>
         <Map />

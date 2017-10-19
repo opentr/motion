@@ -45,6 +45,7 @@ const config = {
   colors: {
     primary: "#0076ff",
     secondary: "#44db5e",
+    alert: "#ff2851",
     text: "#8e8e93"
   }
 };

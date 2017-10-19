@@ -18,7 +18,8 @@ export const ORDERING_STEPS = [
   /* Choose vehicle */
   { id: "vehicleSelect" },
   /* Confirm order */
-  { id: "confirmation", action: "Confirm and book" }
+  { id: "confirmation", action: "Confirm and book" },
+  { id: "traveling" }
 ];
 
 /**
@@ -271,6 +272,15 @@ export function onSelectVehicle(index) {
     });
 
     // go to next step
+    dispatch(onNextStep());
+  };
+}
+
+/**
+ * action when user confirms booking and 
+ */
+export function onConfirmBooking() {
+  return dispatch => {
     dispatch(onNextStep());
   };
 }
