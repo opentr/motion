@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "react-redux";
-import { View } from "react-native";
+import { View, BackHandler, Platform } from "react-native";
 import { Provider } from "react-redux";
 
 import styles from "./styles/styles";
@@ -9,6 +9,21 @@ import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
 
 class AppView extends PureComponent {
+  componentDidMount() {
+    // add listener for Android
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      if (this.props.currStepNo === 0) {
+        // exit the app, since we do not have prev step in the app
+        return false;
+      } else {
+        // go to previous step
+        this.props.onPrevStep();
+        // do not exit the app
+        return true;
+      }
+    });
+  }
+
   render() {
     // wait for local storage data to load, like user if he is logged in and other options
     if (!this.props.rehydrate.done) return null;
@@ -24,7 +39,13 @@ class AppView extends PureComponent {
 }
 
 const mapStateToProps = state => ({
+  currStepNo: state.ordering.currStepNo,
   rehydrate: state.rehydrate
 });
 
-export default connect(mapStateToProps)(AppView);
+import { onPrevStep } from "./store/orderingReducer";
+const mapDispatchToProps = {
+  onPrevStep
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppView);

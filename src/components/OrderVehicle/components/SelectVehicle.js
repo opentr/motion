@@ -48,9 +48,7 @@ class SelectVehicle extends PureComponent {
 
   render() {
     console.log("render select vehicles ", this.props.availableVehicles);
-    const vehicles = this.props.availableVehicles.concat(
-      this.props.availableVehicles
-    );
+    const vehicles = this.props.availableVehicles;
 
     return (
       <View

@@ -49,7 +49,7 @@ class SelectVehicleItem extends PureComponent {
             style={{
               height: 40,
               fontSize: 15,
-              width: 85,
+              width: 83,
               color: config.colors.primary,
               textAlignVertical: "center",
               textAlign: "center"
@@ -59,7 +59,8 @@ class SelectVehicleItem extends PureComponent {
           </Text>
           <Image
             source={{ uri: image_url }}
-            style={{ maxWidth: 100, width: 105, height: 60 }}
+            resizeMode="contain"
+            style={{ width: 105, marginTop: 3, height: 60 }}
           />
           <Text
             style={{
@@ -119,7 +120,7 @@ class SelectVehicleItem extends PureComponent {
                   fontSize: 18
                 }}
               >
-                8.4
+                8
               </Text>
             </View>
           </View>

@@ -1,4 +1,5 @@
 import config from "../config/config";
+import { REHYDRATE } from "redux-persist/constants";
 
 // import function so we can update region from ordering
 import { onRegionChange } from "./mapReducer";
@@ -115,9 +116,7 @@ export function onNextStep() {
 
       // reset data about available vehicles, not to diplsay vehicles for last ordering location
       if (nextStep.id === "vehicleSelect") {
-        addToData = {
-          availableVehicles: []
-        };
+        addToData.availableVehicles = [];
       }
 
       // if current step is destination we can zoom in region with from / to in the center
@@ -168,6 +167,8 @@ export function onPrevStep() {
       const prevStepNo = ordering.currStepNo - 1;
       const prevStep = ORDERING_STEPS[prevStepNo];
 
+      let addToData = {};
+
       // check if we need to recenter the map
       if (prevStep.id === "to") {
         // recenter map to destination
@@ -189,12 +190,17 @@ export function onPrevStep() {
             longitudeDelta: region.longitudeDelta
           })
         );
+      } else if (prevStep.id === "vehicleSelect") {
+        // reset data about available vehicles, not to diplsay vehicles for last ordering location
+        addToData = {
+          availableVehicles: []
+        };
       }
 
       // update data to reflect prev step
       dispatch({
         type: UPDATE_ORDERING_DATA,
-        payload: { currStepNo: prevStepNo, currStep: prevStep }
+        payload: { ...addToData, currStepNo: prevStepNo, currStep: prevStep }
       });
     }
   };
@@ -323,7 +329,16 @@ const ACTION_HANDLERS = {
   [UPDATE_ORDERING_DATA]: (state, action) => ({
     ...state,
     ...action.payload
-  })
+  }),
+
+  /* make sure some data on reload of the app are not  in loaded from local storage */
+  [REHYDRATE]: (state, action) => {
+    const incoming = action.payload.ordering;
+    if (incoming) {
+      return { ...state, ...incoming, availableVehicles: [] };
+    }
+    return state;
+  }
 };
 
 const initialState = {

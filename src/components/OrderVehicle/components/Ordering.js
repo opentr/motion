@@ -297,12 +297,12 @@ class Ordering extends PureComponent {
           style={{
             position: "absolute",
             top: 50,
-            left: 8,
+            left: 6,
             zIndex: 20
           }}
         >
           <Animated.Image
-            source={require("../../../assets/prev-step.png")}
+            source={require("../../../assets/back.png")}
             style={{
               width: 32,
               height: 32,

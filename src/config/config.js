@@ -15,7 +15,7 @@ const config = {
       urlTextSearch:
         "https://maps.googleapis.com/maps/api/place/textsearch/json",
       urlReverseGeocode: "https://maps.googleapis.com/maps/api/geocode/json",
-      key: "AIzaSyCmYvf5VBGELkRiZSp4Ef0LVeRBUfcm9jg",
+      key: "AIzaSyAGclthw8FegS6fvqJ0_MHDxQxRidUdqxo",
       location: "start-location",
       radius: 50000
     }
