@@ -8,7 +8,7 @@ const config = {
       url: "https://opentransport.com",
       apiPrefix: "/api/beta",
       /* radius API will use to find vehicles */
-      searchRadius: 10000,
+      searchRadius: 2000,
       refreshInterval: 15000
     },
     google: {

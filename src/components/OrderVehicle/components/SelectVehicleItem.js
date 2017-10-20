@@ -29,7 +29,7 @@ class SelectVehicleItem extends PureComponent {
   }
 
   render() {
-    const { type } = this.props.data;
+    const { make, image_url } = this.props.data;
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -55,11 +55,11 @@ class SelectVehicleItem extends PureComponent {
               textAlign: "center"
             }}
           >
-            {type}
+            {make}
           </Text>
           <Image
-            source={require("../../../assets/vehicle.jpg")}
-            style={{ maxWidth: 100, height: 60 }}
+            source={{ uri: image_url }}
+            style={{ maxWidth: 100, width: 105, height: 60 }}
           />
           <Text
             style={{

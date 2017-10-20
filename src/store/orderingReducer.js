@@ -113,6 +113,13 @@ export function onNextStep() {
         };
       }
 
+      // reset data about available vehicles, not to diplsay vehicles for last ordering location
+      if (nextStep.id === "vehicleSelect") {
+        addToData = {
+          availableVehicles: []
+        };
+      }
+
       // if current step is destination we can zoom in region with from / to in the center
       if (ORDERING_STEPS[ordering.currStepNo].id === "to") {
         // recenter region focusing on pickup and destination
