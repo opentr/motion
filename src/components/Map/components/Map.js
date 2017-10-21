@@ -179,26 +179,27 @@ class Map extends PureComponent {
               image={require("../../../assets/pinMap.png")}
             />
           )}
-          {this.props.vehicles.map((vehicle, index) => (
-            <MapView.Marker
-              key={index}
-              anchor={{ x: 0.5, y: 0.5 }}
-              style={{
-                transform: [{ rotateZ: vehicle.heading + "deg" }],
-                opacity:
-                  !this.state.mapExpanded ||
-                  (this.state.mapExpanded &&
-                    vehicle.id === this.props.ordering.selectedVehicle.id)
-                    ? 1
-                    : 0.1
-              }}
-              coordinate={{
-                latitude: vehicle.position.lat,
-                longitude: vehicle.position.lng
-              }}
-              image={require("../../../assets/car.png")}
-            />
-          ))}
+          {this.props.ordering.currStep.id !== "traveling" &&
+            this.props.vehicles.map((vehicle, index) => (
+              <MapView.Marker
+                key={index}
+                anchor={{ x: 0.5, y: 0.5 }}
+                style={{
+                  transform: [{ rotateZ: vehicle.heading + "deg" }],
+                  opacity:
+                    !this.state.mapExpanded ||
+                    (this.state.mapExpanded &&
+                      vehicle.id === this.props.ordering.selectedVehicle.id)
+                      ? 1
+                      : 0.1
+                }}
+                coordinate={{
+                  latitude: vehicle.position.lat,
+                  longitude: vehicle.position.lng
+                }}
+                image={require("../../../assets/car.png")}
+              />
+            ))}
         </MapView>
         {/* Show overlay map cursor only if you are choosing location, like from and to steps */}
         {(this.props.ordering.currStep.id === "from" ||

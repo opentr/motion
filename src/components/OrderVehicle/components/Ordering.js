@@ -13,10 +13,13 @@ import {
 } from "react-native";
 import PropTypes from "prop-types";
 
-import SelectFromToTime from "./SelectFromToTime";
+import Carousel from "react-native-snap-carousel";
+
+import SelectFromToTime from "./SelectFromToTime/";
 import SelectVehicle from "./SelectVehicle";
 import Confirmation from "./Confirmation";
 import Traveling from "./Traveling";
+import Steps from "./Steps/";
 
 import config from "../../../config/config";
 import styles from "../../../styles/styles";
@@ -63,6 +66,8 @@ class Ordering extends PureComponent {
     this.onSelectAddress = this.onSelectAddress.bind(this);
     this.onBack = this.onBack.bind(this);
     this.onNextStep = this.onNextStep.bind(this);
+    this.getStep = this.getStep.bind(this);
+    this.getStepsSlider = this.getStepsSlider.bind(this);
 
     // reference to ordering step component, will be set once the component is rendered
     this.orderingStep = false;
@@ -346,70 +351,106 @@ class Ordering extends PureComponent {
     );
   }
 
-  /**
-   * get current step display 
-   */
-  getStep(currStepId, width) {
-    {
-      /* if steps are from, to or time show Ordering step for from to and time */
-    }
+  getStep(step) {
+    console.log("get step now", step);
+    return (
+      <Text
+        onPress={this.onNextStep}
+        style={{
+          fontSize: 30,
+          color: "green",
+          textAlign: "center"
+        }}
+      >
+        {step.id}
+      </Text>
+    );
+
+    const currStepId = step.id;
     switch (currStepId) {
       case "from":
       case "to":
       case "time":
-        return (
-          <SelectFromToTime
-            width={width}
-            ordering={this.props.ordering}
-            panelOpen={this.state.panelOpen}
-            /* passing down animated props */
-            animated={{
-              titleTranslate: this.state.titleTranslate,
-              inputTranslate: this.state.inputTranslate,
-              buttonOpacity: this.state.buttonOpacity
-            }}
-            onNextStep={this.onNextStep}
-            openPanel={this.openPanel}
-            onSelectAddress={this.onSelectAddress}
-            ref={instance => {
-              this.orderingStep = instance;
-            }}
-          />
-        );
+        return <SelectFromToTime key={step.id} {...step.data} />;
         break;
 
       case "vehicleSelect":
-        return (
-          <SelectVehicle
-            width={width}
-            availableVehicles={this.props.availableVehicles}
-            onSearchForVehicle={this.props.onSearchForVehicle}
-            onSelectVehicle={this.props.onSelectVehicle}
-          />
-        );
+        return <SelectVehicle key={step.id} {...step.data} />;
         break;
 
       case "confirmation":
-        return (
-          <Confirmation
-            width={width}
-            fromAddress={this.props.ordering.fromAddress}
-            toAddress={this.props.ordering.toAddress}
-            vehicle={this.props.ordering.selectedVehicle}
-            actionText={this.props.ordering.currStep.action}
-            onConfirmBooking={this.props.onConfirmBooking}
-            price="£17"
-          />
-        );
+        return <Confirmation key={step.id} {...step.data} />;
         break;
       case "traveling":
-        return (
-          <Traveling width={width} toAddress={this.props.ordering.toAddress} />
-        );
+        return <Traveling key={step.id} {...step.data} />;
         break;
       default:
         break;
     }
+  }
+
+  getStepsSlider(currStepId, currStepNo, width) {
+    let data = {};
+    const stepsData = ORDERING_STEPS.slice(0).map((step, index) => {
+      switch (step.id) {
+        case "from":
+        case "to":
+        case "time":
+          step.data = {
+            width: width,
+            stepId: currStepId,
+            panelOpen: this.state.panelOpen,
+            /* passing down animated props */
+            animated: {
+              titleTranslate: this.state.titleTranslate,
+              inputTranslate: this.state.inputTranslate,
+              buttonOpacity: this.state.buttonOpacity
+            },
+            onNextStep: this.onNextStep,
+            openPanel: this.openPanel,
+            onSelectAddress: this.onSelectAddress
+          };
+          break;
+        case "vehicleSelect":
+          step.data = {
+            width: width,
+            availableVehicles: this.props.availableVehicles,
+            onSearchForVehicle: this.props.onSearchForVehicle,
+            onSelectVehicle: this.props.onSelectVehicle
+          };
+          break;
+        case "confirmation":
+          step.data = {
+            width: width,
+            fromAddress: this.props.ordering.fromAddress || "",
+            toAddress: this.props.ordering.toAddress || "",
+            vehicle: this.props.ordering.selectedVehicle || {},
+            actionText: this.props.ordering.currStep.action,
+            onConfirmBooking: this.props.onConfirmBooking,
+            price: "£17"
+          };
+          break;
+        case "traveling":
+          step.data = {
+            width: width,
+            toAddress: this.props.ordering.toAddress
+          };
+        default:
+          break;
+      }
+      return step;
+    });
+
+    return (
+      <Steps
+        width={width}
+        height={this.state.panelHeight}
+        currStepNo={currStepNo}
+        totalSteps={ORDERING_STEPS.length}
+        renderStep={this.getStep}
+        steps={stepsData}
+      />
+    );
   }
 
   render() {
@@ -418,6 +459,8 @@ class Ordering extends PureComponent {
     const height = Dimensions.get("window").height; //full width
 
     const currStepId = this.props.ordering.currStep.id;
+
+    const { currStepNo } = this.props.ordering;
 
     return (
       <Animated.View
@@ -451,8 +494,8 @@ class Ordering extends PureComponent {
           }}
         />
 
-        {/* get current step */}
-        {this.getStep(currStepId, width)}
+        {/* steps container */}
+        {this.getStepsSlider(currStepId, currStepNo, width)}
       </Animated.View>
     );
   }

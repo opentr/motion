@@ -52,6 +52,8 @@ export function onLoadVehicles() {
   return (dispatch, getState) => {
     // get current region
     const region = getState().map.region;
+    // get ordering info
+    const ordering = getState().ordering;
 
     // calculate radius based on map region data
     // formula is - delta * 111 = radius in miles
@@ -60,22 +62,27 @@ export function onLoadVehicles() {
     const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000);
 
     // fetch data from API
-    fetch(
-      config.api.openTransport.url +
-        config.api.openTransport.apiPrefix +
-        "/vehicles?radius=" +
-        radius +
-        "&position=" +
-        region.latitude +
-        "," +
-        region.longitude,
-      {
-        method: "get",
-        headers: {
-          Authorization: "Bearer " + config.api.openTransport.key
-        }
+    let url =
+      ordering.currStep.id === "traveling222"
+        ? config.api.openTransport.url +
+          config.api.openTransport.apiPrefix +
+          "/vehicles/" +
+          ordering.selectedVehicle.id
+        : config.api.openTransport.url +
+          config.api.openTransport.apiPrefix +
+          "/vehicles?radius=" +
+          radius +
+          "&position=" +
+          region.latitude +
+          "," +
+          region.longitude;
+
+    fetch(url, {
+      method: "get",
+      headers: {
+        Authorization: "Bearer " + config.api.openTransport.key
       }
-    )
+    })
       .then(
         response => response.json(),
         error => console.log("An error occured.", error)
@@ -84,7 +91,8 @@ export function onLoadVehicles() {
         console.log("vehicles", json);
 
         // get vehicles from returned JSON
-        const responseVehicles = json.vehicles || [];
+        const responseVehicles =
+          json.vehicles || (json.vehicle && [json.vehicle]) || [];
 
         // dispatch map update with vehicles update
         dispatch({
@@ -262,20 +270,22 @@ export function onSearchForVehicle() {
         const responseVehicles = json.vehicles || [];
 
         // dispatch map update with vehicles update
-        dispatch({
-          type: UPDATE_ORDERING_DATA,
-          payload: {
-            availableVehicles: responseVehicles
-          }
-        });
         // dispatch({
         //   type: UPDATE_ORDERING_DATA,
         //   payload: {
-        //     availableVehicles: responseVehicles.filter(
-        //       v => v.status === "available"
-        //     )
+        //     availableVehicles: responseVehicles
         //   }
         // });
+
+        // dispatch map update with vehicles update
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            availableVehicles: responseVehicles.filter(
+              v => v.status === "available"
+            )
+          }
+        });
       });
   };
 }
@@ -358,10 +368,15 @@ const ACTION_HANDLERS = {
 // is pickup step before destination step
 const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
 const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
+const confirmationStepNo = findWithAttr(ORDERING_STEPS, "id", "confirmation");
 console.log("from to", fromStepNo, toStepNo);
 // variable to store initial address information for first step on the map
 // fromStepNo stores step
-let initialAddressState = { fromStepNo: fromStepNo, toStepNo: toStepNo };
+let initialAddressState = {
+  fromStepNo: fromStepNo,
+  toStepNo: toStepNo,
+  confirmationStepNo: confirmationStepNo
+};
 // if we start with pickup then we need to initialize fromAddress and fromData
 if (fromStepNo < toStepNo) {
   initialAddressState = {

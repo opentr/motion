@@ -4,16 +4,18 @@ import { View, Text, TextInput, Animated, Platform } from "react-native";
 
 const timer = require("react-native-timer");
 
-import config from "../../../config/config";
-import styles from "../../../styles/styles";
+import config from "../../../../config/config";
+import styles from "../../../../styles/styles";
 
 class SelectFromToTime extends PureComponent {
   static propTypes = {
-    ordering: PropTypes.object.isRequired
+    ordering: PropTypes.object.isRequired,
+    style: PropTypes.object.isRequired
   };
 
   static defaultProps = {
-    ...PureComponent.defaultProps
+    ...PureComponent.defaultProps,
+    style: {}
   };
 
   constructor(props) {
@@ -93,7 +95,7 @@ class SelectFromToTime extends PureComponent {
 
     return (
       this.props.panelOpen && (
-        <View style={{ flexDirection: "column" }}>
+        <View style={{ ...this.props.style, flexDirection: "column" }}>
           <TextInput
             autoFocus={true}
             multiline={false}
@@ -166,13 +168,8 @@ class SelectFromToTime extends PureComponent {
       value = "",
       action = "";
 
-    console.log("Select from to", this.props);
-    if (typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === "function") {
-      console.log("redux", window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__);
-    } else {
-      console.log("redux none");
-    }
-    switch (this.props.ordering.currStep.id) {
+    console.log("render from to", this.props);
+    switch (this.props.stepId) {
       case "from":
         title = this.props.ordering.currStep.title;
         value = this.props.ordering.fromAddress;

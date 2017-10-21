@@ -60,7 +60,7 @@ class SelectVehicleItem extends PureComponent {
           <Image
             source={{ uri: image_url }}
             resizeMode="contain"
-            style={{ width: 105, marginTop: 3, height: 60 }}
+            style={{ width: 105, marginTop: 5, height: 60 }}
           />
           <Text
             style={{

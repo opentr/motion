@@ -15,15 +15,16 @@ import styles from "../../../styles/styles";
 
 class Confirmation extends PureComponent {
   static propTypes = {
-    fromAddress: PropTypes.string.isRequired,
-    toAddress: PropTypes.string.isRequired,
-    vehicle: PropTypes.object.isRequired,
-    price: PropTypes.any.isRequired,
+    fromAddress: PropTypes.string,
+    toAddress: PropTypes.string,
+    vehicle: PropTypes.object,
+    price: PropTypes.any,
     onConfirmBooking: PropTypes.func.isRequired
   };
 
   static defaultProps = {
-    ...PureComponent.defaultProps
+    ...PureComponent.defaultProps,
+    vehicle: {}
   };
 
   constructor(props) {
@@ -111,7 +112,7 @@ class Confirmation extends PureComponent {
             textAlign: "left"
           }}
         >
-          {this.props.vehicle.type}
+          {this.props.vehicle.type || ""}
         </Text>
         <Text
           style={{
