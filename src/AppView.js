@@ -1,12 +1,16 @@
 import React, { PureComponent } from "react";
 import { connect } from "react-redux";
-import { View, BackHandler, Platform } from "react-native";
+import { View, BackHandler, Text, Platform } from "react-native";
 import { Provider } from "react-redux";
 
 import styles from "./styles/styles";
+import config from "./config/config";
 
 import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
+
+//var DeviceInfo = require("react-native-device-info");
+// let versionNumber = ""; //DeviceInfo.getVersion();
 
 class AppView extends PureComponent {
   componentDidMount() {

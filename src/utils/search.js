@@ -37,6 +37,13 @@ export function leftJoin(arr1, arr2, key1, key2, arrFields = []) {
   return res;
 }
 
+/**
+ * Returns index of an element that has certain key with a certain value
+ * Return -1 if no results
+ * @param {*Array} array 
+ * @param {*String} attr Key name to search
+ * @param {*String} value Key value we are searching for
+ */
 export function findWithAttr(array, attr, value) {
   // console.log("findWithAttr", array, attr, value);
   for (var i = 0; i < array.length; i += 1) {

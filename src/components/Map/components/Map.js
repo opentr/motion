@@ -153,7 +153,8 @@ class Map extends PureComponent {
           onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
         >
-          {this.props.ordering.currStepNo > 0 && (
+          {/* if we passed pick up step show pick up market */}
+          {this.props.ordering.currStepNo > this.props.ordering.fromStepNo && (
             <MapView.Marker
               key={"fromMarker"}
               anchor={{ x: 0.5, y: 0.5 }}
@@ -165,8 +166,8 @@ class Map extends PureComponent {
               image={require("../../../assets/pinMap.png")}
             />
           )}
-
-          {this.props.ordering.currStepNo > 1 && (
+          {/* if we passed destination step show destination marker */}
+          {this.props.ordering.currStepNo > this.props.ordering.toStepNo && (
             <MapView.Marker
               key={"toMarker"}
               anchor={{ x: 0.5, y: 0.5 }}

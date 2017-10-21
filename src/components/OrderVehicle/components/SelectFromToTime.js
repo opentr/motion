@@ -166,6 +166,12 @@ class SelectFromToTime extends PureComponent {
       value = "",
       action = "";
 
+    console.log("Select from to", this.props);
+    if (typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === "function") {
+      console.log("redux", window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__);
+    } else {
+      console.log("redux none");
+    }
     switch (this.props.ordering.currStep.id) {
       case "from":
         title = this.props.ordering.currStep.title;

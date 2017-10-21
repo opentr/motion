@@ -35,10 +35,13 @@ const config = {
       address: "23e Grove End Rd"
     }
   },
+
   /** ordering steps UI config */
   ordering: {
     height: 270
   },
+  /** show version number */
+  showVersionNumber: true,
   /**
    * Colors used in the app interface
    */

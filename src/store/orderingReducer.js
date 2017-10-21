@@ -4,16 +4,18 @@ import { REHYDRATE } from "redux-persist/constants";
 // import function so we can update region from ordering
 import { onRegionChange } from "./mapReducer";
 
+import { findWithAttr } from "../utils/search";
+
 /**
  * CONSTANTS USED
  */
 
 // ordering steps, feel free to change titles but DO NOT CHANGE the ids
 export const ORDERING_STEPS = [
-  /* Pick up location */
-  { id: "from", title: "Pick me up from", action: "Next" },
   /* Drop off location */
   { id: "to", title: "Drop me at", action: "Next" },
+  /* Pick up location */
+  { id: "from", title: "Pick me up from", action: "Next" },
   /* Time of ride */
   { id: "time", title: "When?", action: "Next" },
   /* Choose vehicle */
@@ -107,10 +109,17 @@ export function onNextStep() {
 
       // add to address data if next step is destination, and no data is present
       let addToData = {};
-      if (nextStep.id === "to" && !("toAddress" in ordering)) {
+      if (!ordering.toFirst && nextStepNo === ordering.toStepNo) {
         addToData = {
           toAddress: ordering.fromAddress,
           toData: ordering.fromData
+        };
+      }
+
+      if (ordering.toFirst && nextStepNo === ordering.fromStepNo) {
+        addToData = {
+          fromAddress: ordering.toAddress,
+          fromData: ordering.toData
         };
       }
 
@@ -119,8 +128,13 @@ export function onNextStep() {
         addToData.availableVehicles = [];
       }
 
-      // if current step is destination we can zoom in region with from / to in the center
-      if (ORDERING_STEPS[ordering.currStepNo].id === "to") {
+      // if this is second step in pickup/destination ordering steps
+      //  zoom in region with from / to in the center
+      if (
+        (!ordering.toFirst &&
+          ORDERING_STEPS[ordering.currStepNo].id === "to") ||
+        (ordering.toFirst && ORDERING_STEPS[ordering.currStepNo].id === "from")
+      ) {
         // recenter region focusing on pickup and destination
         dispatch(
           onRegionChange({
@@ -341,26 +355,59 @@ const ACTION_HANDLERS = {
   }
 };
 
+// is pickup step before destination step
+const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
+const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
+console.log("from to", fromStepNo, toStepNo);
+// variable to store initial address information for first step on the map
+// fromStepNo stores step
+let initialAddressState = { fromStepNo: fromStepNo, toStepNo: toStepNo };
+// if we start with pickup then we need to initialize fromAddress and fromData
+if (fromStepNo < toStepNo) {
+  initialAddressState = {
+    ...initialAddressState,
+    toFirst: false,
+    fromAddress: config.map.forceStartLocation
+      ? config.map.startLocation.address
+      : "Type in address",
+    fromData: {
+      geometry: {
+        location: {
+          lat: config.map.startLocation.latitude,
+          lng: config.map.startLocation.longitude
+        }
+      }
+    }
+  };
+} else {
+  initialAddressState = {
+    ...initialAddressState,
+    toFirst: true,
+    toAddress: config.map.forceStartLocation
+      ? config.map.startLocation.address
+      : "Type in address",
+    toData: {
+      geometry: {
+        location: {
+          lat: config.map.startLocation.latitude,
+          lng: config.map.startLocation.longitude
+        }
+      }
+    }
+  };
+}
+
+// initial values for reducer
 const initialState = {
   currStepNo: 0,
   currStep: ORDERING_STEPS[0],
-  fromAddress: config.map.forceStartLocation
-    ? config.map.startLocation.address
-    : "Type in address",
-  fromData: {
-    geometry: {
-      location: {
-        lat: config.map.startLocation.latitude,
-        lng: config.map.startLocation.longitude
-      }
-    }
-  },
   /* vehicles displated on the map */
   vehicles: [],
   /* vehicles returned from search when ordering, avialable for booking */
   availableVehicles: [],
   selectedVehicle: {},
-  time: "Now"
+  time: "Now",
+  ...initialAddressState
 };
 
 export default function orderingReducer(state = initialState, action) {
