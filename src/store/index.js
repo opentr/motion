@@ -2,6 +2,7 @@ import { compose, combineReducers, createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
 import { persistStore, autoRehydrate } from "redux-persist";
 import { AsyncStorage } from "react-native";
+import { composeWithDevTools } from "remote-redux-devtools";
 
 // reducer connected to rehydrate from redux-persist
 // this enables us to wait for data about user and app to load first
@@ -18,11 +19,13 @@ const reducers = combineReducers({
   ordering: orderingReducer
 });
 
+const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
+
 // create redux store with combined reducers and middleware
 const store = createStore(
   reducers,
   {},
-  compose(applyMiddleware(thunkMiddleware), autoRehydrate())
+  composeEnhancers(applyMiddleware(thunkMiddleware), autoRehydrate())
 );
 
 // react-native
