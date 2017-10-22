@@ -186,20 +186,21 @@ export function onRecenterMap(stepId) {
           longitude:
             (ordering.fromData.geometry.location.lng +
               ordering.toData.geometry.location.lng) /
-            2,
+              2 -
+            0.002,
           latitudeDelta: Math.max(
-            0.0024,
+            0.0026,
             Math.abs(
               ordering.toData.geometry.location.lat -
                 ordering.fromData.geometry.location.lat
-            ) * 1.3
+            ) * 1.5
           ),
           longitudeDelta: Math.max(
-            0.0024,
+            0.0026,
             Math.abs(
               ordering.toData.geometry.location.lng -
                 ordering.fromData.geometry.location.lng
-            ) * 1.3
+            ) * 1.7
           )
         })
       );

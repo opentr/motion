@@ -234,12 +234,18 @@ class Map extends PureComponent {
                 <View
                   style={{
                     backgroundColor: config.colors.secondary,
-                    padding: 3
+                    padding: 3,
+                    borderRadius: 5
                   }}
                 >
                   <Text
                     numberOfLines={1}
-                    style={{ color: "white", fontSize: 16, padding: 3 }}
+                    style={{
+                      color: "white",
+                      fontSize:
+                        this.props.region.latitudeDelta < 0.002 ? 14 : 16,
+                      padding: 3
+                    }}
                   >
                     {this.props.ordering.toAddress}
                   </Text>
