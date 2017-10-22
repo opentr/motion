@@ -29,7 +29,10 @@ class SelectVehicle extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.onSearchForVehicle();
+    console.log("active", this.props.active);
+    if (this.props.active) {
+      this.props.onSearchForVehicle();
+    }
   }
 
   keyExtractor = (item, index) => index;
@@ -38,6 +41,7 @@ class SelectVehicle extends PureComponent {
     <SelectVehicleItem
       data={item}
       index={index}
+      inTransition={this.props.inTransition}
       onPressItem={this.props.onSelectVehicle}
     />
     //  id={item.id}

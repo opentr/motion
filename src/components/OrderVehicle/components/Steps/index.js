@@ -28,7 +28,9 @@ class Steps extends Component {
     this.state = {
       inPrevTransition: false,
       inNextTransition: false,
-      viewTranslateX: new Animated.Value(-currStepNo * width)
+      viewTranslateX: new Animated.Value(0),
+      /* which slide is current step using */
+      currStepSlide: "first"
     };
   }
 
@@ -39,22 +41,38 @@ class Steps extends Component {
     if (nextProps.currStepNo !== currStepNo) {
       let stateUpdate = {};
 
-      Animated.timing(
-        // Animate over time
-        this.state.viewTranslateX, // The animated value to drive
+      let inNextTransition = nextProps.currStepNo > currStepNo,
+        inPrevTransition = nextProps.currStepNo < currStepNo;
+
+      this.state.viewTranslateX.setValue(inPrevTransition ? -width : 0);
+
+      this.setState(
         {
-          toValue: -nextProps.currStepNo * width,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-          duration: 500
+          inNextTransition: inNextTransition,
+          inPrevTransition: inPrevTransition,
+          currStepSlide:
+            this.state.currStepSlide === "first" ? "second" : "first"
+        },
+        () => {
+          Animated.timing(
+            // Animate over time
+            this.state.viewTranslateX, // The animated value to drive
+            {
+              toValue: inPrevTransition ? 0 : -width,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+              duration: 500
+            }
+          ).start(() => {
+            console.log("finished now");
+            this.setState({
+              inPrevTransition: false,
+              inNextTransition: false
+            });
+            this.state.viewTranslateX.setValue(0);
+          });
         }
-      ).start(() => {
-        console.log("finished now");
-        // this.setState({
-        //   inPrevTransition: false,
-        //   inNextTransition: false
-        // });
-      });
+      );
     }
   }
 
@@ -82,32 +100,29 @@ class Steps extends Component {
     );
 
     return (
-      <View
+      <Animated.View
         style={{
-          width: width,
-          height: height * 2
+          ...style,
+          /* view is maximum 2 widths of a slider since we can see at most 2 slides at the same time */
+          width: 2 * width,
+          position: "absolute",
+          left: 0,
+          top: 0,
+          alignItems: "flex-start",
+          transform: [{ translateX: this.state.viewTranslateX }]
         }}
       >
-        <Animated.View
-          style={{
-            ...style,
-            width: totalSteps * width,
-            left: 0,
-            top: 0,
-            transform: [{ translateX: this.state.viewTranslateX }]
-          }}
-        >
-          <VisibleSteps
-            currStepNo={currStepNo}
-            width={width}
-            totalWidth={totalSteps * width}
-            inNextTransition={inNextTransition}
-            inPrevTransition={inPrevTransition}
-            renderStep={renderStep}
-            steps={this.props.steps}
-          />
-        </Animated.View>
-      </View>
+        <VisibleSteps
+          currStepNo={currStepNo}
+          width={width}
+          totalWidth={totalSteps * width}
+          inNextTransition={inNextTransition}
+          inPrevTransition={inPrevTransition}
+          renderStep={renderStep}
+          steps={this.props.steps}
+          currStepSlide={this.state.currStepSlide}
+        />
+      </Animated.View>
     );
   }
 }

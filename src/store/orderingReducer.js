@@ -428,6 +428,7 @@ const ACTION_HANDLERS = {
 const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
 const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
 const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
+const vehicleSelectStepNo = findWithAttr(ORDERING_STEPS, "id", "vehicleSelect");
 const confirmationStepNo = findWithAttr(ORDERING_STEPS, "id", "confirmation");
 console.log("from to", fromStepNo, toStepNo);
 // variable to store initial address information for first step on the map
@@ -436,6 +437,7 @@ let initialAddressState = {
   fromStepNo: fromStepNo,
   toStepNo: toStepNo,
   timeStepNo: timeStepNo,
+  vehicleSelectStepNo: vehicleSelectStepNo,
   confirmationStepNo: confirmationStepNo
 };
 // if we start with pickup then we need to initialize fromAddress and fromData

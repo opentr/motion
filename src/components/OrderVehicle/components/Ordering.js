@@ -351,38 +351,52 @@ class Ordering extends PureComponent {
     );
   }
 
-  getStep(step, index) {
-    // console.log("get step now", step);
-    // return (
-    //   <Text
-    //     onPress={this.onNextStep}
-    //     style={{
-    //       fontSize: 30,
-    //       color: "green",
-    //       textAlign: "center"
-    //     }}
-    //   >
-    //     {step.id}
-    //   </Text>
-    // );
-
+  getStep(step, index, inPrevTransition, inNextTransition) {
     const currStepId = step.id;
     switch (currStepId) {
       case "from":
       case "to":
       case "time":
-        return <SelectFromToTime key={index} {...step.data} />;
+        return (
+          <SelectFromToTime
+            key={index}
+            {...step.data}
+            inPrevTransition={inPrevTransition}
+            inNextTransition={inNextTransition}
+          />
+        );
         break;
 
       case "vehicleSelect":
-        return <SelectVehicle key={index} {...step.data} />;
+        return (
+          <SelectVehicle
+            key={index}
+            {...step.data}
+            inPrevTransition={inPrevTransition}
+            inNextTransition={inNextTransition}
+          />
+        );
         break;
 
       case "confirmation":
-        return <Confirmation key={index} {...step.data} />;
+        return (
+          <Confirmation
+            key={index}
+            {...step.data}
+            inPrevTransition={inPrevTransition}
+            inNextTransition={inNextTransition}
+          />
+        );
         break;
       case "traveling":
-        return <Traveling key={index} {...step.data} />;
+        return (
+          <Traveling
+            key={index}
+            {...step.data}
+            inPrevTransition={inPrevTransition}
+            inNextTransition={inNextTransition}
+          />
+        );
         break;
       default:
         break;
@@ -415,6 +429,9 @@ class Ordering extends PureComponent {
         case "vehicleSelect":
           step.data = {
             width: width,
+            active:
+              this.props.ordering.currStepNo ===
+              this.props.ordering.vehicleSelectStepNo,
             availableVehicles: this.props.availableVehicles,
             onSearchForVehicle: this.props.onSearchForVehicle,
             onSelectVehicle: this.props.onSelectVehicle

@@ -13,8 +13,18 @@ class VisibleSteps extends Component {
   render() {
     console.log("render VisibleSteps now", this.props);
 
+    // {
+    //   renderStep(
+    //     steps[currStepNo - 1],
+    //     currStepNo - 1,
+    //     inPrevTransition,
+    //     inNextTransition
+    //   );
+    // }
+
     const {
       currStepNo,
+      currStepSlide,
       inPrevTransition,
       inNextTransition,
       width,
@@ -23,42 +33,82 @@ class VisibleSteps extends Component {
       steps
     } = this.props;
 
+    let slideOrder,
+      showFirstSlide,
+      showSecondSlide,
+      firstSlideStep,
+      secondSlideStep;
+
+    if (inPrevTransition) {
+      showFirstSlide = showSecondSlide = true;
+      if (currStepSlide === "first") {
+        slideOrder = "row";
+        firstSlideStep = currStepNo;
+        secondSlideStep = currStepNo + 1;
+      } else {
+        slideOrder = "row-reverse";
+        firstSlideStep = currStepNo + 1;
+        secondSlideStep = currStepNo;
+      }
+    } else if (inNextTransition) {
+      showFirstSlide = showSecondSlide = true;
+      if (currStepSlide === "first") {
+        slideOrder = "row-reverse";
+        firstSlideStep = currStepNo;
+        secondSlideStep = currStepNo - 1;
+      } else {
+        slideOrder = "row";
+        firstSlideStep = currStepNo - 1;
+        secondSlideStep = currStepNo;
+      }
+    } else {
+      showFirstSlide = currStepSlide === "first";
+      showSecondSlide = currStepSlide === "second";
+      if (showFirstSlide) firstSlideStep = currStepNo;
+      if (showSecondSlide) secondSlideStep = currStepNo;
+    }
+
     return (
       <View
         style={{
-          width: totalWidth,
+          width: width * 2,
           height: "auto",
-          flexDirection: "row"
+          flexDirection: slideOrder
         }}
       >
-        {/* {currStepNo > 0 && (
+        {showFirstSlide && (
           <View
-            key="next"
+            key="first"
             style={{
               width: width,
-              height: 200
+              minHeight: 400
             }}
           >
-            {renderStep(steps[currStepNo - 1])}
+            {renderStep(
+              steps[firstSlideStep],
+              firstSlideStep,
+              inPrevTransition,
+              inNextTransition
+            )}
           </View>
-        )} */}
+        )}
 
-        {steps.map((step, index) => (
-          <View key={step.id} style={{ width: width, height: "auto" }}>
-            {React.cloneElement(renderStep(step, index), { ...step.data })}
+        {showSecondSlide && (
+          <View
+            key="second"
+            style={{
+              width: width,
+              minHeight: 400
+            }}
+          >
+            {renderStep(
+              steps[secondSlideStep],
+              secondSlideStep,
+              inPrevTransition,
+              inNextTransition
+            )}
           </View>
-        ))}
-
-        {/* <View
-          key="prev"
-          style={{
-            width: width,
-            justifyContent: "flex-start",
-            height: 200
-          }}
-        >
-          {renderStep(steps[currStepNo + 1])}
-        </View> */}
+        )}
       </View>
     );
   }

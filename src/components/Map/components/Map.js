@@ -123,7 +123,7 @@ class Map extends PureComponent {
       () => {
         this.props.reverseGeocodeLocation();
       },
-      300
+      150
     );
   }
 

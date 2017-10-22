@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 
 import { Provider } from "react-redux";
 
-import store from "./store/";
+import store from "./store/createStore";
 
 import AppView from "./AppView";
 

@@ -59,6 +59,7 @@ class SelectVehicleItem extends PureComponent {
           </Text>
           <Image
             source={{ uri: image_url }}
+            fadeDuration={this.props.inPrevTransition ? 0 : 100}
             resizeMode="contain"
             style={{ width: 105, marginTop: 5, height: 60 }}
           />
