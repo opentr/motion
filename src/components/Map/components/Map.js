@@ -1,9 +1,17 @@
 import React, { PureComponent } from "react";
-import { Dimensions, InteractionManager, View, Image } from "react-native";
+import {
+  Dimensions,
+  InteractionManager,
+  View,
+  Image,
+  PermissionsAndroid,
+  Platform
+} from "react-native";
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
 import { findWithAttr } from "../../../utils/search";
 
+const equal = require("fast-deep-equal");
 const timer = require("react-native-timer");
 
 import config from "../../../config/config";
@@ -27,9 +35,11 @@ class Map extends PureComponent {
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
     this.restartUpdating = this.restartUpdating.bind(this);
+    // this.onMapReady = this.onMapReady.bind(this);
 
     this.state = {
-      mapExpanded: false
+      mapExpanded: false,
+      myPosition: null
     };
   }
 
@@ -64,6 +74,7 @@ class Map extends PureComponent {
   }
 
   componentWillUnmount() {
+    if (this.watchID) navigator.geolocation.clearWatch(this.watchID);
     this.stopUpdating();
   }
 
@@ -127,6 +138,33 @@ class Map extends PureComponent {
     );
   }
 
+  // onMapReady() {
+  //   if (Platform.OS === "android") {
+  //     PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //     ).then(granted => {
+  //       if (granted && this.mounted) this.watchLocation();
+  //     });
+  //   } else {
+  //     this.watchLocation();
+  //   }
+  // }
+
+  // watchLocation() {
+  //   // eslint-disable-next-line no-undef
+  //   this.watchID = navigator.geolocation.watchPosition(
+  //     position => {
+  //       const myLastPosition = this.state.myPosition;
+  //       const myPosition = position.coords;
+  //       if (!equal(myPosition, myLastPosition)) {
+  //         this.setState({ myPosition });
+  //       }
+  //     },
+  //     null,
+  //     config.map.geolocation
+  //   );
+  // }
+
   render() {
     // console.log("render", this.state);
 
@@ -140,6 +178,13 @@ class Map extends PureComponent {
       height:
         height - config.ordering.height + (this.state.mapExpanded ? 100 : 0)
     };
+
+    // const { myPosition } = this.state;
+    // if (myPosition) {
+    //   const heading = myPosition.heading;
+    //   const rotate =
+    //     typeof heading === "number" && heading >= 0 ? `${heading}deg` : null;
+    // }
 
     return (
       <View style={mapStyle}>
@@ -205,6 +250,26 @@ class Map extends PureComponent {
               coordinates={this.props.ordering.route}
               strokeWidth={2}
               strokeColor="red"
+            />
+          )}
+          {this.state.myPosition && (
+            <MapView.Marker
+              key={index}
+              anchor={{ x: 0.5, y: 0.5 }}
+              style={{
+                transform: [{ rotateZ: vehicle.heading + "deg" }],
+                opacity:
+                  !this.state.mapExpanded ||
+                  (this.state.mapExpanded &&
+                    vehicle.id === this.props.ordering.selectedVehicle.id)
+                    ? 1
+                    : 0.1
+              }}
+              coordinate={{
+                latitude: vehicle.position.lat,
+                longitude: vehicle.position.lng
+              }}
+              image={require("../../../assets/car.png")}
             />
           )}
         </MapView>

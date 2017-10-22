@@ -44,6 +44,14 @@ export function onUpdateOrderingData(data = {}) {
   return { type: UPDATE_ORDERING_DATA, payload: data };
 }
 
+function radiusToMeters(value) {
+  return Math.round(value * 111 * 1.60934 * 1000);
+}
+
+function metersToRadius(value) {
+  return Math.round(value / (111 * 1.60934 * 1000));
+}
+
 /**
  * load vehicles list from API for the region we are in, this only displays vehicles on the map
  */
@@ -61,7 +69,7 @@ export function onLoadVehicles() {
     // formula is - delta * 111 = radius in miles
     // we multiply by 1.60936 to get kilometers
     // and multiply by 1000 to get meters
-    const radius = Math.round(region.latitudeDelta * 111 * 1.60934 * 1000);
+    const radius = radiusToMeters(region.latitudeDelta);
 
     // fetch data from API
     let url =
@@ -105,6 +113,78 @@ export function onLoadVehicles() {
   };
 }
 
+/**
+ * Contextually recenters the map based on the step in ordering process
+ * @param {*String} stepId 
+ */
+export function onRecenterMap(stepId) {
+  console.log("on recenter map now", stepId);
+  return (dispatch, getState) => {
+    const ordering = getState().ordering;
+
+    if (stepId.constructor !== String) stepId = ordering.currStep.id;
+
+    const region = Object.assign({}, getState().map.region);
+
+    // console.log(
+    //   "recenter now ",
+    //   "stepId",
+    //   stepId,
+    //   "arguments",
+    //   arguments,
+    //   "ordering",
+    //   ordering,
+    //   "region",
+    //   region,
+    //   "ordering.toFirst",
+    //   ordering.toFirst,
+    //   metersToRadius(1000)
+    // );
+
+    if (stepId === "to" && ordering.toData) {
+      return dispatch(
+        onRegionChange({
+          ...region,
+          latitudeDelta: config.map.recenterZoom.to, //region.latitudeDelta,
+          longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
+        })
+      );
+    } else if (stepId === "from" && ordering.fromData) {
+      return dispatch(
+        onRegionChange({
+          ...region,
+          latitudeDelta: config.map.recenterZoom.from,
+          longitudeDelta: config.map.recenterZoom.from
+        })
+      );
+    } else if (ordering.toData && ordering.fromData) {
+      // recenter region focusing on pickup and destination
+      return dispatch(
+        onRegionChange({
+          latitude:
+            (ordering.fromData.geometry.location.lat +
+              ordering.toData.geometry.location.lat) /
+            2,
+          longitude:
+            (ordering.fromData.geometry.location.lng +
+              ordering.toData.geometry.location.lng) /
+            2,
+          latitudeDelta:
+            Math.abs(
+              ordering.toData.geometry.location.lat -
+                ordering.fromData.geometry.location.lat
+            ) * 1.3,
+          longitudeDelta:
+            Math.abs(
+              ordering.toData.geometry.location.lng -
+                ordering.fromData.geometry.location.lng
+            ) * 1.3
+        })
+      );
+    }
+  };
+}
+
 /** handles click on the next step */
 export function onNextStep() {
   return (dispatch, getState) => {
@@ -141,6 +221,12 @@ export function onNextStep() {
         addToData.route = [];
       }
 
+      // update data to reflect prev step
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: { ...addToData, currStepNo: nextStepNo, currStep: nextStep }
+      });
+
       // if this is second step in pickup/destination ordering steps
       //  zoom in region with from / to in the center
       if (
@@ -148,36 +234,8 @@ export function onNextStep() {
           ORDERING_STEPS[ordering.currStepNo].id === "to") ||
         (ordering.toFirst && ORDERING_STEPS[ordering.currStepNo].id === "from")
       ) {
-        // recenter region focusing on pickup and destination
-        dispatch(
-          onRegionChange({
-            latitude:
-              (ordering.fromData.geometry.location.lat +
-                ordering.toData.geometry.location.lat) /
-              2,
-            longitude:
-              (ordering.fromData.geometry.location.lng +
-                ordering.toData.geometry.location.lng) /
-              2,
-            latitudeDelta:
-              Math.abs(
-                ordering.toData.geometry.location.lat -
-                  ordering.fromData.geometry.location.lat
-              ) + 0.0175,
-            longitudeDelta:
-              Math.abs(
-                ordering.toData.geometry.location.lng -
-                  ordering.fromData.geometry.location.lng
-              ) + 0.0175
-          })
-        );
+        dispatch(onRecenterMap("route"));
       }
-
-      // update data to reflect prev step
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: { ...addToData, currStepNo: nextStepNo, currStep: nextStep }
-      });
     }
   };
 }
@@ -200,25 +258,11 @@ export function onPrevStep() {
       if (prevStep.id === "to") {
         addToData.route = [];
         // recenter map to destination
-        dispatch(
-          onRegionChange({
-            latitude: ordering.toData.geometry.location.lat,
-            longitude: ordering.toData.geometry.location.lng,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta
-          })
-        );
+        dispatch(onRecenterMap("to"));
       } else if (prevStep.id === "from") {
         addToData.route = [];
         // recenter map to pick up location
-        dispatch(
-          onRegionChange({
-            latitude: ordering.fromData.geometry.location.lat,
-            longitude: ordering.fromData.geometry.location.lng,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta
-          })
-        );
+        dispatch(onRecenterMap("from"));
       } else if (prevStep.id === "vehicleSelect") {
         // reset data about available vehicles, not to diplsay vehicles for last ordering location
         addToData = {

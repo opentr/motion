@@ -169,7 +169,7 @@ class SelectFromToTime extends PureComponent {
       value = "",
       action = "";
 
-    console.log("render from to now", this.props);
+    // console.log("render from to now", this.props);
 
     if (
       !("ordering" in this.props) ||

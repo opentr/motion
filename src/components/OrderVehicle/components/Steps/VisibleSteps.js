@@ -11,7 +11,7 @@ class VisibleSteps extends Component {
   };
 
   render() {
-    console.log("render VisibleSteps now", this.props);
+    // console.log("render VisibleSteps now", this.props);
 
     // {
     //   renderStep(

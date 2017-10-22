@@ -299,7 +299,7 @@ class Ordering extends PureComponent {
       this.props.ordering.currStepNo > 0 && (
         <TouchableOpacity
           onPress={this.props.onPrevStep}
-          activeOpacity={1}
+          activeOpacity={0.8}
           style={{
             position: "absolute",
             top: 50,
@@ -320,10 +320,34 @@ class Ordering extends PureComponent {
     );
   }
 
+  getRecenterButton() {
+    return (
+      <TouchableOpacity
+        onPress={this.props.onRecenterMap}
+        activeOpacity={0.8}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          zIndex: 20
+        }}
+      >
+        <Animated.Image
+          source={require("../../../assets/recenter.png")}
+          style={{
+            width: 24,
+            height: 24,
+            opacity: this.state.buttonOpacity
+          }}
+        />
+      </TouchableOpacity>
+    );
+  }
+
   getBackPanelButton() {
     return this.state.panelOpen ? (
       <TouchableOpacity
-        activeOpacity={1}
+        activeOpacity={0.8}
         onPress={this.onBack}
         style={{ marginRight: "auto", marginLeft: 20 }}
       >
@@ -465,7 +489,7 @@ class Ordering extends PureComponent {
     let data = {};
     const stepsData = this.getStepsData(currStepId, currStepNo, width);
 
-    console.log("steps now", stepsData);
+    // console.log("steps now", stepsData);
 
     return (
       <Steps
@@ -509,6 +533,9 @@ class Ordering extends PureComponent {
 
         {/* Back icon for closing input panel */}
         {this.getBackPanelButton()}
+
+        {/* Button to recenter map with context  */}
+        {this.getRecenterButton()}
 
         {/* White background of the panel */}
         <View

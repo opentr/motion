@@ -33,6 +33,15 @@ const config = {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
       address: "23e Grove End Rd"
+    },
+    geolocation: {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 1000
+    },
+    recenterZoom: {
+      from: 0.017,
+      to: 0.034
     }
   },
 

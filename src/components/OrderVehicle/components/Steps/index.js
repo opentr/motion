@@ -36,7 +36,7 @@ class Steps extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { currStepNo, width } = this.props;
-    console.log("nextProps now ", nextProps.currStepNo, currStepNo);
+    // console.log("nextProps now ", nextProps.currStepNo, currStepNo);
 
     if (nextProps.currStepNo !== currStepNo) {
       let stateUpdate = {};
@@ -88,12 +88,12 @@ class Steps extends Component {
 
     const { inPrevTransition, inNextTransition } = this.state;
 
-    console.log(
-      "render slider now",
-      totalSteps,
-      inPrevTransition,
-      inNextTransition
-    );
+    // console.log(
+    //   // "render slider now",
+    //   totalSteps,
+    //   inPrevTransition,
+    //   inNextTransition
+    // );
 
     return (
       <Animated.View
