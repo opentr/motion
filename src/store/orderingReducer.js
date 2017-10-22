@@ -1,6 +1,8 @@
 import config from "../config/config";
 import { REHYDRATE } from "redux-persist/constants";
 
+const Polyline = require("@mapbox/polyline");
+
 // import function so we can update region from ordering
 import { onRegionChange } from "./mapReducer";
 
@@ -134,6 +136,9 @@ export function onNextStep() {
       // reset data about available vehicles, not to diplsay vehicles for last ordering location
       if (nextStep.id === "vehicleSelect") {
         addToData.availableVehicles = [];
+      } else if (nextStep.id === "time") {
+        dispatch(getRoute());
+        addToData.route = [];
       }
 
       // if this is second step in pickup/destination ordering steps
@@ -193,6 +198,7 @@ export function onPrevStep() {
 
       // check if we need to recenter the map
       if (prevStep.id === "to") {
+        addToData.route = [];
         // recenter map to destination
         dispatch(
           onRegionChange({
@@ -203,6 +209,7 @@ export function onPrevStep() {
           })
         );
       } else if (prevStep.id === "from") {
+        addToData.route = [];
         // recenter map to pick up location
         dispatch(
           onRegionChange({
@@ -229,12 +236,64 @@ export function onPrevStep() {
 }
 
 /**
+ * get directions between pickup and destination
+ */
+export function getRoute() {
+  return (dispatch, getState) => {
+    // get starting point data from state
+
+    const fromData = getState().ordering.fromData;
+    const toData = getState().ordering.toData;
+
+    if (!fromData || !toData) {
+      return false;
+    }
+
+    fetch(
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${fromData
+        .geometry.location.lat},${fromData.geometry.location
+        .lng}&destination=${toData.geometry.location.lat},${toData.geometry
+        .location.lng}`
+    )
+      .then(
+        response => response.json(),
+        error =>
+          console.log("An error occured loading search vehicle results.", error)
+      )
+      .then(json => {
+        console.log("route json", json);
+        if (!("routes" in json)) return false;
+
+        let points = Polyline.decode(json.routes[0].overview_polyline.points);
+        let coords = points.map((point, index) => {
+          return {
+            latitude: point[0],
+            longitude: point[1]
+          };
+        });
+
+        // dispatch map update with vehicles update
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            route: coords
+          }
+        });
+      });
+  };
+}
+/**
  * search for vehicles that are close to our from address, so we can display results
  */
 export function onSearchForVehicle() {
   return (dispatch, getState) => {
     // get starting point data from state
+
     const fromData = getState().ordering.fromData;
+
+    if (!fromData) {
+      return false;
+    }
 
     // get search radius from config
     const radius = config.api.openTransport.searchRadius;
@@ -270,22 +329,22 @@ export function onSearchForVehicle() {
         const responseVehicles = json.vehicles || [];
 
         // dispatch map update with vehicles update
-        // dispatch({
-        //   type: UPDATE_ORDERING_DATA,
-        //   payload: {
-        //     availableVehicles: responseVehicles
-        //   }
-        // });
-
-        // dispatch map update with vehicles update
         dispatch({
           type: UPDATE_ORDERING_DATA,
           payload: {
-            availableVehicles: responseVehicles.filter(
-              v => v.status === "available"
-            )
+            availableVehicles: responseVehicles
           }
         });
+
+        // // dispatch map update with vehicles update
+        // dispatch({
+        //   type: UPDATE_ORDERING_DATA,
+        //   payload: {
+        //     availableVehicles: responseVehicles.filter(
+        //       v => v.status === "available"
+        //     )
+        //   }
+        // });
       });
   };
 }
@@ -422,6 +481,7 @@ const initialState = {
   vehicles: [],
   /* vehicles returned from search when ordering, avialable for booking */
   availableVehicles: [],
+  route: [],
   selectedVehicle: {},
   time: "Now",
   ...initialAddressState

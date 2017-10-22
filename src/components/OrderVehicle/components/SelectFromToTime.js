@@ -170,15 +170,23 @@ class SelectFromToTime extends PureComponent {
       action = "";
 
     console.log("render from to now", this.props);
+
+    if (
+      !("ordering" in this.props) ||
+      ("ordering" in this.props && !("fromStepNo" in this.props.ordering))
+    ) {
+      return null;
+    }
+
     switch (this.props.stepId) {
       case "from":
         title = ORDERING_STEPS[this.props.ordering.fromStepNo].title;
-        value = this.props.ordering.fromAddress;
+        value = this.props.ordering.fromAddress || "";
         action = ORDERING_STEPS[this.props.ordering.fromStepNo].action;
         break;
       case "to":
         title = ORDERING_STEPS[this.props.ordering.toStepNo].title;
-        value = this.props.ordering.toAddress;
+        value = this.props.ordering.toAddress || "";
         action = ORDERING_STEPS[this.props.ordering.toStepNo].action;
         break;
       case "time":
@@ -209,7 +217,7 @@ class SelectFromToTime extends PureComponent {
             }
           ]}
         >
-          {title} {this.props.stepId}
+          {title}
         </Animated.Text>
         {/* Expanded address input view */}
         {this.getExpandedAddressInput()}

@@ -200,6 +200,13 @@ class Map extends PureComponent {
                 image={require("../../../assets/car.png")}
               />
             ))}
+          {this.props.ordering.route && (
+            <MapView.Polyline
+              coordinates={this.props.ordering.route}
+              strokeWidth={2}
+              strokeColor="red"
+            />
+          )}
         </MapView>
         {/* Show overlay map cursor only if you are choosing location, like from and to steps */}
         {(this.props.ordering.currStep.id === "from" ||
