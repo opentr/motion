@@ -3,6 +3,7 @@ import {
   Dimensions,
   InteractionManager,
   View,
+  Text,
   Image,
   PermissionsAndroid,
   Platform
@@ -215,14 +216,44 @@ class Map extends PureComponent {
           {this.props.ordering.currStepNo > this.props.ordering.toStepNo && (
             <MapView.Marker
               key={"toMarker"}
-              anchor={{ x: 0.5, y: 0.5 }}
+              anchor={{ x: 0.5, y: 1 }}
               style={{ zIndex: 1000 }}
               coordinate={{
                 latitude: this.props.ordering.toData.geometry.location.lat,
                 longitude: this.props.ordering.toData.geometry.location.lng
               }}
-              image={require("../../../assets/pinMap.png")}
-            />
+            >
+              <View
+                style={{
+                  maxWidth: 160,
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "center"
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: config.colors.secondary,
+                    padding: 3
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{ color: "white", fontSize: 16, padding: 3 }}
+                  >
+                    {this.props.ordering.toAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: 3,
+                    maxWidth: 3,
+                    height: 10,
+                    backgroundColor: config.colors.secondary
+                  }}
+                />
+              </View>
+            </MapView.Marker>
           )}
           {this.props.ordering.currStep.id !== "traveling" &&
             this.props.vehicles.map((vehicle, index) => (

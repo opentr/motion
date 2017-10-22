@@ -122,7 +122,7 @@ export function onRecenterMap(stepId) {
   return (dispatch, getState) => {
     const ordering = getState().ordering;
 
-    if (stepId.constructor !== String) stepId = ordering.currStep.id;
+    if (typeof stepId !== "string") stepId = ordering.currStep.id;
 
     const region = Object.assign({}, getState().map.region);
 
@@ -149,17 +149,35 @@ export function onRecenterMap(stepId) {
           longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
         })
       );
-    } else if (stepId === "from" && ordering.fromData) {
+    } else if (stepId === "toPrev" && ordering.toData) {
       return dispatch(
+        onRegionChange({
+          latitude: ordering.toData.geometry.location.lat,
+          longitude: ordering.toData.geometry.location.lng,
+          latitudeDelta: config.map.recenterZoom.to, //region.latitudeDelta,
+          longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
+        })
+      );
+    } else if (stepId === "from" && ordering.fromData) {
+      dispatch(
         onRegionChange({
           ...region,
           latitudeDelta: config.map.recenterZoom.from,
           longitudeDelta: config.map.recenterZoom.from
         })
       );
+    } else if (stepId === "fromPrev" && ordering.fromData) {
+      dispatch(
+        onRegionChange({
+          latitude: ordering.fromData.geometry.location.lat,
+          longitude: ordering.fromData.geometry.location.lng,
+          latitudeDelta: config.map.recenterZoom.to, //region.latitudeDelta,
+          longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
+        })
+      );
     } else if (ordering.toData && ordering.fromData) {
       // recenter region focusing on pickup and destination
-      return dispatch(
+      dispatch(
         onRegionChange({
           latitude:
             (ordering.fromData.geometry.location.lat +
@@ -169,16 +187,20 @@ export function onRecenterMap(stepId) {
             (ordering.fromData.geometry.location.lng +
               ordering.toData.geometry.location.lng) /
             2,
-          latitudeDelta:
+          latitudeDelta: Math.max(
+            0.0024,
             Math.abs(
               ordering.toData.geometry.location.lat -
                 ordering.fromData.geometry.location.lat
-            ) * 1.3,
-          longitudeDelta:
+            ) * 1.3
+          ),
+          longitudeDelta: Math.max(
+            0.0024,
             Math.abs(
               ordering.toData.geometry.location.lng -
                 ordering.fromData.geometry.location.lng
             ) * 1.3
+          )
         })
       );
     }
@@ -258,11 +280,11 @@ export function onPrevStep() {
       if (prevStep.id === "to") {
         addToData.route = [];
         // recenter map to destination
-        dispatch(onRecenterMap("to"));
+        dispatch(onRecenterMap("toPrev", true));
       } else if (prevStep.id === "from") {
         addToData.route = [];
         // recenter map to pick up location
-        dispatch(onRecenterMap("from"));
+        dispatch(onRecenterMap("fromPrev"));
       } else if (prevStep.id === "vehicleSelect") {
         // reset data about available vehicles, not to diplsay vehicles for last ordering location
         addToData = {
