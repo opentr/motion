@@ -26,9 +26,8 @@ class VisibleSteps extends Component {
     return (
       <View
         style={{
-          backgroundColor: "#f00",
           width: totalWidth,
-          height: 200,
+          height: "auto",
           flexDirection: "row"
         }}
       >
@@ -44,9 +43,9 @@ class VisibleSteps extends Component {
           </View>
         )} */}
 
-        {steps.map(step => (
-          <View key={step.id} style={{ width: width, height: 200 }}>
-            {renderStep(step)}
+        {steps.map((step, index) => (
+          <View key={step.id} style={{ width: width, height: "auto" }}>
+            {React.cloneElement(renderStep(step, index), { ...step.data })}
           </View>
         ))}
 

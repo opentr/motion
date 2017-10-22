@@ -351,38 +351,38 @@ class Ordering extends PureComponent {
     );
   }
 
-  getStep(step) {
-    console.log("get step now", step);
-    return (
-      <Text
-        onPress={this.onNextStep}
-        style={{
-          fontSize: 30,
-          color: "green",
-          textAlign: "center"
-        }}
-      >
-        {step.id}
-      </Text>
-    );
+  getStep(step, index) {
+    // console.log("get step now", step);
+    // return (
+    //   <Text
+    //     onPress={this.onNextStep}
+    //     style={{
+    //       fontSize: 30,
+    //       color: "green",
+    //       textAlign: "center"
+    //     }}
+    //   >
+    //     {step.id}
+    //   </Text>
+    // );
 
     const currStepId = step.id;
     switch (currStepId) {
       case "from":
       case "to":
       case "time":
-        return <SelectFromToTime key={step.id} {...step.data} />;
+        return <SelectFromToTime key={index} {...step.data} />;
         break;
 
       case "vehicleSelect":
-        return <SelectVehicle key={step.id} {...step.data} />;
+        return <SelectVehicle key={index} {...step.data} />;
         break;
 
       case "confirmation":
-        return <Confirmation key={step.id} {...step.data} />;
+        return <Confirmation key={index} {...step.data} />;
         break;
       case "traveling":
-        return <Traveling key={step.id} {...step.data} />;
+        return <Traveling key={index} {...step.data} />;
         break;
       default:
         break;
@@ -398,8 +398,9 @@ class Ordering extends PureComponent {
         case "time":
           step.data = {
             width: width,
-            stepId: currStepId,
+            stepId: step.id,
             panelOpen: this.state.panelOpen,
+            ordering: this.props.ordering,
             /* passing down animated props */
             animated: {
               titleTranslate: this.state.titleTranslate,
@@ -440,6 +441,8 @@ class Ordering extends PureComponent {
       }
       return step;
     });
+
+    console.log("steps now", stepsData);
 
     return (
       <Steps

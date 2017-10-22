@@ -4,8 +4,9 @@ import { View, Text, TextInput, Animated, Platform } from "react-native";
 
 const timer = require("react-native-timer");
 
-import config from "../../../../config/config";
-import styles from "../../../../styles/styles";
+import { ORDERING_STEPS } from "../../../store/orderingReducer";
+import config from "../../../config/config";
+import styles from "../../../styles/styles";
 
 class SelectFromToTime extends PureComponent {
   static propTypes = {
@@ -168,22 +169,22 @@ class SelectFromToTime extends PureComponent {
       value = "",
       action = "";
 
-    console.log("render from to", this.props);
+    console.log("render from to now", this.props);
     switch (this.props.stepId) {
       case "from":
-        title = this.props.ordering.currStep.title;
+        title = ORDERING_STEPS[this.props.ordering.fromStepNo].title;
         value = this.props.ordering.fromAddress;
-        action = this.props.ordering.currStep.action;
+        action = ORDERING_STEPS[this.props.ordering.fromStepNo].action;
         break;
       case "to":
-        title = this.props.ordering.currStep.title;
+        title = ORDERING_STEPS[this.props.ordering.toStepNo].title;
         value = this.props.ordering.toAddress;
-        action = this.props.ordering.currStep.action;
+        action = ORDERING_STEPS[this.props.ordering.toStepNo].action;
         break;
       case "time":
-        title = this.props.ordering.currStep.title;
+        title = ORDERING_STEPS[this.props.ordering.timeStepNo].title;
         value = this.props.ordering.time;
-        action = this.props.ordering.currStep.action;
+        action = ORDERING_STEPS[this.props.ordering.timeStepNo].action;
         break;
     }
 
@@ -208,7 +209,7 @@ class SelectFromToTime extends PureComponent {
             }
           ]}
         >
-          {title}
+          {title} {this.props.stepId}
         </Animated.Text>
         {/* Expanded address input view */}
         {this.getExpandedAddressInput()}

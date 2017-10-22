@@ -85,15 +85,12 @@ class Steps extends Component {
       <View
         style={{
           width: width,
-          height: height * 2,
-          marginTop: -100,
-          transform: [{ scale: 0.5 }]
+          height: height * 2
         }}
       >
         <Animated.View
           style={{
             ...style,
-            backgroundColor: "#0f0",
             width: totalSteps * width,
             left: 0,
             top: 0,
