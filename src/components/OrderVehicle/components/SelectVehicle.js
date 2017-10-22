@@ -26,12 +26,18 @@ class SelectVehicle extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.state = { searched: false };
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
     console.log("active", this.props.active);
-    if (this.props.active) {
+    if (
+      !this.state.searched &&
+      !nextProps.isPrevAnimation &&
+      !nextProps.isNextAnimation
+    ) {
       this.props.onSearchForVehicle();
+      this.setState({ searched: true });
     }
   }
 
@@ -52,7 +58,7 @@ class SelectVehicle extends PureComponent {
 
   render() {
     console.log("render select vehicles ", this.props.availableVehicles);
-    const vehicles = this.props.availableVehicles;
+    const { availableVehicles } = this.props;
 
     return (
       <View
@@ -64,7 +70,7 @@ class SelectVehicle extends PureComponent {
         <FlatList
           horizontal={true}
           legacyImplementation={false}
-          data={vehicles}
+          data={availableVehicles}
           keyExtractor={this.keyExtractor}
           renderItem={this.renderItem}
         />

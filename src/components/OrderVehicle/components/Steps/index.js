@@ -46,33 +46,29 @@ class Steps extends Component {
 
       this.state.viewTranslateX.setValue(inPrevTransition ? -width : 0);
 
-      this.setState(
+      this.setState({
+        inNextTransition: inNextTransition,
+        inPrevTransition: inPrevTransition,
+        currStepSlide: this.state.currStepSlide === "first" ? "second" : "first"
+      });
+
+      Animated.timing(
+        // Animate over time
+        this.state.viewTranslateX, // The animated value to drive
         {
-          inNextTransition: inNextTransition,
-          inPrevTransition: inPrevTransition,
-          currStepSlide:
-            this.state.currStepSlide === "first" ? "second" : "first"
-        },
-        () => {
-          Animated.timing(
-            // Animate over time
-            this.state.viewTranslateX, // The animated value to drive
-            {
-              toValue: inPrevTransition ? 0 : -width,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: true,
-              duration: 500
-            }
-          ).start(() => {
-            console.log("finished now");
-            this.setState({
-              inPrevTransition: false,
-              inNextTransition: false
-            });
-            this.state.viewTranslateX.setValue(0);
-          });
+          toValue: inPrevTransition ? 0 : -width,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+          duration: 500
         }
-      );
+      ).start(() => {
+        console.log("finished now");
+        this.setState({
+          inPrevTransition: false,
+          inNextTransition: false
+        });
+        this.state.viewTranslateX.setValue(0);
+      });
     }
   }
 
@@ -105,6 +101,7 @@ class Steps extends Component {
           ...style,
           /* view is maximum 2 widths of a slider since we can see at most 2 slides at the same time */
           width: 2 * width,
+          height: height,
           position: "absolute",
           left: 0,
           top: 0,
@@ -115,6 +112,7 @@ class Steps extends Component {
         <VisibleSteps
           currStepNo={currStepNo}
           width={width}
+          height={height}
           totalWidth={totalSteps * width}
           inNextTransition={inNextTransition}
           inPrevTransition={inPrevTransition}

@@ -109,8 +109,8 @@ export function onLoadVehicles() {
 export function onNextStep() {
   return (dispatch, getState) => {
     // check if prev step is from or to, to recenter map
-    const ordering = getState().ordering;
-    const region = getState().map.region;
+    const ordering = Object.assign({}, getState().ordering);
+    const region = Object.assign({}, getState().map.region);
 
     // check if previous step will be from or to location to recenter map there
     if (ordering.currStepNo < ORDERING_STEPS.length) {
@@ -264,21 +264,25 @@ export function getRoute() {
         console.log("route json", json);
         if (!("routes" in json)) return false;
 
-        let points = Polyline.decode(json.routes[0].overview_polyline.points);
-        let coords = points.map((point, index) => {
-          return {
-            latitude: point[0],
-            longitude: point[1]
-          };
-        });
+        try {
+          let points = Polyline.decode(json.routes[0].overview_polyline.points);
+          let coords = points.map((point, index) => {
+            return {
+              latitude: point[0],
+              longitude: point[1]
+            };
+          });
 
-        // dispatch map update with vehicles update
-        dispatch({
-          type: UPDATE_ORDERING_DATA,
-          payload: {
-            route: coords
-          }
-        });
+          // dispatch map update with vehicles update
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: {
+              route: coords
+            }
+          });
+        } catch (error) {
+          console.log(error);
+        }
       });
   };
 }

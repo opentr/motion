@@ -67,6 +67,7 @@ class Ordering extends PureComponent {
     this.onBack = this.onBack.bind(this);
     this.onNextStep = this.onNextStep.bind(this);
     this.getStep = this.getStep.bind(this);
+    this.getStepsData = this.getStepsData.bind(this);
     this.getStepsSlider = this.getStepsSlider.bind(this);
 
     // reference to ordering step component, will be set once the component is rendered
@@ -403,9 +404,9 @@ class Ordering extends PureComponent {
     }
   }
 
-  getStepsSlider(currStepId, currStepNo, width) {
-    let data = {};
-    const stepsData = ORDERING_STEPS.slice(0).map((step, index) => {
+  getStepsData(currStepId, currStepNo, width) {
+    return ORDERING_STEPS.slice(0).map((stepOrig, index) => {
+      let step = Object.assign({}, stepOrig);
       switch (step.id) {
         case "from":
         case "to":
@@ -458,11 +459,17 @@ class Ordering extends PureComponent {
       }
       return step;
     });
+  }
+
+  getStepsSlider(currStepId, currStepNo, width) {
+    let data = {};
+    const stepsData = this.getStepsData(currStepId, currStepNo, width);
 
     console.log("steps now", stepsData);
 
     return (
       <Steps
+        style={{ marginTop: 35 }}
         width={width}
         height={this.state.panelHeight}
         currStepNo={currStepNo}

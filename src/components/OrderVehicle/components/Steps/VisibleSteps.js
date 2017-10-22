@@ -28,6 +28,7 @@ class VisibleSteps extends Component {
       inPrevTransition,
       inNextTransition,
       width,
+      height,
       totalWidth,
       renderStep,
       steps
@@ -72,7 +73,7 @@ class VisibleSteps extends Component {
       <View
         style={{
           width: width * 2,
-          height: "auto",
+          height: height,
           flexDirection: slideOrder
         }}
       >
