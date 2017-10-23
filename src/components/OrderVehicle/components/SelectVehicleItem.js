@@ -98,11 +98,9 @@ class SelectVehicleItem extends PureComponent {
               backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
-            {placeholder ||
-            Number.isNaN(routeTime) ||
-            typeof routeTime === "undefined"
+            {placeholder || !("routeTime" in this.props.data)
               ? "     "
-              : "in " + Math.round(routeTime / 60) + "  min"}
+              : routeTime === "N/A" ? routeTime : "in " + routeTime + "  min"}
           </Text>
           <Text
             style={{

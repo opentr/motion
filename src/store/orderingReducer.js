@@ -323,21 +323,31 @@ export function onGetVehicleTime(id, location) {
       )
       .then(json => {
         console.log("route json vehicle time", json);
-        if (!("routes" in json)) return false;
 
+        // exit if there is no route or no legs information
+        if (!("routes" in json) || (json.routes && json.routes.length === 0))
+          return false;
+
+        // calculate route time
         let routeTime = 0;
         try {
           const route = json.routes[0];
           console.log("vehicle time route", route);
 
+          // if the route has no legs information
+          if (!"legs" in route) return false;
+
           route.legs.map(leg => {
             routeTime += leg.duration.value;
           });
+          routeTime = Math.round(routeTime / 60);
         } catch (error) {
           console.log(error);
-          routeTime = "N/A";
+          routeTime = false;
+          return false;
         }
 
+        // update vehicle list with specific time
         console.log("vehicle time route time ", routeTime);
         let availableVehicles = getState().ordering.availableVehicles.slice(0);
         const findId = findWithAttr(availableVehicles, "id", id);

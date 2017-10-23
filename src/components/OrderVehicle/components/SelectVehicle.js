@@ -58,9 +58,13 @@ class SelectVehicle extends PureComponent {
 
   render() {
     console.log("render select vehicles ", this.props.availableVehicles);
-    const { availableVehicles, inNextTransition } = this.props;
+    const {
+      availableVehicles,
+      inNextTransition,
+      inPrevTransition
+    } = this.props;
 
-    if (inNextTransition) {
+    if (inNextTransition || inPrevTransition) {
       return (
         <View
           style={{

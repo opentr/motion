@@ -245,7 +245,7 @@ class Map extends PureComponent {
               >
                 <View
                   style={{
-                    backgroundColor: config.colors.alert,
+                    backgroundColor: config.colors.secondary,
                     padding: 3,
                     borderRadius: 5
                   }}
@@ -267,7 +267,7 @@ class Map extends PureComponent {
                     width: 3,
                     maxWidth: 3,
                     height: 10,
-                    backgroundColor: config.colors.alert
+                    backgroundColor: config.colors.secondary
                   }}
                 />
               </View>
@@ -295,7 +295,7 @@ class Map extends PureComponent {
               >
                 <View
                   style={{
-                    backgroundColor: config.colors.secondary,
+                    backgroundColor: "red",
                     padding: 3,
                     borderRadius: 5
                   }}
