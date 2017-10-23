@@ -98,7 +98,9 @@ class SelectVehicleItem extends PureComponent {
               backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
-            {placeholder || !routeTime
+            {placeholder ||
+            Number.isNaN(routeTime) ||
+            typeof routeTime === "undefined"
               ? "     "
               : "in " + Math.round(routeTime / 60) + "  min"}
           </Text>
