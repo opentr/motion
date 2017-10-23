@@ -317,7 +317,7 @@ class Map extends PureComponent {
                     width: 3,
                     maxWidth: 3,
                     height: 10,
-                    backgroundColor: config.colors.secondary
+                    backgroundColor: "red"
                   }}
                 />
               </View>
@@ -347,8 +347,8 @@ class Map extends PureComponent {
           {this.props.ordering.route && (
             <MapView.Polyline
               coordinates={this.props.ordering.route}
-              strokeWidth={2}
-              strokeColor={config.colors.alert}
+              strokeWidth={3}
+              strokeColor="red"
             />
           )}
           {this.state.myPosition && (
