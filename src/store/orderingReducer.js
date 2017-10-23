@@ -53,6 +53,23 @@ function metersToRadius(value) {
 }
 
 /**
+ * RESET APP
+ */
+export function onResetApp() {
+  return {
+    type: UPDATE_ORDERING_DATA,
+    payload: {
+      currStepNo: 0,
+      currStep: ORDERING_STEPS[0],
+      selectedVehicle: {},
+      route: [],
+      routeLength: undefined,
+      booking: {}
+    }
+  };
+}
+
+/**
  * LOAD POSSIBLE STATUSES FOR THE BOOKING
  */
 export function onLoadBookingStatuses() {
@@ -84,8 +101,100 @@ export function onLoadBookingStatuses() {
 }
 
 /**
- * MAKE A BOOKING 
+ * CREATE A BOOKING 
  */
+export function onCreateBooking() {
+  return (dispatch, getState) => {
+    const ordering = getState().ordering;
+
+    // set pending status immediately
+    dispatch({
+      type: UPDATE_ORDERING_DATA,
+      payload: { booking: { status: "pending" } }
+    });
+
+    fetch(
+      config.api.openTransport.url +
+        config.api.openTransport.apiPrefix +
+        "/vehicles/" +
+        ordering.selectedVehicle.id +
+        "/bookings",
+      {
+        method: "post",
+        headers: {
+          Authorization: "Bearer " + config.api.openTransport.key
+        },
+        body: JSON.stringify({
+          customer_name: "John Smith",
+          customer_phone_number: "+44 1623 661787",
+          from_position: ordering.fromData.geometry.location,
+          to_position: ordering.toData.geometry.location
+        })
+      }
+    )
+      .then(
+        response => response.json(),
+        error => console.log("create booking - An error occured.", error)
+      )
+      .then(json => {
+        console.log("create booking ", json);
+        if (json.booking_id) {
+          // save booking info in state
+          json.id = json.booking_id;
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: { booking: json }
+          });
+        }
+      });
+  };
+}
+
+/** GET UPDATED BOOKING INFO */
+export function getBookingUpdate() {
+  return (dispatch, getState) => {
+    console.log("get booking update");
+    const bookingId = getState().ordering.booking.booking_id;
+
+    fetch(
+      config.api.openTransport.url +
+        config.api.openTransport.apiPrefix +
+        "/bookings/" +
+        bookingId,
+      {
+        method: "get",
+        headers: {
+          Authorization: "Bearer " + config.api.openTransport.key
+        }
+      }
+    )
+      .then(
+        response => response.json(),
+        error => console.log("get booking - An error occured.", error)
+      )
+      .then(json => {
+        console.log("get booking ", json);
+
+        const booking = getState().ordering.booking;
+        if (
+          json.booking &&
+          booking.id === json.booking.id &&
+          booking.status !== json.booking.status
+        ) {
+          // save booking info in state
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: {
+              booking: {
+                ...getState().ordering.booking,
+                ...json.booking
+              }
+            }
+          });
+        }
+      });
+  };
+}
 
 /**
  * LOAD VEHICLES LIST FROM API 
@@ -151,6 +260,30 @@ export function onLoadVehicles() {
           type: UPDATE_ORDERING_DATA,
           payload: { vehicles: responseVehicles }
         });
+
+        if (getState().ordering.currStep.id === "traveling") {
+          // keep updating the map on vehicle moving
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: { selectedVehicle: responseVehicles[0] }
+          });
+
+          const status = getState().ordering.booking.status;
+          if (
+            !(
+              status === "declined" ||
+              (status === "completed" ||
+                status === "cancelled_by_supplier" ||
+                status === "cancelled_by_user")
+            )
+          )
+            dispatch(
+              onGetVehicleTime(
+                responseVehicles[0].id,
+                responseVehicles[0].position
+              )
+            );
+        }
       });
   };
 }
@@ -219,6 +352,33 @@ export function onRecenterMap(stepId) {
           longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
         })
       );
+    } else if (stepId === "traveling") {
+      return dispatch(
+        onRegionChange({
+          latitude:
+            (ordering.fromData.geometry.location.lat +
+              ordering.selectedVehicle.position.lat) /
+            2,
+          longitude:
+            (ordering.fromData.geometry.location.lng +
+              ordering.selectedVehicle.position.lng) /
+            2,
+          latitudeDelta: Math.max(
+            0.005,
+            Math.abs(
+              ordering.fromData.geometry.location.lat -
+                ordering.selectedVehicle.position.lat
+            ) * 1.5
+          ),
+          longitudeDelta: Math.max(
+            0.005,
+            Math.abs(
+              ordering.fromData.geometry.location.lng -
+                ordering.selectedVehicle.position.lng
+            ) * 1.5
+          )
+        })
+      );
     } else if (ordering.toData && ordering.fromData) {
       // recenter region focusing on pickup and destination
       return dispatch(
@@ -243,7 +403,7 @@ export function onRecenterMap(stepId) {
             Math.abs(
               ordering.toData.geometry.location.lng -
                 ordering.fromData.geometry.location.lng
-            ) * 1.7
+            ) * 1.5
           )
         })
       );
@@ -301,6 +461,8 @@ export function onNextStep() {
         (ordering.toFirst && ORDERING_STEPS[ordering.currStepNo].id === "from")
       ) {
         dispatch(onRecenterMap("route"));
+      } else if (nextStep.id === "traveling") {
+        dispatch(onRecenterMap("traveling"));
       }
     }
   };
@@ -389,29 +551,63 @@ export function onGetVehicleTime(id, location) {
           return false;
         }
 
-        // update vehicle list with specific time
-        console.log("vehicle time route time ", routeTime);
-        let availableVehicles = getState().ordering.availableVehicles.slice(0);
-        const findId = findWithAttr(availableVehicles, "id", id);
-        console.log("vehicle time findId", findId);
+        const currStepId = getState().ordering.currStep.id;
 
-        if (findId !== -1) {
-          console.log("vehicle time assign");
+        console.log("update time ", currStepId);
 
-          const vehicle = availableVehicles[findId];
+        if (currStepId === "traveling") {
+          // update booking time to arrival
+          const booking = Object.assign({}, getState().ordering.booking);
 
-          availableVehicles.splice(findId, 1, {
-            ...vehicle,
-            routeTime: routeTime
-          });
+          console.log(
+            "update time ",
+            booking.booking_id,
+            id,
+            routeTime,
+            booking.booking_id === id
+          );
 
-          // dispatch map update with vehicles update
-          dispatch({
-            type: UPDATE_ORDERING_DATA,
-            payload: {
-              availableVehicles: availableVehicles
-            }
-          });
+          if (booking.vehicle_id === id && routeTime !== false) {
+            console.log("update driver away time ");
+            // dispatch map update with vehicles update
+            dispatch({
+              type: UPDATE_ORDERING_DATA,
+              payload: {
+                booking: { ...booking, driverAway: routeTime }
+              }
+            });
+          }
+          return false;
+        } else {
+          // if not traveling step then
+          // we are updating availableVehicles list
+
+          // update vehicle list with specific time
+          console.log("vehicle time route time ", routeTime);
+          let availableVehicles = getState().ordering.availableVehicles.slice(
+            0
+          );
+          const findId = findWithAttr(availableVehicles, "id", id);
+          console.log("vehicle time findId", findId);
+
+          if (findId !== -1) {
+            console.log("vehicle time assign");
+
+            const vehicle = availableVehicles[findId];
+
+            availableVehicles.splice(findId, 1, {
+              ...vehicle,
+              routeTime: routeTime
+            });
+
+            // dispatch map update with vehicles update
+            dispatch({
+              type: UPDATE_ORDERING_DATA,
+              payload: {
+                availableVehicles: availableVehicles
+              }
+            });
+          }
         }
       });
   };
@@ -431,12 +627,12 @@ export function getRoute() {
       return false;
     }
 
-    fetch(
-      `https://maps.googleapis.com/maps/api/directions/json?origin=${fromData
-        .geometry.location.lat},${fromData.geometry.location
-        .lng}&destination=${toData.geometry.location.lat},${toData.geometry
-        .location.lng}`
-    )
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${fromData
+      .geometry.location.lat},${fromData.geometry.location
+      .lng}&destination=${toData.geometry.location.lat},${toData.geometry
+      .location.lng}`;
+
+    fetch(url)
       .then(
         response => response.json(),
         error =>
@@ -578,10 +774,67 @@ export function onSelectVehicle(index) {
 }
 
 /**
+ * CREATE SET OF TIMEOUTS TO SIMULATE ORDERING
+ */
+export function simulateOrdering() {
+  return (dispatch, getState) => {
+    // dispatch booking is accepted
+    setTimeout(() => {
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: {
+          booking: { ...getState().ordering.booking, status: "accepted" }
+        }
+      });
+    }, 3000);
+
+    // dispatch driver on its way
+    setTimeout(() => {
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: {
+          booking: { ...getState().ordering.booking, status: "driver_on_way" }
+        }
+      });
+    }, 5000);
+
+    // dispatch driver arrives info
+    setTimeout(() => {
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: {
+          booking: { ...getState().ordering.booking, status: "driver_arriving" }
+        }
+      });
+    }, 12000);
+    // dispatch driver arrived
+    setTimeout(() => {
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: {
+          booking: { ...getState().ordering.booking, status: "driver_arrived" }
+        }
+      });
+    }, 30000);
+
+    // dispatch ride completed
+    setTimeout(() => {
+      dispatch({
+        type: UPDATE_ORDERING_DATA,
+        payload: {
+          booking: { ...getState().ordering.booking, status: "completed" }
+        }
+      });
+    }, 50000);
+  };
+}
+
+/**
  * action when user confirms booking and 
  */
 export function onConfirmBooking() {
   return dispatch => {
+    dispatch(onCreateBooking());
     dispatch(onNextStep());
   };
 }

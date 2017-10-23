@@ -96,6 +96,15 @@ class Ordering extends PureComponent {
       // mark that booking statuses was loaded from the API
       this.setState({ loadingBookingStatuses: false });
     }
+
+    if (
+      this.props.ordering.currStep.id === "traveling" &&
+      (nextProps.ordering.currStep.id === "from" ||
+        nextProps.ordering.currStep.id === "to")
+    ) {
+      this.setState({ panelHeight: config.ordering.height + 40 });
+      this.state.panelTranslate.setValue(0);
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -198,7 +207,7 @@ class Ordering extends PureComponent {
   closePanel() {
     if (this.state.panelAnimating || this.state.openPanel) return false;
 
-    const toValue = this.props.ordering.currStep.id === "traveling" ? 100 : 0;
+    const toValue = this.props.ordering.currStep.id === "traveling" ? 150 : 0;
 
     // set closed state
     this.setState({
@@ -318,6 +327,7 @@ class Ordering extends PureComponent {
 
   getPrevStepButton() {
     return (
+      this.props.ordering.currStep.id !== "traveling" &&
       (!this.state.panelOpen ||
         this.props.ordering.currStep.id === "confirmation") &&
       this.props.ordering.currStepNo > 0 && (
@@ -501,6 +511,11 @@ class Ordering extends PureComponent {
         case "traveling":
           step.data = {
             width: width,
+            getBookingUpdate: this.props.getBookingUpdate,
+            onRecenterMap: this.props.onRecenterMap,
+            onResetApp: this.props.onResetApp,
+            simulateOrdering: this.props.simulateOrdering,
+            booking: this.props.ordering.booking,
             toAddress: this.props.ordering.toAddress
           };
         default:

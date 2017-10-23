@@ -79,9 +79,9 @@ class Map extends PureComponent {
     this.stopUpdating();
   }
 
-  startUpdating() {
+  startUpdating(callFirst = true) {
     // debounce loading of vehicles for 300ms
-    this.props.onLoadVehicles();
+    if (callFirst) this.props.onLoadVehicles();
 
     // timer.setTimeout(
     //   this,
@@ -116,7 +116,7 @@ class Map extends PureComponent {
     this.stopUpdating();
 
     // start new updating
-    this.startUpdating();
+    this.startUpdating(false);
   }
 
   updateRegion(region) {
@@ -177,7 +177,7 @@ class Map extends PureComponent {
       top: 0,
       width: width,
       height:
-        height - config.ordering.height + (this.state.mapExpanded ? 100 : 0)
+        height - config.ordering.height + (this.state.mapExpanded ? 150 : 0)
     };
 
     // const { myPosition } = this.state;
