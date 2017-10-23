@@ -57,9 +57,9 @@ class Steps extends Component {
         this.state.viewTranslateX, // The animated value to drive
         {
           toValue: inPrevTransition ? 0 : -width,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ).start(() => {
         console.log("finished now");

@@ -198,19 +198,80 @@ class Map extends PureComponent {
           onRegionChange={this.updateRegion}
           onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
+          legalLabelInsets={{ top: 0, left: 0, right: 0, bottom: 100 }}
+          onMapReady={() => {
+            // this.map.fitToCoordinates(
+            //   [
+            //     {
+            //       latitude: this.props.region.latitude,
+            //       longitude: this.props.region.longitude
+            //     },
+            //     {
+            //       latitude:
+            //         this.props.region.latitude +
+            //         this.props.region.latitudeDelta,
+            //       longitude:
+            //         this.props.region.longitude +
+            //         this.props.region.longitudeDelta
+            //     }
+            //   ],
+            //   {
+            //     edgePadding: { top: 0, left: 100, right: 0, bottom: 100 }
+            //   }
+            // );
+          }}
+          ref={map => {
+            this.map = map;
+          }}
         >
           {/* if we passed pick up step show pick up market */}
           {this.props.ordering.currStepNo > this.props.ordering.fromStepNo && (
             <MapView.Marker
               key={"fromMarker"}
-              anchor={{ x: 0.5, y: 0.5 }}
+              anchor={{ x: 0.5, y: 1 }}
               coordinate={{
                 latitude: this.props.ordering.fromData.geometry.location.lat,
                 longitude: this.props.ordering.fromData.geometry.location.lng
               }}
               style={{ zIndex: 1000 }}
-              image={require("../../../assets/pinMap.png")}
-            />
+            >
+              <View
+                style={{
+                  maxWidth: 160,
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "center"
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: config.colors.alert,
+                    padding: 3,
+                    borderRadius: 5
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      color: "white",
+                      fontSize:
+                        this.props.region.latitudeDelta < 0.002 ? 14 : 16,
+                      padding: 3
+                    }}
+                  >
+                    {this.props.ordering.fromAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: 3,
+                    maxWidth: 3,
+                    height: 10,
+                    backgroundColor: config.colors.alert
+                  }}
+                />
+              </View>
+            </MapView.Marker>
           )}
           {/* if we passed destination step show destination marker */}
           {this.props.ordering.currStepNo > this.props.ordering.toStepNo && (
@@ -226,6 +287,7 @@ class Map extends PureComponent {
               <View
                 style={{
                   maxWidth: 160,
+                  height: 40,
                   flexDirection: "column",
                   justifyContent: "flex-start",
                   alignItems: "center"
@@ -286,7 +348,7 @@ class Map extends PureComponent {
             <MapView.Polyline
               coordinates={this.props.ordering.route}
               strokeWidth={2}
-              strokeColor="red"
+              strokeColor={config.colors.alert}
             />
           )}
           {this.state.myPosition && (
