@@ -73,11 +73,12 @@ export function onLoadVehicles() {
 
     // fetch data from API
     let url =
-      ordering.currStep.id === "traveling222"
+      ordering.currStep.id === "traveling"
         ? config.api.openTransport.url +
           config.api.openTransport.apiPrefix +
           "/vehicles/" +
-          ordering.selectedVehicle.id
+          ordering.selectedVehicle.id +
+          "/status"
         : config.api.openTransport.url +
           config.api.openTransport.apiPrefix +
           "/vehicles?radius=" +
@@ -86,6 +87,8 @@ export function onLoadVehicles() {
           region.latitude +
           "," +
           region.longitude;
+
+    console.log("vehicle update URL ", url);
 
     fetch(url, {
       method: "get",
@@ -102,7 +105,9 @@ export function onLoadVehicles() {
 
         // get vehicles from returned JSON
         const responseVehicles =
-          json.vehicles || (json.vehicle && [json.vehicle]) || [];
+          json.vehicles && json.vehicles.constructor === Array
+            ? json.vehicles
+            : json.id ? [json] : [];
 
         // dispatch map update with vehicles update
         dispatch({
