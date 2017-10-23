@@ -8,6 +8,9 @@ import config from "./config/config";
 
 import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
+import VersionNumber from "react-native-version-number";
+
+const appVersion = VersionNumber.appVersion;
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();
@@ -37,6 +40,19 @@ class AppView extends PureComponent {
       <View style={styles.app}>
         <Map />
         <OrderVehicle />
+        <Text
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            color: "white",
+            paddingLeft: 3,
+            paddingRight: 3,
+            backgroundColor: "rgba(0,0,0,.5)"
+          }}
+        >
+          {appVersion}
+        </Text>
       </View>
     );
   }
