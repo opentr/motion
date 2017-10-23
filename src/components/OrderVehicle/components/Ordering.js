@@ -88,6 +88,7 @@ class Ordering extends PureComponent {
     }
   }
 
+  //
   componentWillReceiveProps(nextProps) {
     if (
       nextProps.ordering.BOOKING_STATUSES &&
