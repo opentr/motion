@@ -324,41 +324,41 @@ export function onGetVehicleTime(id, location) {
         console.log("route json vehicle time", json);
         if (!("routes" in json)) return false;
 
+        let routeTime = 0;
         try {
           const route = json.routes[0];
           console.log("vehicle time route", route);
 
-          let routeTime = 0;
           route.legs.map(leg => {
             routeTime += leg.duration.value;
           });
-
-          console.log("vehicle time route time ", routeTime);
-          let availableVehicles = getState().ordering.availableVehicles.slice(
-            0
-          );
-          const findId = findWithAttr(availableVehicles, "id", id);
-          console.log("vehicle time findId", findId);
-          if (findId !== -1) {
-            console.log("vehicle time assign");
-
-            const vehicle = availableVehicles[findId];
-
-            availableVehicles.splice(findId, 1, {
-              ...vehicle,
-              routeTime: routeTime
-            });
-
-            // dispatch map update with vehicles update
-            dispatch({
-              type: UPDATE_ORDERING_DATA,
-              payload: {
-                availableVehicles: availableVehicles
-              }
-            });
-          }
         } catch (error) {
           console.log(error);
+          routeTime = "N/A";
+        }
+
+        console.log("vehicle time route time ", routeTime);
+        let availableVehicles = getState().ordering.availableVehicles.slice(0);
+        const findId = findWithAttr(availableVehicles, "id", id);
+        console.log("vehicle time findId", findId);
+
+        if (findId !== -1) {
+          console.log("vehicle time assign");
+
+          const vehicle = availableVehicles[findId];
+
+          availableVehicles.splice(findId, 1, {
+            ...vehicle,
+            routeTime: routeTime
+          });
+
+          // dispatch map update with vehicles update
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: {
+              availableVehicles: availableVehicles
+            }
+          });
         }
       });
   };
