@@ -41,6 +41,9 @@ class Ordering extends PureComponent {
     super(props);
 
     this.state = {
+      // flag to tell if we are in loading of booking statuses using API
+      // API provides a list of booking statuses that then we handle in the app
+      loadingBookingStatuses: false,
       /* is panel open/expanded for input */
       panelOpen: false,
       /* is panel opening/closing */
@@ -72,6 +75,27 @@ class Ordering extends PureComponent {
 
     // reference to ordering step component, will be set once the component is rendered
     this.orderingStep = false;
+  }
+
+  componentDidMount() {
+    // load booking statuses using API
+    if (
+      !this.state.loadingBookingStatuses &&
+      !this.props.ordering.BOOKING_STATUSES
+    ) {
+      this.setState({ loadingBookingStatuses: true });
+      this.props.onLoadBookingStatuses();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.ordering.BOOKING_STATUSES &&
+      this.state.loadingBookingStatuses
+    ) {
+      // mark that booking statuses was loaded from the API
+      this.setState({ loadingBookingStatuses: false });
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {

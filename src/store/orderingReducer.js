@@ -53,7 +53,44 @@ function metersToRadius(value) {
 }
 
 /**
- * load vehicles list from API for the region we are in, this only displays vehicles on the map
+ * LOAD POSSIBLE STATUSES FOR THE BOOKING
+ */
+export function onLoadBookingStatuses() {
+  return (dispatch, getState) => {
+    fetch(
+      config.api.openTransport.url +
+        config.api.openTransport.apiPrefix +
+        "/booking-statuses",
+      {
+        method: "get",
+        headers: {
+          Authorization: "Bearer " + config.api.openTransport.key
+        }
+      }
+    )
+      .then(
+        response => response.json(),
+        error => console.log("An error occured.", error)
+      )
+      .then(json => {
+        if (json.booking_statuses) {
+          dispatch({
+            type: UPDATE_ORDERING_DATA,
+            payload: { BOOKING_STATUSES: json.booking_statuses }
+          });
+        }
+      });
+  };
+}
+
+/**
+ * MAKE A BOOKING 
+ */
+
+/**
+ * LOAD VEHICLES LIST FROM API 
+ * WHEN NOT IN BOOKING - FOR THE REGION WE ARE IN 
+ * WHEN IN BOOKING - LOADING ONLY ONE VEHICLE THAT IS BOOKED
  */
 export function onLoadVehicles() {
   // vehicle format
