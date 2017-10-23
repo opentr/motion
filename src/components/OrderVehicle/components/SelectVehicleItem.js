@@ -15,21 +15,33 @@ import styles from "../../../styles/styles";
 
 class SelectVehicleItem extends PureComponent {
   static propTypes = {
-    data: PropTypes.object.isRequired,
+    placeholder: PropTypes.bool,
+    data: PropTypes.object,
     index: PropTypes.number,
-    onPressItem: PropTypes.func.isRequired
+    onPressItem: PropTypes.func
   };
 
   static defaultProps = {
-    ...PureComponent.defaultProps
+    ...PureComponent.defaultProps,
+    placeholder: false,
+    data: {},
+    onPressItem: () => {}
   };
 
   constructor(props) {
     super(props);
   }
 
+  componentDidMount() {
+    if (!this.props.placeholder)
+      this.props.onGetVehicleTime(this.props.data.id, this.props.data.position);
+  }
+
   render() {
-    const { make, image_url } = this.props.data;
+    const { make, image_url, routePrice, routeTime } = this.props.data;
+
+    const { placeholder } = this.props;
+
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -47,84 +59,114 @@ class SelectVehicleItem extends PureComponent {
         >
           <Text
             style={{
-              height: 40,
+              height: placeholder ? 30 : 40,
               fontSize: 15,
+              marginTop: placeholder ? 0 : 10,
               width: 83,
               color: config.colors.primary,
               textAlignVertical: "center",
-              textAlign: "center"
+              textAlign: "center",
+              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
             }}
           >
-            {make}
+            {placeholder ? "     " : make}
           </Text>
           <Image
-            source={{ uri: image_url }}
-            fadeDuration={this.props.inPrevTransition ? 0 : 100}
+            source={
+              placeholder
+                ? require("../../../assets/car-placeholder.png")
+                : {
+                    uri: image_url
+                  }
+            }
             resizeMode="contain"
-            style={{ width: 105, marginTop: 5, height: 60 }}
+            style={{
+              width: 105,
+              height: 60,
+              marginTop: placeholder ? 15 : 5
+            }}
           />
           <Text
             style={{
               fontSize: 15,
-              lineHeight: 24,
-              width: 85,
+              lineHeight: placeholder ? 16 : 24,
+              width: placeholder ? 60 : 85,
+              marginTop: placeholder ? 8 : 0,
               color: config.colors.text,
               textAlignVertical: "center",
-              textAlign: "center"
+              textAlign: "center",
+              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
             }}
           >
-            in 5 min
+            {placeholder || !routeTime
+              ? "     "
+              : "in " + Math.round(routeTime / 60) + "  min"}
           </Text>
           <Text
             style={{
               fontSize: 20,
-              lineHeight: 30,
-              width: 85,
+              lineHeight: placeholder ? 20 : 30,
+              marginTop: placeholder ? 10 : 0,
+              width: placeholder ? 60 : 85,
               color: config.colors.text,
               textAlignVertical: "center",
               textAlign: "center",
-              fontWeight: "bold"
+              fontWeight: "bold",
+              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
             }}
           >
-            £15.30
+            {placeholder ? "     " : "£" + routePrice.toFixed(2)}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              width: 105,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingTop: 10
-            }}
-          >
-            <Image
-              source={require("../../../assets/heart.png")}
-              style={{
-                width: 24,
-                height: 20,
-                marginRight: 5
-              }}
-            />
+          {placeholder ? (
             <View
               style={{
-                paddingTop: 2,
-                paddingBottom: 4,
-                paddingLeft: 6,
-                paddingRight: 6,
-                backgroundColor: config.colors.secondary
+                flexDirection: "row",
+                width: placeholder ? 60 : 105,
+                height: 24,
+                paddingTop: placeholder ? 0 : 10,
+                marginTop: placeholder ? 10 : 4,
+                backgroundColor: placeholder ? "#f2f2f2" : "transparent"
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                flexDirection: "row",
+                width: 105,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 10
               }}
             >
-              <Text
+              <Image
+                source={require("../../../assets/heart.png")}
                 style={{
-                  color: "white",
-                  lineHeight: 18,
-                  fontSize: 18
+                  width: 24,
+                  height: 20,
+                  marginRight: 5
+                }}
+              />
+              <View
+                style={{
+                  paddingTop: 2,
+                  paddingBottom: 4,
+                  paddingLeft: 6,
+                  paddingRight: 6,
+                  backgroundColor: config.colors.secondary
                 }}
               >
-                8
-              </Text>
+                <Text
+                  style={{
+                    color: "white",
+                    lineHeight: 18,
+                    fontSize: 18
+                  }}
+                >
+                  8
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </TouchableWithoutFeedback>
     );

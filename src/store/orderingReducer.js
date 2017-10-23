@@ -303,6 +303,68 @@ export function onPrevStep() {
 }
 
 /**
+ * get vehicle time 
+ */
+export function onGetVehicleTime(id, location) {
+  return (dispatch, getState) => {
+    console.log("on get vehicle time lognow ", id, location);
+
+    const fromData = getState().ordering.fromData;
+
+    fetch(
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${location.lat},${location.lng}&destination=${fromData
+        .geometry.location.lat},${fromData.geometry.location.lng}`
+    )
+      .then(
+        response => response.json(),
+        error =>
+          console.log("An error occured loading search vehicle results.", error)
+      )
+      .then(json => {
+        console.log("route json vehicle time", json);
+        if (!("routes" in json)) return false;
+
+        try {
+          const route = json.routes[0];
+          console.log("vehicle time route", route);
+
+          let routeTime = 0;
+          route.legs.map(leg => {
+            routeTime += leg.duration.value;
+          });
+
+          console.log("vehicle time route time ", routeTime);
+          let availableVehicles = getState().ordering.availableVehicles.slice(
+            0
+          );
+          const findId = findWithAttr(availableVehicles, "id", id);
+          console.log("vehicle time findId", findId);
+          if (findId !== -1) {
+            console.log("vehicle time assign");
+
+            const vehicle = availableVehicles[findId];
+
+            availableVehicles.splice(findId, 1, {
+              ...vehicle,
+              routeTime: routeTime
+            });
+
+            // dispatch map update with vehicles update
+            dispatch({
+              type: UPDATE_ORDERING_DATA,
+              payload: {
+                availableVehicles: availableVehicles
+              }
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+  };
+}
+
+/**
  * get directions between pickup and destination
  */
 export function getRoute() {
@@ -332,7 +394,8 @@ export function getRoute() {
         if (!("routes" in json)) return false;
 
         try {
-          let points = Polyline.decode(json.routes[0].overview_polyline.points);
+          const route = json.routes[0];
+          let points = Polyline.decode(route.overview_polyline.points);
           let coords = points.map((point, index) => {
             return {
               latitude: point[0],
@@ -340,11 +403,21 @@ export function getRoute() {
             };
           });
 
+          let routeLength = 0;
+          route.legs.map(leg => {
+            // leg.steps.map(step => {
+            routeLength += leg.distance.value;
+            // });
+          });
+
+          routeLength = routeLength / 1000;
+
           // dispatch map update with vehicles update
           dispatch({
             type: UPDATE_ORDERING_DATA,
             payload: {
-              route: coords
+              route: coords,
+              routeLength: routeLength
             }
           });
         } catch (error) {
@@ -397,7 +470,15 @@ export function onSearchForVehicle() {
         console.log("search vehicles", json);
 
         // get vehicles from returned JSON
-        const responseVehicles = json.vehicles || [];
+        let responseVehicles = json.vehicles || [];
+        const routeLength = getState().ordering.routeLength;
+
+        if (routeLength) {
+          responseVehicles = responseVehicles.slice(0).map(v => ({
+            ...v,
+            routePrice: v.price_per_km * getState().ordering.routeLength
+          }));
+        }
 
         // dispatch map update with vehicles update
         dispatch({

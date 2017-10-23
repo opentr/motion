@@ -9,7 +9,8 @@ import {
   onSearchForVehicle,
   onSelectVehicle,
   onConfirmBooking,
-  onRecenterMap
+  onRecenterMap,
+  onGetVehicleTime
 } from "../../store/orderingReducer";
 
 const mapDispatchToProps = {
@@ -20,7 +21,8 @@ const mapDispatchToProps = {
   onSearchForVehicle,
   onSelectVehicle,
   onConfirmBooking,
-  onRecenterMap
+  onRecenterMap,
+  onGetVehicleTime
 };
 
 const mapStateToProps = state => ({

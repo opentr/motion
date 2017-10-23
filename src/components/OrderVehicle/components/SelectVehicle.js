@@ -47,8 +47,8 @@ class SelectVehicle extends PureComponent {
     <SelectVehicleItem
       data={item}
       index={index}
-      inTransition={this.props.inTransition}
       onPressItem={this.props.onSelectVehicle}
+      onGetVehicleTime={this.props.onGetVehicleTime}
     />
     //  id={item.id}
     //  onPressItem={this._onPressItem}
@@ -58,13 +58,32 @@ class SelectVehicle extends PureComponent {
 
   render() {
     console.log("render select vehicles ", this.props.availableVehicles);
-    const { availableVehicles } = this.props;
+    const { availableVehicles, inNextTransition } = this.props;
 
+    if (inNextTransition) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            paddingTop: 48,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            flexWrap: "nowrap"
+          }}
+        >
+          <SelectVehicleItem key={0} placeholder={true} index={0} />
+          <SelectVehicleItem key={1} placeholder={true} index={1} />
+          <SelectVehicleItem key={2} placeholder={true} index={2} />
+        </View>
+      );
+    }
+    console.log("not in next transition lognow");
     return (
       <View
         style={{
           flex: 1,
-          paddingTop: 48
+          paddingTop: 38
         }}
       >
         <FlatList

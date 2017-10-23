@@ -376,7 +376,7 @@ class Ordering extends PureComponent {
     );
   }
 
-  getStep(step, index, inPrevTransition, inNextTransition) {
+  getStep(step, stepNo, currStep, inPrevTransition, inNextTransition) {
     const currStepId = step.id;
     switch (currStepId) {
       case "from":
@@ -384,10 +384,10 @@ class Ordering extends PureComponent {
       case "time":
         return (
           <SelectFromToTime
-            key={index}
+            key={stepNo}
             {...step.data}
-            inPrevTransition={inPrevTransition}
-            inNextTransition={inNextTransition}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
           />
         );
         break;
@@ -395,10 +395,10 @@ class Ordering extends PureComponent {
       case "vehicleSelect":
         return (
           <SelectVehicle
-            key={index}
+            key={stepNo}
             {...step.data}
-            inPrevTransition={inPrevTransition}
-            inNextTransition={inNextTransition}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
           />
         );
         break;
@@ -406,20 +406,20 @@ class Ordering extends PureComponent {
       case "confirmation":
         return (
           <Confirmation
-            key={index}
+            key={stepNo}
             {...step.data}
-            inPrevTransition={inPrevTransition}
-            inNextTransition={inNextTransition}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
           />
         );
         break;
       case "traveling":
         return (
           <Traveling
-            key={index}
+            key={stepNo}
             {...step.data}
-            inPrevTransition={inPrevTransition}
-            inNextTransition={inNextTransition}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
           />
         );
         break;
@@ -459,7 +459,8 @@ class Ordering extends PureComponent {
               this.props.ordering.vehicleSelectStepNo,
             availableVehicles: this.props.availableVehicles,
             onSearchForVehicle: this.props.onSearchForVehicle,
-            onSelectVehicle: this.props.onSelectVehicle
+            onSelectVehicle: this.props.onSelectVehicle,
+            onGetVehicleTime: this.props.onGetVehicleTime
           };
           break;
         case "confirmation":

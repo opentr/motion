@@ -88,6 +88,7 @@ class VisibleSteps extends Component {
             {renderStep(
               steps[firstSlideStep],
               firstSlideStep,
+              currStepNo,
               inPrevTransition,
               inNextTransition
             )}
@@ -105,6 +106,7 @@ class VisibleSteps extends Component {
             {renderStep(
               steps[secondSlideStep],
               secondSlideStep,
+              currStepNo,
               inPrevTransition,
               inNextTransition
             )}
