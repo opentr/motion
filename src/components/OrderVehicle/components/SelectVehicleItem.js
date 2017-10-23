@@ -66,7 +66,7 @@ class SelectVehicleItem extends PureComponent {
               color: config.colors.primary,
               textAlignVertical: "center",
               textAlign: "center",
-              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
+              backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
             {placeholder ? "     " : make}
@@ -81,7 +81,7 @@ class SelectVehicleItem extends PureComponent {
             }
             resizeMode="contain"
             style={{
-              width: 105,
+              width: placeholder ? 100 : 105,
               height: 60,
               marginTop: placeholder ? 15 : 5
             }}
@@ -95,7 +95,7 @@ class SelectVehicleItem extends PureComponent {
               color: config.colors.text,
               textAlignVertical: "center",
               textAlign: "center",
-              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
+              backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
             {placeholder || !routeTime
@@ -112,7 +112,7 @@ class SelectVehicleItem extends PureComponent {
               textAlignVertical: "center",
               textAlign: "center",
               fontWeight: "bold",
-              backgroundColor: placeholder ? "#f2f2f2" : "transparent"
+              backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
             {placeholder ? "     " : "£" + routePrice.toFixed(2)}
@@ -125,7 +125,7 @@ class SelectVehicleItem extends PureComponent {
                 height: 24,
                 paddingTop: placeholder ? 0 : 10,
                 marginTop: placeholder ? 10 : 4,
-                backgroundColor: placeholder ? "#f2f2f2" : "transparent"
+                backgroundColor: placeholder ? "#f2f2f2" : "white"
               }}
             />
           ) : (

@@ -332,12 +332,12 @@ class Ordering extends PureComponent {
           zIndex: 20
         }}
       >
-        <Animated.Image
+        <Image
           source={require("../../../assets/recenter.png")}
           style={{
             width: 24,
             height: 24,
-            opacity: this.state.buttonOpacity
+            opacity: 1
           }}
         />
       </TouchableOpacity>

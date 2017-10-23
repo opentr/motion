@@ -41,7 +41,7 @@ const config = {
     },
     recenterZoom: {
       from: 0.017,
-      to: 0.034
+      to: 0.017
     }
   },
 

@@ -72,9 +72,9 @@ class SelectVehicle extends PureComponent {
             flexWrap: "nowrap"
           }}
         >
-          <SelectVehicleItem key={0} placeholder={true} index={0} />
-          <SelectVehicleItem key={1} placeholder={true} index={1} />
-          <SelectVehicleItem key={2} placeholder={true} index={2} />
+          {[0, 1, 2, 3].map(i => (
+            <SelectVehicleItem key={i} placeholder={true} index={i} />
+          ))}
         </View>
       );
     }

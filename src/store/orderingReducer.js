@@ -120,7 +120,7 @@ export function onLoadVehicles() {
 export function onRecenterMap(stepId) {
   console.log("on recenter map now", stepId);
   return (dispatch, getState) => {
-    const ordering = getState().ordering;
+    const ordering = Object.assign({}, getState().ordering);
 
     if (typeof stepId !== "string") stepId = ordering.currStep.id;
 
@@ -144,7 +144,8 @@ export function onRecenterMap(stepId) {
     if (stepId === "to" && ordering.toData) {
       return dispatch(
         onRegionChange({
-          ...region,
+          latitude: region.latitude,
+          longitude: region.longitude,
           latitudeDelta: config.map.recenterZoom.to, //region.latitudeDelta,
           longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
         })
@@ -161,13 +162,14 @@ export function onRecenterMap(stepId) {
     } else if (stepId === "from" && ordering.fromData) {
       dispatch(
         onRegionChange({
-          ...region,
+          latitude: region.latitude,
+          longitude: region.longitude,
           latitudeDelta: config.map.recenterZoom.from,
           longitudeDelta: config.map.recenterZoom.from
         })
       );
     } else if (stepId === "fromPrev" && ordering.fromData) {
-      dispatch(
+      return dispatch(
         onRegionChange({
           latitude: ordering.fromData.geometry.location.lat,
           longitude: ordering.fromData.geometry.location.lng,
@@ -177,7 +179,7 @@ export function onRecenterMap(stepId) {
       );
     } else if (ordering.toData && ordering.fromData) {
       // recenter region focusing on pickup and destination
-      dispatch(
+      return dispatch(
         onRegionChange({
           latitude:
             (ordering.fromData.geometry.location.lat +
