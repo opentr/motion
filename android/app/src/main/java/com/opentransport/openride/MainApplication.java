@@ -2,7 +2,10 @@ package com.opentransport.openride;
 
 import android.app.Application;
 
+
+
 import com.facebook.react.ReactApplication;
+import com.magus.fblogin.FacebookLoginPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -26,7 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RNVersionNumberPackage(),
-            new MapsPackage()
+            new MapsPackage(),
+            new FacebookLoginPackage()
       );
     }
   };

@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import PropTypes from "prop-types";
 
+import { FBLogin, FBLoginManager } from "react-native-facebook-login";
+
 import Carousel from "react-native-snap-carousel";
 
 import SelectFromToTime from "./SelectFromToTime/";
@@ -577,17 +579,6 @@ class Ordering extends PureComponent {
 
         {/* Button to recenter map with context  */}
         {this.getRecenterButton()}
-
-        {/* White background of the panel */}
-        <View
-          style={{
-            height: height,
-            backgroundColor: "white",
-            width: width,
-            position: "absolute",
-            top: 40
-          }}
-        />
 
         {/* steps container */}
         {this.getStepsSlider(currStepId, currStepNo, width)}

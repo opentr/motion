@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Motion</string>
+    <string name="facebook_app_id">838505606327166</string>
+    <string name="fb_login_protocol_scheme">fb838505606327166</string>
 </resources>
