@@ -36,6 +36,7 @@ class SelectVehicle extends PureComponent {
 
   componentDidMount() {
     console.log("select component did mount ", this.props);
+    if (!this.props.isActive) return false;
     if (
       !this.state.searched &&
       !this.props.isPrevAnimation &&
@@ -47,6 +48,7 @@ class SelectVehicle extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (!this.props.isActive) return false;
     console.log(
       "select componentWillReceiveProps",
       nextProps,

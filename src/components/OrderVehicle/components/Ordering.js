@@ -457,6 +457,7 @@ class Ordering extends PureComponent {
             key={stepNo}
             {...step.data}
             onLayout={onLayout}
+            isActive={currStep === stepNo}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />

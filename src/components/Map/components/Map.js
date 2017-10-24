@@ -333,7 +333,8 @@ class Map extends PureComponent {
                   (this.state.mapExpanded &&
                     vehicle.id === this.props.ordering.selectedVehicle.id)
                     ? 1
-                    : 0.1
+                    : 0.1,
+                zIndex: 500
               }}
               coordinate={{
                 latitude: vehicle.position.lat,

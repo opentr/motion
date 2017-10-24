@@ -4,8 +4,6 @@ import { Animated, Easing, View } from "react-native";
 
 import VisibleSteps from "./VisibleSteps";
 
-const timer = require("react-native-timer");
-
 class Steps extends Component {
   static propTypes = {
     totalSteps: PropTypes.number.isRequired,
@@ -59,7 +57,8 @@ class Steps extends Component {
           toValue: inPrevTransition ? 0 : -width,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-          duration: 200
+          duration: 200,
+          delay: 5
         }
       ).start(() => {
         console.log("finished now");
@@ -72,9 +71,7 @@ class Steps extends Component {
     }
   }
 
-  componentWillUnmount() {
-    timer.clearTimeout(this);
-  }
+  componentWillUnmount() {}
 
   render() {
     const {
