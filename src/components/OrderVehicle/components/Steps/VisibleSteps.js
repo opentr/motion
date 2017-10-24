@@ -10,11 +10,32 @@ class VisibleSteps extends Component {
     ...Component.defaultProps
   };
 
+  constructor(props) {
+    super(props);
+    this.onLayout = this.onLayout.bind(this);
+    // this.onLayoutFirst = this.onLayoutFirst.bind(this);
+    // this.onLayoutSecond = this.onLayoutSecond.bind(this);
+  }
+
   componentDidMount() {}
 
   onLayout(e) {
-    console.log("on layout", e.nativeEvent.layout);
+    console.log("on layout", e);
+    this.props.onLayoutChange(e.nativeEvent.layout);
   }
+
+  // onLayoutFirst(e) {
+  //   console.log("on layout first", this.props, e);
+  //   if (this.props.currStepSlide === "first") {
+  //     this.onLayout(e);
+  //   }
+  // }
+  // onLayoutSecond(e) {
+  //   console.log("on layout second", this.props, e);
+  //   if (this.props.currStepSlide === "second") {
+  //     this.onLayout(e);
+  //   }
+  // }
 
   render() {
     // console.log("render VisibleSteps now", this.props);
@@ -79,7 +100,7 @@ class VisibleSteps extends Component {
       <View
         style={{
           width: width * 2,
-          height: height,
+          height: "auto",
           flexDirection: slideOrder
         }}
       >
@@ -90,14 +111,14 @@ class VisibleSteps extends Component {
               width: width
             }}
             ref={first => (this.first = first)}
-            onLayout={this.onLayout}
           >
             {renderStep(
               steps[firstSlideStep],
               firstSlideStep,
               currStepNo,
               inPrevTransition,
-              inNextTransition
+              inNextTransition,
+              this.onLayout
             )}
           </View>
         )}
@@ -109,14 +130,14 @@ class VisibleSteps extends Component {
             style={{
               width: width
             }}
-            onLayout={this.onLayout}
           >
             {renderStep(
               steps[secondSlideStep],
               secondSlideStep,
               currStepNo,
               inPrevTransition,
-              inNextTransition
+              inNextTransition,
+              this.onLayout
             )}
           </View>
         )}

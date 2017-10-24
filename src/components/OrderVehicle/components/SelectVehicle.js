@@ -35,6 +35,7 @@ class SelectVehicle extends PureComponent {
   }
 
   componentDidMount() {
+    console.log("select component did mount ", this.props);
     if (
       !this.state.searched &&
       !this.props.isPrevAnimation &&
@@ -46,14 +47,15 @@ class SelectVehicle extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    //console.log(
-    //   "active debugnow",
-    //   nextProps,
-    //   this.state,
-    //   nextProps.searchingVehicles
-    // );
+    console.log(
+      "select componentWillReceiveProps",
+      nextProps,
+      this.state,
+      this.props
+    );
     if (
       !this.state.searched &&
+      !nextProps.searchingVehicles &&
       !nextProps.isPrevAnimation &&
       !nextProps.isNextAnimation
     ) {
@@ -120,14 +122,15 @@ class SelectVehicle extends PureComponent {
         <View
           style={{
             paddingTop: 48,
+            paddingBottom: 0,
             width: "auto",
             height: "auto",
-            backgroundColor: "red",
             flexDirection: "row",
             justifyContent: "flex-start",
             alignItems: "flex-start",
             flexWrap: "nowrap"
           }}
+          onLayout={this.props.onLayout}
         >
           {[0, 1, 2, 3].map(i => <SelectVehicleItem key={i} index={i} />)}
         </View>
@@ -142,6 +145,7 @@ class SelectVehicle extends PureComponent {
           width: "auto",
           height: "auto"
         }}
+        onLayout={this.props.onLayout}
       >
         <FlatList
           horizontal={true}

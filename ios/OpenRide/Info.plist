@@ -73,5 +73,7 @@
     <string>fbauth2</string>
     <string>fbshareextension</string>
   </array>
+  <key>BugsnagAPIKey</key>
+  <string>598743f2541cc795e560735266d05ff7</string>
 </dict>
 </plist>

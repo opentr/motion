@@ -269,22 +269,24 @@ export function onLoadVehicles() {
             payload: { selectedVehicle: responseVehicles[0] }
           });
 
-          const status = getState().ordering.booking.status;
-          if (
-            !(
-              status === "declined" ||
-              (status === "completed" ||
-                status === "cancelled_by_supplier" ||
-                status === "cancelled_by_user")
-            )
-          ) {
-            dispatch(
-              onGetVehicleTime(
-                responseVehicles[0].id,
-                responseVehicles[0].position
+          if ("booking" in getState().ordering) {
+            const status = getState().ordering.booking.status;
+            if (
+              !(
+                status === "declined" ||
+                (status === "completed" ||
+                  status === "cancelled_by_supplier" ||
+                  status === "cancelled_by_user")
               )
-            );
-            dispatch(onRecenterMap());
+            ) {
+              dispatch(
+                onGetVehicleTime(
+                  responseVehicles[0].id,
+                  responseVehicles[0].position
+                )
+              );
+              dispatch(onRecenterMap());
+            }
           }
         }
       });

@@ -67,10 +67,11 @@ class SelectVehicleItem extends PureComponent {
         <View
           style={{
             flexDirection: "column",
-            justifyContent: "flex-start",
+            justifyContent: "flex-end",
             alignItems: "center",
             paddingLeft: 10,
-            paddingRight: 10
+            paddingRight: 10,
+            paddingBottom: 10
           }}
         >
           <Text
@@ -134,7 +135,7 @@ class SelectVehicleItem extends PureComponent {
             {placeholder
               ? "     "
               : typeof routePrice === "undefined"
-                ? "n/a"
+                ? "N/A"
                 : "£" + routePrice.toFixed(2)}
           </Text>
           {placeholder ? (

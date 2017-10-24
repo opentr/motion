@@ -3,9 +3,9 @@ import { AppRegistry, Text, View } from "react-native";
 
 import { Client } from "bugsnag-react-native";
 
-if (!__DEV__) {
-  const bugsnag = new Client();
-}
+// if (!__DEV__) {
+//   const bugsnag = new Client();
+// }
 
 import App from "./src/App";
 

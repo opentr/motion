@@ -9,7 +9,8 @@ import {
   Easing,
   Image,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
+  InteractionManager
 } from "react-native";
 import PropTypes from "prop-types";
 
@@ -60,7 +61,7 @@ class Ordering extends PureComponent {
       buttonOpacity: new Animated.Value(1),
       backButtonOpacity: new Animated.Value(0),
       /* height of the ordering panel */
-      panelHeight: config.ordering.height + 40
+      panelHeight: 600
     };
 
     this.openPanel = this.openPanel.bind(this);
@@ -74,6 +75,8 @@ class Ordering extends PureComponent {
     this.getStep = this.getStep.bind(this);
     this.getStepsData = this.getStepsData.bind(this);
     this.getStepsSlider = this.getStepsSlider.bind(this);
+
+    this.onLayoutChange = this.onLayoutChange.bind(this);
 
     // reference to ordering step component, will be set once the component is rendered
     this.orderingStep = false;
@@ -103,24 +106,55 @@ class Ordering extends PureComponent {
       this.setState({ loadingBookingStatuses: false });
     }
 
-    if (nextProps.ordering.currStep.id === "confirmation") {
-      this.openPanel(true);
-    } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
-      this.closePanel(true);
-    } else if (nextProps.ordering.currStep.id === "traveling") {
-      this.closePanel(true);
-    } else if (
-      this.props.ordering.currStep.id === "traveling" &&
-      (nextProps.ordering.currStep.id === "from" ||
-        nextProps.ordering.currStep.id === "to")
-    ) {
-      this.setState({ panelHeight: config.ordering.height + 40 });
-      //console.log("SET PANEK TRANSLATE debug now");
-      this.state.panelTranslate.setValue(0);
-    }
+    // if (nextProps.ordering.currStep.id === "confirmation") {
+    //   this.openPanel(true);
+    // } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
+    //   this.closePanel(true);
+    // } else if (nextProps.ordering.currStep.id === "traveling") {
+    //   this.closePanel(true);
+    // } else if (
+    //   this.props.ordering.currStep.id === "traveling" &&
+    //   (nextProps.ordering.currStep.id === "from" ||
+    //     nextProps.ordering.currStep.id === "to")
+    // ) {
+    //   this.setState({ panelHeight: config.ordering.height + 40 });
+    //   //console.log("SET PANEK TRANSLATE debug now");
+    //   this.state.panelTranslate.setValue(0);
+    // }
+  }
+
+  onLayoutChange(layout) {
+    console.log("on layout change ", layout.height);
+    const height = Dimensions.get("window").height; //full width
+
+    // this.state.panelTranslate.setValue(
+    //   config.ordering.height - 85 - layout.height
+    // );
+    // this.setState({
+    //   targetPanelHeight: config.ordering.height - 85 - layout.height
+    // });
+
+    const targetH = config.ordering.height - 85 - layout.height;
+
+    this.animatePanelHeight(targetH);
+  }
+
+  animatePanelHeight(newHeight) {
+    Animated.timing(
+      // Animate over time
+      this.state.panelTranslate, // The animated value to drive
+      {
+        toValue: newHeight,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+        duration: 200
+      }
+    ).start();
   }
 
   openPanel(force) {
+    return false;
+
     //console.log("open panel debug now", this.state);
     // check if panel is on from or to step, if not do not open address input
     if (this.state.panelAnimating || this.state.panelOpen) {
@@ -129,8 +163,7 @@ class Ordering extends PureComponent {
 
     this.setState({
       panelAnimating: true,
-      panelOpen: false,
-      panelHeight: Dimensions.get("window").height
+      panelOpen: false
     });
 
     // determine top position for the panel
@@ -189,6 +222,8 @@ class Ordering extends PureComponent {
   }
 
   closePanel() {
+    return false;
+
     if (this.state.panelAnimating) return false;
 
     const toValue = this.props.ordering.currStep.id === "traveling" ? 150 : 0;
@@ -315,7 +350,7 @@ class Ordering extends PureComponent {
         activeOpacity={0.8}
         style={{
           position: "absolute",
-          top: 8,
+          top: 6,
           right: 8,
           zIndex: 20
         }}
@@ -392,7 +427,14 @@ class Ordering extends PureComponent {
     );
   }
 
-  getStep(step, stepNo, currStep, inPrevTransition, inNextTransition) {
+  getStep(
+    step,
+    stepNo,
+    currStep,
+    inPrevTransition,
+    inNextTransition,
+    onLayout
+  ) {
     const currStepId = step.id;
     switch (currStepId) {
       case "from":
@@ -402,6 +444,7 @@ class Ordering extends PureComponent {
           <SelectFromToTime
             key={stepNo}
             {...step.data}
+            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -413,6 +456,7 @@ class Ordering extends PureComponent {
           <SelectVehicle
             key={stepNo}
             {...step.data}
+            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -424,6 +468,7 @@ class Ordering extends PureComponent {
           <Confirmation
             key={stepNo}
             {...step.data}
+            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -434,6 +479,7 @@ class Ordering extends PureComponent {
           <Traveling
             key={stepNo}
             {...step.data}
+            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -516,6 +562,7 @@ class Ordering extends PureComponent {
 
     return (
       <Steps
+        onLayoutChange={this.onLayoutChange}
         style={{ marginTop: 35 }}
         width={width}
         height={this.state.panelHeight}
@@ -540,14 +587,14 @@ class Ordering extends PureComponent {
       <Animated.View
         style={{
           position: "absolute",
-          top: height - config.ordering.height - 40,
+          top: height - config.ordering.height,
           zIndex: 1000,
           backgroundColor: "rgba(0,0,0,0)",
           width: width,
           height: this.state.panelHeight,
           flexDirection: "column",
           justifyContent: "flex-start",
-          alignItems: "center",
+          alignItems: "flex-start",
           transform: [{ translateY: this.state.panelTranslate }]
         }}
       >

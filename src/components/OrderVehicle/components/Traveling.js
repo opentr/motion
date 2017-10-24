@@ -185,22 +185,23 @@ class Traveling extends PureComponent {
     return (
       <View
         style={{
-          height: 150,
           width: "100%",
+          height: "auto",
+          minHeight: 70,
           flexDirection: "column",
           justifyContent: "flex-start",
-          alignItems: "center"
+          alignItems: "center",
+          paddingTop: 35
         }}
+        onLayout={this.props.onLayout}
       >
         <Animated.Text
           style={{
             fontSize: 20,
-            height: 110,
             color: config.colors.secondary,
-            textAlignVertical: "center",
             textAlign: "center",
+            textAlignVertical: "center",
             width: this.props.width * 0.9,
-
             opacity: this.state.opacityText
           }}
           onPress={() => {

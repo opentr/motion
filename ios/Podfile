@@ -7,8 +7,7 @@ target 'OpenRide' do
 
 
 
-  # Pods for OpenRide
-  pod 'GoogleSignIn'
+  pod 'Bugsnag'
 
   target 'OpenRideTests' do
     inherit! :search_paths

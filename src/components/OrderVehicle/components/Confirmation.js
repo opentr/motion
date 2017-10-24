@@ -46,6 +46,7 @@ class Confirmation extends PureComponent {
           paddingLeft: 10,
           paddingRight: 10
         }}
+        onLayout={this.props.onLayout}
       >
         <Text
           style={{

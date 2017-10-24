@@ -4,6 +4,7 @@ import config from "../config/config";
  * ACTION TYPES
  */
 export const UPDATE_MAP_DATA = "UPDATE_MAP_DATA";
+export const UPDATE_REGION = "UPDATE_REGION";
 export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 
 /**
@@ -12,7 +13,7 @@ export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 
 export function onRegionChange(region) {
   // dispatch map update with region data
-  return { type: UPDATE_MAP_DATA, payload: { region: region } };
+  return { type: UPDATE_REGION, payload: region };
 }
 
 /**
@@ -55,6 +56,10 @@ const ACTION_HANDLERS = {
   [UPDATE_MAP_DATA]: (state, action) => ({
     ...state,
     ...action.payload
+  }),
+  [UPDATE_REGION]: (state, action) => ({
+    ...state,
+    region: action.payload
   })
 };
 

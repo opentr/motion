@@ -203,6 +203,7 @@ class SelectFromToTime extends PureComponent {
           justifyContent: "flex-start",
           alignItems: "center"
         }}
+        onLayout={this.props.onLayout}
       >
         {/* Title of the panel */}
         <Animated.Text

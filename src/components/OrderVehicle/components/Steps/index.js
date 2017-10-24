@@ -59,7 +59,7 @@ class Steps extends Component {
           toValue: inPrevTransition ? 0 : -width,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-          duration: 300
+          duration: 200
         }
       ).start(() => {
         console.log("finished now");
@@ -100,8 +100,8 @@ class Steps extends Component {
         style={{
           ...style,
           /* view is maximum 2 widths of a slider since we can see at most 2 slides at the same time */
-          width: 2 * width,
-          height: height,
+          width: 2 * width + 2,
+          height: "auto",
           position: "absolute",
           left: 0,
           top: 0,
@@ -119,6 +119,7 @@ class Steps extends Component {
           renderStep={renderStep}
           steps={this.props.steps}
           currStepSlide={this.state.currStepSlide}
+          onLayoutChange={this.props.onLayoutChange}
         />
       </Animated.View>
     );
