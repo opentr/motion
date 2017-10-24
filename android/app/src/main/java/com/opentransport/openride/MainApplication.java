@@ -5,8 +5,8 @@ import android.app.Application;
 
 
 import com.facebook.react.ReactApplication;
+import com.bugsnag.BugsnagReactNative;
 import com.magus.fblogin.FacebookLoginPackage;
-import com.apsl.versionnumber.RNVersionNumberPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -28,7 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNVersionNumberPackage(),
+            BugsnagReactNative.getPackage(),
             new MapsPackage(),
             new FacebookLoginPackage()
       );
@@ -43,6 +43,7 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+    BugsnagReactNative.start(this);
     SoLoader.init(this, /* native exopackage */ false);
   }
 }

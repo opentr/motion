@@ -15,7 +15,6 @@ import styles from "../../../styles/styles";
 
 class SelectVehicleItem extends PureComponent {
   static propTypes = {
-    placeholder: PropTypes.bool,
     data: PropTypes.object,
     index: PropTypes.number,
     onPressItem: PropTypes.func
@@ -23,24 +22,41 @@ class SelectVehicleItem extends PureComponent {
 
   static defaultProps = {
     ...PureComponent.defaultProps,
-    placeholder: false,
     data: {},
     onPressItem: () => {}
   };
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      placeholder:
+        !("id" in this.props.data) ||
+        !("routeTime" in this.props.data) ||
+        !this.props.sortedVehicles
+    };
   }
+  rr;
 
   componentDidMount() {
-    if (!this.props.placeholder)
-      this.props.onGetVehicleTime(this.props.data.id, this.props.data.position);
+    // console.log("vehicle item debug now", this.props, this.state);
+    // if ("id" in this.props.data && !("routeTime" in this.props.data))
+    //   this.props.onGetVehicleTime(this.props.data.id, this.props.data.position);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      placeholder:
+        !("id" in nextProps.data) ||
+        !("routeTime" in nextProps.data) ||
+        !nextProps.sortedVehicles
+    });
   }
 
   render() {
     const { make, image_url, routePrice, routeTime } = this.props.data;
 
-    const { placeholder } = this.props;
+    const { placeholder } = this.state;
 
     return (
       <TouchableWithoutFeedback
@@ -100,7 +116,7 @@ class SelectVehicleItem extends PureComponent {
           >
             {placeholder || !("routeTime" in this.props.data)
               ? "     "
-              : routeTime === "N/A" ? routeTime : "in " + routeTime + "  min"}
+              : routeTime === -1 ? "N/A" : "in " + routeTime + "  min"}
           </Text>
           <Text
             style={{
@@ -115,7 +131,11 @@ class SelectVehicleItem extends PureComponent {
               backgroundColor: placeholder ? "#f2f2f2" : "white"
             }}
           >
-            {placeholder ? "     " : "£" + routePrice.toFixed(2)}
+            {placeholder
+              ? "     "
+              : typeof routePrice === "undefined"
+                ? "n/a"
+                : "£" + routePrice.toFixed(2)}
           </Text>
           {placeholder ? (
             <View

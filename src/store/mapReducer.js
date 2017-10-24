@@ -37,7 +37,7 @@ export function reverseGeocodeLocation() {
         error => console.log("An error occured.", error)
       )
       .then(json => {
-        console.log("map search", json);
+        // console.log("map search", json);
 
         if (json.results) {
           // dispatch address update that will be picked up by Ordering reducer

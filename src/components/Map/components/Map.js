@@ -266,7 +266,7 @@ class Map extends PureComponent {
                   style={{
                     width: 3,
                     maxWidth: 3,
-                    height: 10,
+                    height: 28,
                     backgroundColor: config.colors.secondary
                   }}
                 />
@@ -287,7 +287,6 @@ class Map extends PureComponent {
               <View
                 style={{
                   maxWidth: 160,
-                  height: 40,
                   flexDirection: "column",
                   justifyContent: "flex-start",
                   alignItems: "center"
@@ -316,7 +315,7 @@ class Map extends PureComponent {
                   style={{
                     width: 3,
                     maxWidth: 3,
-                    height: 10,
+                    height: 28,
                     backgroundColor: "red"
                   }}
                 />

@@ -65,7 +65,7 @@ class SelectFromToTime extends PureComponent {
         config.map.startLocation.longitude) +
       ("&radius=" + config.api.google.radius) +
       ("&key=" + config.api.google.key);
-    console.log(url);
+    //console.log(url);
     // call Google API
     let response = await fetch(url, {
       method: "get"
@@ -81,7 +81,7 @@ class SelectFromToTime extends PureComponent {
       // no addresses in result then set empty list so the interface does not show old results
       this.setState({ addresses: [] });
     }
-    console.log("geocode", responseJson);
+    //console.log("geocode", responseJson);
   }
 
   onAddressClick(index) {
@@ -128,7 +128,7 @@ class SelectFromToTime extends PureComponent {
             />
           )}
           {this.state.addresses.slice(0, 5).map((addr, index) => {
-            console.log("render", addr, index);
+            //console.log("render", addr, index);
 
             const types = addr.types.join(",");
             const text =

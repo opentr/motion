@@ -26,18 +26,72 @@ class SelectVehicle extends PureComponent {
 
   constructor(props) {
     super(props);
-    this.state = { searched: false };
+    this.state = {
+      searched: false,
+      waitingForTimes: true,
+      data: this.props.availableVehicles,
+      sortedVehicles: false
+    };
+  }
+
+  componentDidMount() {
+    if (
+      !this.state.searched &&
+      !this.props.isPrevAnimation &&
+      !this.props.isNextAnimation
+    ) {
+      this.props.onSearchForVehicle();
+      this.setState({ searched: true, waitingForTimes: true });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("active", this.props.active);
+    //console.log(
+    //   "active debugnow",
+    //   nextProps,
+    //   this.state,
+    //   nextProps.searchingVehicles
+    // );
     if (
       !this.state.searched &&
       !nextProps.isPrevAnimation &&
       !nextProps.isNextAnimation
     ) {
       this.props.onSearchForVehicle();
-      this.setState({ searched: true });
+      this.setState({ searched: true, waitingForTimes: true });
+    } else if (
+      this.state.searched &&
+      nextProps.searchingVehicles === false &&
+      !this.state.sortedVehicles
+    ) {
+      //console.log(
+      //   "debug now ",
+      //   nextProps.availableVehicles.length,
+      //   nextProps.availableVehicles.filter(
+      //     v => typeof v.routeTime !== "undefined"
+      //   ).length
+      // );
+      const waitingForTimes =
+        nextProps.availableVehicles.length >
+        nextProps.availableVehicles.filter(
+          v => typeof v.routeTime !== "undefined"
+        ).length;
+
+      let data = nextProps.availableVehicles.slice(0);
+      if (!waitingForTimes) {
+        data.sort((a, b) => {
+          if (a.routeTime === -1) return 1;
+          if (b.routeTime === -1) return -1;
+          if (a.routeTime < b.routeTime) return -1;
+          return 1;
+        });
+      }
+
+      this.setState({
+        waitingForTimes: waitingForTimes,
+        data: data,
+        sortedVehicles: !waitingForTimes
+      });
     }
   }
 
@@ -47,6 +101,7 @@ class SelectVehicle extends PureComponent {
     <SelectVehicleItem
       data={item}
       index={index}
+      sortedVehicles={this.state.sortedVehicles}
       onPressItem={this.props.onSelectVehicle}
       onGetVehicleTime={this.props.onGetVehicleTime}
     />
@@ -57,43 +112,41 @@ class SelectVehicle extends PureComponent {
   );
 
   render() {
-    console.log("render select vehicles ", this.props.availableVehicles);
-    const {
-      availableVehicles,
-      inNextTransition,
-      inPrevTransition
-    } = this.props;
+    //console.log("render select vehicles debug now", this.state);
+    const { inNextTransition, inPrevTransition, width } = this.props;
 
-    if (inNextTransition || inPrevTransition) {
+    if (inNextTransition || inPrevTransition || this.state.waitingForTimes) {
       return (
         <View
           style={{
-            flex: 1,
             paddingTop: 48,
+            width: "auto",
+            height: "auto",
+            backgroundColor: "red",
             flexDirection: "row",
             justifyContent: "flex-start",
             alignItems: "flex-start",
             flexWrap: "nowrap"
           }}
         >
-          {[0, 1, 2, 3].map(i => (
-            <SelectVehicleItem key={i} placeholder={true} index={i} />
-          ))}
+          {[0, 1, 2, 3].map(i => <SelectVehicleItem key={i} index={i} />)}
         </View>
       );
     }
-    console.log("not in next transition lognow");
+
+    //console.log("render select vehicles debug now SHOW ", this.state);
     return (
       <View
         style={{
-          flex: 1,
-          paddingTop: 38
+          paddingTop: 38,
+          width: "auto",
+          height: "auto"
         }}
       >
         <FlatList
           horizontal={true}
           legacyImplementation={false}
-          data={availableVehicles}
+          data={this.state.data}
           keyExtractor={this.keyExtractor}
           renderItem={this.renderItem}
         />

@@ -1,8 +1,6 @@
 /* class Vehicles is singleton class handling Vehicles OpenTransport API  */
 export class Vehicles {
-  constructor() {
-    super(props);
-  }
+  constructor(props) {}
 
   get() {
     return fetch("https://facebook.github.io/react-native/movies.json")
@@ -11,7 +9,7 @@ export class Vehicles {
         return responseJson.movies;
       })
       .catch(error => {
-        console.error(error);
+        //console.error(error);
       });
   }
 }

@@ -8,9 +8,9 @@ import config from "./config/config";
 
 import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
-import VersionNumber from "react-native-version-number";
+// import VersionNumber from "react-native-version-number";
 
-const appVersion = "v" + VersionNumber.appVersion;
+const appVersion = "v0.0.8";
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();

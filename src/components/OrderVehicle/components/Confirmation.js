@@ -32,13 +32,14 @@ class Confirmation extends PureComponent {
   }
 
   render() {
-    console.log("COnfirmation ", this.props);
+    //console.log("COnfirmation ", this.props);
     return (
       <View
         style={{
-          paddingTop: 65,
-          flex: 1,
-          width: "100%",
+          paddingTop: 20,
+          width: "auto",
+          height: "auto",
+
           flexDirection: "column",
           justifyContent: "flex-start",
           alignItems: "flex-start",

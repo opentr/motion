@@ -137,7 +137,7 @@ export function onCreateBooking() {
         error => console.log("create booking - An error occured.", error)
       )
       .then(json => {
-        console.log("create booking ", json);
+        //console.log("create booking ", json);
         if (json.booking_id) {
           // save booking info in state
           json.id = json.booking_id;
@@ -153,7 +153,8 @@ export function onCreateBooking() {
 /** GET UPDATED BOOKING INFO */
 export function getBookingUpdate() {
   return (dispatch, getState) => {
-    console.log("get booking update");
+    //console.log("get booking update");
+
     const bookingId = getState().ordering.booking.booking_id;
 
     fetch(
@@ -173,7 +174,7 @@ export function getBookingUpdate() {
         error => console.log("get booking - An error occured.", error)
       )
       .then(json => {
-        console.log("get booking ", json);
+        //console.log("get booking ", json);
 
         const booking = getState().ordering.booking;
         if (
@@ -204,7 +205,7 @@ export function getBookingUpdate() {
 export function onLoadVehicles() {
   // vehicle format
 
-  console.log("load vehicles");
+  //console.log("load vehicles");
   return (dispatch, getState) => {
     // get current region
     const region = getState().map.region;
@@ -234,7 +235,7 @@ export function onLoadVehicles() {
           "," +
           region.longitude;
 
-    console.log("vehicle update URL ", url);
+    //console.log("vehicle update URL ", url);
 
     fetch(url, {
       method: "get",
@@ -276,13 +277,15 @@ export function onLoadVehicles() {
                 status === "cancelled_by_supplier" ||
                 status === "cancelled_by_user")
             )
-          )
+          ) {
             dispatch(
               onGetVehicleTime(
                 responseVehicles[0].id,
                 responseVehicles[0].position
               )
             );
+            dispatch(onRecenterMap());
+          }
         }
       });
   };
@@ -293,7 +296,7 @@ export function onLoadVehicles() {
  * @param {*String} stepId 
  */
 export function onRecenterMap(stepId) {
-  console.log("on recenter map now", stepId);
+  //console.log("on recenter map now", stepId);
   return (dispatch, getState) => {
     const ordering = Object.assign({}, getState().ordering);
 
@@ -353,32 +356,38 @@ export function onRecenterMap(stepId) {
         })
       );
     } else if (stepId === "traveling") {
-      return dispatch(
-        onRegionChange({
-          latitude:
-            (ordering.fromData.geometry.location.lat +
-              ordering.selectedVehicle.position.lat) /
-            2,
-          longitude:
-            (ordering.fromData.geometry.location.lng +
-              ordering.selectedVehicle.position.lng) /
-            2,
-          latitudeDelta: Math.max(
-            0.005,
-            Math.abs(
-              ordering.fromData.geometry.location.lat -
-                ordering.selectedVehicle.position.lat
-            ) * 1.5
-          ),
-          longitudeDelta: Math.max(
-            0.005,
-            Math.abs(
-              ordering.fromData.geometry.location.lng -
-                ordering.selectedVehicle.position.lng
-            ) * 1.5
-          )
-        })
-      );
+      //console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
+      if (
+        "selectedVehicle" in ordering &&
+        "position" in ordering.selectedVehicle
+      ) {
+        return dispatch(
+          onRegionChange({
+            latitude:
+              (ordering.fromData.geometry.location.lat +
+                ordering.selectedVehicle.position.lat) /
+              2,
+            longitude:
+              (ordering.fromData.geometry.location.lng +
+                ordering.selectedVehicle.position.lng) /
+              2,
+            latitudeDelta: Math.max(
+              0.005,
+              Math.abs(
+                ordering.fromData.geometry.location.lat -
+                  ordering.selectedVehicle.position.lat
+              ) * 1.5
+            ),
+            longitudeDelta: Math.max(
+              0.005,
+              Math.abs(
+                ordering.fromData.geometry.location.lng -
+                  ordering.selectedVehicle.position.lng
+              ) * 1.5
+            )
+          })
+        );
+      }
     } else if (ordering.toData && ordering.fromData) {
       // recenter region focusing on pickup and destination
       return dispatch(
@@ -396,14 +405,14 @@ export function onRecenterMap(stepId) {
             Math.abs(
               ordering.toData.geometry.location.lat -
                 ordering.fromData.geometry.location.lat
-            ) * 1.5
+            ) * 2.2
           ),
           longitudeDelta: Math.max(
             0.005,
             Math.abs(
               ordering.toData.geometry.location.lng -
                 ordering.fromData.geometry.location.lng
-            ) * 1.5
+            ) * 2.2
           )
         })
       );
@@ -512,7 +521,7 @@ export function onPrevStep() {
  */
 export function onGetVehicleTime(id, location) {
   return (dispatch, getState) => {
-    console.log("on get vehicle time lognow ", id, location);
+    //console.log("on get vehicle time debug now ", id, location);
 
     const fromData = getState().ordering.fromData;
 
@@ -522,52 +531,58 @@ export function onGetVehicleTime(id, location) {
     )
       .then(
         response => response.json(),
-        error =>
-          console.log("An error occured loading search vehicle results.", error)
+        error => {
+          console.log(
+            "An error occured loading search vehicle results.",
+            error
+          );
+        }
       )
       .then(json => {
-        console.log("route json vehicle time", json);
-
-        // exit if there is no route or no legs information
-        if (!("routes" in json) || (json.routes && json.routes.length === 0))
-          return false;
+        //console.log("route json vehicle time debugnow", json);
 
         // calculate route time
-        let routeTime = 0;
-        try {
-          const route = json.routes[0];
-          console.log("vehicle time route", route);
+        let routeTime = -1;
 
-          // if the route has no legs information
-          if (!"legs" in route) return false;
+        // exit if there is no route or no legs information
+        if (!("routes" in json) || (json.routes && json.routes.length === 0)) {
+          routeTime = -1;
+        } else {
+          try {
+            const route = json.routes[0];
+            console.log("vehicle time route", route);
 
-          route.legs.map(leg => {
-            routeTime += leg.duration.value;
-          });
-          routeTime = Math.round(routeTime / 60);
-        } catch (error) {
-          console.log(error);
-          routeTime = false;
-          return false;
+            // if the route has no legs information
+            if (!"legs" in route) return false;
+
+            route.legs.map(leg => {
+              routeTime += leg.duration.value;
+            });
+            routeTime = Math.round(routeTime / 60);
+          } catch (error) {
+            //console.log(error);
+            routeTime = -1;
+            return false;
+          }
         }
 
         const currStepId = getState().ordering.currStep.id;
 
-        console.log("update time ", currStepId);
+        //console.log("update time debugnow", id, routeTime);
 
         if (currStepId === "traveling") {
           // update booking time to arrival
           const booking = Object.assign({}, getState().ordering.booking);
 
-          console.log(
-            "update time ",
-            booking.booking_id,
-            id,
-            routeTime,
-            booking.booking_id === id
-          );
+          // console.log(
+          //   "update time ",
+          //   booking.booking_id,
+          //   id,
+          //   routeTime,
+          //   booking.booking_id === id
+          // );
 
-          if (booking.vehicle_id === id && routeTime !== false) {
+          if (booking.vehicle_id === id) {
             console.log("update driver away time ");
             // dispatch map update with vehicles update
             dispatch({
@@ -583,15 +598,14 @@ export function onGetVehicleTime(id, location) {
           // we are updating availableVehicles list
 
           // update vehicle list with specific time
-          console.log("vehicle time route time ", routeTime);
-          let availableVehicles = getState().ordering.availableVehicles.slice(
-            0
-          );
+          //console.log("vehicle time route time ", routeTime);
+          let availableVehicles = getState().ordering.availableVehicles.slice();
+
           const findId = findWithAttr(availableVehicles, "id", id);
-          console.log("vehicle time findId", findId);
+          //console.log("vehicle time findId", findId);
 
           if (findId !== -1) {
-            console.log("vehicle time assign");
+            //console.log("vehicle time assign");
 
             const vehicle = availableVehicles[findId];
 
@@ -639,7 +653,7 @@ export function getRoute() {
           console.log("An error occured loading search vehicle results.", error)
       )
       .then(json => {
-        console.log("route json", json);
+        //console.log("route json", json);
         if (!("routes" in json)) return false;
 
         try {
@@ -688,6 +702,11 @@ export function onSearchForVehicle() {
       return false;
     }
 
+    dispatch({
+      type: UPDATE_ORDERING_DATA,
+      payload: { availableVehicles: [], searchingVehicles: true }
+    });
+
     // get search radius from config
     const radius = config.api.openTransport.searchRadius;
 
@@ -702,7 +721,7 @@ export function onSearchForVehicle() {
       "," +
       fromData.geometry.location.lng;
 
-    console.log("fetch search results ", url);
+    //console.log("fetch search results ", url);
 
     fetch(url, {
       method: "get",
@@ -716,7 +735,7 @@ export function onSearchForVehicle() {
           console.log("An error occured loading search vehicle results.", error)
       )
       .then(json => {
-        console.log("search vehicles", json);
+        //console.log("search vehicles", json);
 
         // get vehicles from returned JSON
         let responseVehicles = json.vehicles || [];
@@ -733,8 +752,13 @@ export function onSearchForVehicle() {
         dispatch({
           type: UPDATE_ORDERING_DATA,
           payload: {
-            availableVehicles: responseVehicles
+            availableVehicles: responseVehicles,
+            searchingVehicles: false
           }
+        });
+
+        responseVehicles.map(v => {
+          dispatch(onGetVehicleTime(v.id, v.position));
         });
 
         // // dispatch map update with vehicles update
@@ -876,6 +900,16 @@ const ACTION_HANDLERS = {
   [REHYDRATE]: (state, action) => {
     const incoming = action.payload.ordering;
     if (incoming) {
+      if (
+        incoming.currStep.id === "traveling" &&
+        (!("selectedVehicle" in incoming) ||
+          ("selectedVehicle" in incoming &&
+            !("position" in incoming.selectedVehicle)))
+      ) {
+        return {
+          ...initialState
+        };
+      }
       return { ...state, ...incoming, availableVehicles: [] };
     }
     return state;
@@ -888,7 +922,7 @@ const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
 const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
 const vehicleSelectStepNo = findWithAttr(ORDERING_STEPS, "id", "vehicleSelect");
 const confirmationStepNo = findWithAttr(ORDERING_STEPS, "id", "confirmation");
-console.log("from to", fromStepNo, toStepNo);
+//console.log("from to", fromStepNo, toStepNo);
 // variable to store initial address information for first step on the map
 // fromStepNo stores step
 let initialAddressState = {

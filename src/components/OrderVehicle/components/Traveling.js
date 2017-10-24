@@ -32,7 +32,7 @@ class Traveling extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.getBookingUpdate();
+    if (this.props.booking.booking_id) this.props.getBookingUpdate();
     if (
       this.props.booking.status !== "completed" &&
       this.props.booking.status !== "declined" &&
@@ -74,7 +74,7 @@ class Traveling extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("traveling ", this.props.booking, nextProps.booking);
+    //console.log("traveling ", this.props.booking, nextProps.booking);
     if (nextProps.booking.status !== this.props.booking.status) {
       // statuses are different so let's get what next message should be
       this.setState(
@@ -181,7 +181,7 @@ class Traveling extends PureComponent {
   }
 
   render() {
-    console.log("Traveling ", this.props);
+    //console.log("Traveling ", this.props);
     return (
       <View
         style={{

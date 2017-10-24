@@ -88,10 +88,13 @@ class Ordering extends PureComponent {
       this.setState({ loadingBookingStatuses: true });
       this.props.onLoadBookingStatuses();
     }
+
+    this.props.onRecenterMap();
   }
 
   //
   componentWillReceiveProps(nextProps) {
+    //console.log("ordering props debug now", this.props, nextProps);
     if (
       nextProps.ordering.BOOKING_STATUSES &&
       this.state.loadingBookingStatuses
@@ -100,41 +103,33 @@ class Ordering extends PureComponent {
       this.setState({ loadingBookingStatuses: false });
     }
 
-    if (
-      this.props.ordering.currStep.id === "traveling" &&
-      (nextProps.ordering.currStep.id === "from" ||
-        nextProps.ordering.currStep.id === "to")
-    ) {
-      this.setState({ panelHeight: config.ordering.height + 40 });
-      this.state.panelTranslate.setValue(0);
-    }
-  }
-
-  componentWillUpdate(nextProps, nextState) {
     if (nextProps.ordering.currStep.id === "confirmation") {
       this.openPanel(true);
     } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
       this.closePanel(true);
     } else if (nextProps.ordering.currStep.id === "traveling") {
       this.closePanel(true);
+    } else if (
+      this.props.ordering.currStep.id === "traveling" &&
+      (nextProps.ordering.currStep.id === "from" ||
+        nextProps.ordering.currStep.id === "to")
+    ) {
+      this.setState({ panelHeight: config.ordering.height + 40 });
+      //console.log("SET PANEK TRANSLATE debug now");
+      this.state.panelTranslate.setValue(0);
     }
   }
 
   openPanel(force) {
+    //console.log("open panel debug now", this.state);
     // check if panel is on from or to step, if not do not open address input
-    if (
-      !force &&
-      !this.state.panelAnimating &&
-      !this.state.openPanel &&
-      (this.props.ordering.currStep.id !== "from" &&
-        this.props.ordering.currStep.id !== "to" &&
-        this.props.ordering.currStep.id !== "confirmation")
-    ) {
+    if (this.state.panelAnimating || this.state.panelOpen) {
       return false;
     }
 
     this.setState({
       panelAnimating: true,
+      panelOpen: false,
       panelHeight: Dimensions.get("window").height
     });
 
@@ -143,79 +138,65 @@ class Ordering extends PureComponent {
     // and bit more far away from top for confirmation step
     const targetTranslatePanel =
       -(Dimensions.get("window").height - 270) +
-      (this.props.ordering.currStep.id === "confirmation" ? 100 : 80);
+      (force || this.props.ordering.currStep.id === "confirmation" ? 100 : 80);
 
-    if (this.props.ordering.currStep.id === "confirmation") {
-      // open panel for confirmation
-      Animated.parallel([
-        Animated.timing(
-          // Animate over time
-          this.state.panelTranslate, // The animated value to drive
-          {
-            toValue: targetTranslatePanel,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-            duration: 500
-          }
-        )
-      ]).start(this.onOpenPanel);
-    } else {
-      // open panel for inputing address
+    //console.log("Target translate debug now ", targetTranslatePanel);
 
-      Animated.parallel([
-        Animated.timing(
-          // Animate over time
-          this.state.panelTranslate, // The animated value to drive
-          {
-            toValue: targetTranslatePanel,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-            duration: 500
-          }
-        ),
-        Animated.timing(
-          // Animate over time
-          this.state.titleTranslate, // The animated value to drive
-          {
-            toValue: -20,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-            duration: 500
-          }
-        ),
-        Animated.timing(
-          // Animate over time
-          this.state.buttonOpacity, // The animated value to drive
-          {
-            toValue: 0,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-            duration: 500
-          }
-        ),
-        Animated.timing(
-          // Animate over time
-          this.state.backButtonOpacity, // The animated value to drive
-          {
-            toValue: 1,
-            easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
-            useNativeDriver: true,
-            duration: 500
-          }
-        )
-      ]).start(this.onOpenPanel);
-    }
+    // open panel for inputing address
+
+    Animated.parallel([
+      Animated.timing(
+        // Animate over time
+        this.state.panelTranslate, // The animated value to drive
+        {
+          toValue: targetTranslatePanel,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+          duration: 300
+        }
+      ),
+      Animated.timing(
+        // Animate over time
+        this.state.titleTranslate, // The animated value to drive
+        {
+          toValue: -20,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+          duration: 500
+        }
+      ),
+      Animated.timing(
+        // Animate over time
+        this.state.buttonOpacity, // The animated value to drive
+        {
+          toValue: 0,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+          duration: 500
+        }
+      ),
+      Animated.timing(
+        // Animate over time
+        this.state.backButtonOpacity, // The animated value to drive
+        {
+          toValue: 1,
+          easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
+          useNativeDriver: true,
+          duration: 500
+        }
+      )
+    ]).start(this.onOpenPanel);
   }
 
   closePanel() {
-    if (this.state.panelAnimating || this.state.openPanel) return false;
+    if (this.state.panelAnimating) return false;
 
     const toValue = this.props.ordering.currStep.id === "traveling" ? 150 : 0;
 
     // set closed state
     this.setState({
-      panelOpen: false,
-      panelAnimating: true
+      panelAnimating: true,
+      panelOpen: false
     });
 
     Animated.parallel([
@@ -226,7 +207,7 @@ class Ordering extends PureComponent {
           toValue: toValue,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ),
       Animated.timing(
@@ -246,7 +227,7 @@ class Ordering extends PureComponent {
           toValue: 1,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ),
       Animated.timing(
@@ -256,7 +237,7 @@ class Ordering extends PureComponent {
           toValue: 0,
           easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       )
     ]).start(this.onClosePanel);
@@ -315,10 +296,9 @@ class Ordering extends PureComponent {
    */
   onBack() {
     Keyboard.dismiss();
-    this.setState({
-      panelOpen: false
-    });
+    this.setState({ panelOpen: false });
     this.closePanel();
+    this.props.onPrevStep();
   }
 
   /**
@@ -326,35 +306,6 @@ class Ordering extends PureComponent {
    */
   onNextStep() {
     this.props.onNextStep();
-  }
-
-  getPrevStepButton() {
-    return (
-      this.props.ordering.currStep.id !== "traveling" &&
-      (!this.state.panelOpen ||
-        this.props.ordering.currStep.id === "confirmation") &&
-      this.props.ordering.currStepNo > 0 && (
-        <TouchableOpacity
-          onPress={this.props.onPrevStep}
-          activeOpacity={0.8}
-          style={{
-            position: "absolute",
-            top: 50,
-            left: 6,
-            zIndex: 20
-          }}
-        >
-          <Animated.Image
-            source={require("../../../assets/back.png")}
-            style={{
-              width: 32,
-              height: 32,
-              opacity: this.state.buttonOpacity
-            }}
-          />
-        </TouchableOpacity>
-      )
-    );
   }
 
   getRecenterButton() {
@@ -386,7 +337,7 @@ class Ordering extends PureComponent {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={this.onBack}
-        style={{ marginRight: "auto", marginLeft: 20 }}
+        style={{ marginRight: "auto", marginLeft: 6 }}
       >
         <Animated.Image
           pointerEvents="none"
@@ -404,12 +355,40 @@ class Ordering extends PureComponent {
         source={require("../../../assets/back.png")}
         style={{
           width: 32,
-          marginLeft: 20,
+          marginLeft: 6,
           height: 32,
           marginRight: "auto",
           opacity: this.state.backButtonOpacity
         }}
       />
+    );
+  }
+  getPrevStepButton() {
+    return (
+      this.props.ordering.currStep.id !== "traveling" &&
+      !this.state.panelOpen &&
+      this.props.ordering.currStep.id !== "confirmation" &&
+      this.props.ordering.currStepNo > 0 && (
+        <TouchableOpacity
+          onPress={this.props.onPrevStep}
+          activeOpacity={0.8}
+          style={{
+            position: "absolute",
+            top: 50,
+            left: 6,
+            zIndex: 20
+          }}
+        >
+          <Animated.Image
+            source={require("../../../assets/back.png")}
+            style={{
+              width: 32,
+              height: 32,
+              opacity: this.state.buttonOpacity
+            }}
+          />
+        </TouchableOpacity>
+      )
     );
   }
 
@@ -495,6 +474,7 @@ class Ordering extends PureComponent {
               this.props.ordering.currStepNo ===
               this.props.ordering.vehicleSelectStepNo,
             availableVehicles: this.props.availableVehicles,
+            searchingVehicles: this.props.ordering.searchingVehicles,
             onSearchForVehicle: this.props.onSearchForVehicle,
             onSelectVehicle: this.props.onSelectVehicle,
             onGetVehicleTime: this.props.onGetVehicleTime
@@ -532,7 +512,7 @@ class Ordering extends PureComponent {
     let data = {};
     const stepsData = this.getStepsData(currStepId, currStepNo, width);
 
-    // console.log("steps now", stepsData);
+    //console.log("steps now", stepsData);
 
     return (
       <Steps
@@ -548,7 +528,7 @@ class Ordering extends PureComponent {
   }
 
   render() {
-    console.log("render ordering ", this.props.ordering);
+    //console.log("render ordering ", this.props.ordering);
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full width
 
@@ -571,6 +551,15 @@ class Ordering extends PureComponent {
           transform: [{ translateY: this.state.panelTranslate }]
         }}
       >
+        <View
+          style={{
+            position: "absolute",
+            top: 40,
+            width: width,
+            backgroundColor: "white",
+            height: height
+          }}
+        />
         {/* Back button for previous steps */}
         {this.getPrevStepButton()}
 

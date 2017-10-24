@@ -9,7 +9,7 @@ const config = {
       apiPrefix: "/api/beta",
       /* radius API will use to find vehicles */
       searchRadius: 10000,
-      refreshInterval: 5000,
+      refreshInterval: 15000,
       refreshBooking: 3000
     },
     google: {

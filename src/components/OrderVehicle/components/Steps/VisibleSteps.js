@@ -10,6 +10,12 @@ class VisibleSteps extends Component {
     ...Component.defaultProps
   };
 
+  componentDidMount() {}
+
+  onLayout(e) {
+    console.log("on layout", e.nativeEvent.layout);
+  }
+
   render() {
     // console.log("render VisibleSteps now", this.props);
 
@@ -81,9 +87,10 @@ class VisibleSteps extends Component {
           <View
             key="first"
             style={{
-              width: width,
-              minHeight: 400
+              width: width
             }}
+            ref={first => (this.first = first)}
+            onLayout={this.onLayout}
           >
             {renderStep(
               steps[firstSlideStep],
@@ -98,10 +105,11 @@ class VisibleSteps extends Component {
         {showSecondSlide && (
           <View
             key="second"
+            ref={second => (this.second = second)}
             style={{
-              width: width,
-              minHeight: 400
+              width: width
             }}
+            onLayout={this.onLayout}
           >
             {renderStep(
               steps[secondSlideStep],

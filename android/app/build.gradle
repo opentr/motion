@@ -91,7 +91,7 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.1'
     
     dexOptions {
         javaMaxHeapSize "2g"
@@ -150,15 +150,17 @@ repositories {
         mavenCentral()
     }
 dependencies {
-    compile project(':react-native-version-number')
+    compile project(':bugsnag-react-native')
+   
     compile 'com.facebook.android:facebook-android-sdk:4+)'
     compile project(':react-native-facebook-login')
-    compile "com.google.android.gms:play-services-base:10.2.4"
-    compile "com.google.android.gms:play-services-maps:10.2.4"
+    compile 'com.google.android.gms:play-services-base:10.2.4'
+    compile 'com.google.android.gms:play-services-maps:10.2.4'
     compile project(':react-native-maps')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.1.1"
-    compile "com.facebook.react:react-native:+"  // From node_modules
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.facebook.react:react-native:+'
+    // From node_modules
 }
 
 // dependencies {
