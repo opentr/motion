@@ -111,10 +111,10 @@ class SelectFromToTime extends PureComponent {
               styles.actionText,
               {
                 width: 0.9 * width,
-                paddingTop: 10,
                 height: Platform.OS === "ios" ? 40 : 60,
                 textAlign: "left",
-                textAlignVertical: "center"
+                textAlignVertical: "center",
+                marginTop: -5
               }
             ]}
           />
@@ -166,10 +166,6 @@ class SelectFromToTime extends PureComponent {
     );
   }
 
-  onLayout(e) {
-    console.log("on layout from to", e.nativeEvent.layout);
-  }
-
   render() {
     let title = "",
       value = "",
@@ -217,7 +213,6 @@ class SelectFromToTime extends PureComponent {
             styles.baseText,
             {
               marginTop: 35,
-              paddingBottom: 5,
               textAlignVertical: "center",
               textAlign: "center",
               transform: [{ translateY: this.props.animated.titleTranslate }]
@@ -231,7 +226,8 @@ class SelectFromToTime extends PureComponent {
         {/* Value text for from, to address, time etc. ... can be clicked in steps that need action */}
         <Animated.Text
           onPress={() => {
-            this.props.openPanel();
+            if (this.props.stepId === "from" || this.props.stepId === "to")
+              this.props.openPanel();
           }}
           ellipsizeMode={"tail"}
           numberOfLines={1}
@@ -243,6 +239,7 @@ class SelectFromToTime extends PureComponent {
               textAlign: "center",
               textAlignVertical: "center",
               marginTop: 15,
+              height: 24,
               opacity: this.props.animated.buttonOpacity,
               fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
             }

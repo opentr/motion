@@ -52,6 +52,7 @@ class Ordering extends PureComponent {
       /* is panel opening/closing */
       panelAnimating: false,
 
+      panelType: "address",
       /**
        * Animation values to be used on panel open/close
        */
@@ -93,7 +94,6 @@ class Ordering extends PureComponent {
     }
 
     this.onLayoutChange(this.props.ordering.currStep.height);
-
     this.props.onRecenterMap();
   }
 
@@ -110,6 +110,10 @@ class Ordering extends PureComponent {
 
     if (nextProps.ordering.currStepNo !== this.props.ordering.currStepNo) {
       this.onLayoutChange(nextProps.ordering.currStep.height);
+      if (nextProps.ordering.currStep.id === "traveling") {
+        // close input panel
+        this.closePanel();
+      }
     }
 
     // if (nextProps.ordering.currStep.id === "confirmation") {
@@ -168,12 +172,18 @@ class Ordering extends PureComponent {
     ).start();
   }
 
-  openPanel() {
+  openPanel(type = "address") {
     if (this.state.panelOpen) return;
 
     this.setState({
-      panelOpen: true
+      panelOpen: true,
+      panelType: type
     });
+
+    if (type === "address") {
+      this.onLayoutChange(500);
+      if (this.orderingStep) this.orderingStep.resetAddressList();
+    }
 
     // this.onLayoutChange("addressInput");
 
@@ -183,7 +193,7 @@ class Ordering extends PureComponent {
         // Animate over time
         this.state.titleTranslate, // The animated value to drive
         {
-          toValue: -20,
+          toValue: -10,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
           duration: 500
@@ -215,7 +225,8 @@ class Ordering extends PureComponent {
   closePanel() {
     if (!this.state.panelOpen) return false;
 
-    this.onLayoutChange(this.props.currStep.height);
+    if (this.state.panelType === "address")
+      this.onLayoutChange(this.props.ordering.currStep.height);
 
     // set closed state
     this.setState({
@@ -258,15 +269,6 @@ class Ordering extends PureComponent {
 
   onOpenPanel() {
     this.setState({ panelOpen: true, panelAnimating: false });
-
-    // reset addresses list when panel is opened, call component method for reset
-    if (
-      this.orderingStep &&
-      (this.props.ordering.currStep.id === "from" ||
-        this.props.ordering.currStep.id === "to")
-    ) {
-      this.orderingStep.resetAddressList();
-    }
   }
 
   onClosePanel() {
@@ -309,9 +311,8 @@ class Ordering extends PureComponent {
    */
   onBack() {
     Keyboard.dismiss();
-    this.setState({ panelOpen: false });
     this.closePanel();
-    this.props.onPrevStep();
+    if (this.state.panelType === "confirmation") this.props.onPrevStep();
   }
 
   /**
@@ -414,6 +415,7 @@ class Ordering extends PureComponent {
         return (
           <SelectFromToTime
             key={stepNo}
+            ref={step => (this.orderingStep = step)}
             {...step.data}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
@@ -438,6 +440,7 @@ class Ordering extends PureComponent {
           <Confirmation
             key={stepNo}
             {...step.data}
+            isActive={currStep === stepNo}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -502,7 +505,7 @@ class Ordering extends PureComponent {
             vehicle: this.props.ordering.selectedVehicle || {},
             actionText: this.props.ordering.currStep.action,
             onConfirmBooking: this.props.onConfirmBooking,
-            price: "£17"
+            openPanel: this.openPanel
           };
           break;
         case "traveling":

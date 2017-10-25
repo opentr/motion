@@ -23,7 +23,7 @@ export const ORDERING_STEPS = [
   /* Choose vehicle */
   { id: "vehicleSelect", height: 280 },
   /* Confirm order */
-  { id: "confirmation", action: "Confirm and book", height: 440 },
+  { id: "confirmation", action: "Confirm and book", height: 410 },
   { id: "traveling", height: 110 }
 ];
 
@@ -358,11 +358,12 @@ export function onRecenterMap(stepId) {
         })
       );
     } else if (stepId === "traveling") {
-      //console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
+      console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
       if (
         "selectedVehicle" in ordering &&
         "position" in ordering.selectedVehicle
       ) {
+        console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
         return dispatch(
           onRegionChange({
             latitude:

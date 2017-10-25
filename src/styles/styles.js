@@ -29,7 +29,25 @@ const styles = {
   inputUnderline: {
     backgroundColor: config.colors.secondary,
     height: 2
+  },
+  ordering: {
+    label: {
+      marginTop: 10,
+      marginBottom: 4,
+      fontSize: 16,
+      height: 22,
+      color: config.colors.text,
+      textAlignVertical: "top",
+      textAlign: "left"
+    },
+    confirmationInfo: {
+      fontSize: 20,
+      height: 30,
+      color: config.colors.secondary,
+      textAlignVertical: "top",
+      textAlign: "left"
+    }
   }
 };
 
-export default StyleSheet.create(styles);
+export default styles;

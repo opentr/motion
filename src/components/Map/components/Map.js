@@ -172,14 +172,21 @@ class Map extends PureComponent {
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full height
     const delta = Platform.OS == "ios" ? 20 : 0;
+
+    let mapHeight;
+    if (this.props.ordering.currStep.height < 350) {
+      mapHeight = this.mapHeight =
+        height - this.props.ordering.currStep.height + delta;
+    } else if (this.mapHeight) {
+      mapHeight = this.mapHeight;
+    } else {
+      mapHeight = this.mapHeight = height - config.ordering.height;
+    }
     const mapStyle = {
       position: "absolute",
       top: 0,
       width: width,
-      height:
-        this.props.ordering.currStep.height < 350
-          ? height - this.props.ordering.currStep.height + delta
-          : height - config.ordering.height + delta
+      height: mapHeight
     };
 
     // const { myPosition } = this.state;
