@@ -39,9 +39,8 @@ class Confirmation extends PureComponent {
           paddingTop: 20,
           width: "auto",
           height: "auto",
-
           flexDirection: "column",
-          justifyContent: "flex-start",
+          justifyContent: "flex-end",
           alignItems: "flex-start",
           paddingLeft: 10,
           paddingRight: 10

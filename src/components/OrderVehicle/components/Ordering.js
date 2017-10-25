@@ -151,7 +151,7 @@ class Ordering extends PureComponent {
 
     // targetH = config.ordering.height - 85 - targetH;
     // if (targetH !== false)
-    this.animatePanelHeight(config.ordering.height - 85 - height);
+    this.animatePanelHeight(-(height + 40));
   }
 
   animatePanelHeight(newHeight) {
@@ -327,7 +327,7 @@ class Ordering extends PureComponent {
         activeOpacity={0.8}
         style={{
           position: "absolute",
-          top: 6,
+          top: 8,
           right: 8,
           zIndex: 20
         }}
@@ -553,7 +553,7 @@ class Ordering extends PureComponent {
       <Animated.View
         style={{
           position: "absolute",
-          top: height - config.ordering.height,
+          top: height - 1,
           zIndex: 1000,
           backgroundColor: "rgba(0,0,0,0)",
           width: width,

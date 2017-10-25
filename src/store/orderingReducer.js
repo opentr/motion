@@ -15,16 +15,16 @@ import { findWithAttr } from "../utils/search";
 // ordering steps, feel free to change titles but DO NOT CHANGE the ids
 export const ORDERING_STEPS = [
   /* Drop off location */
-  { id: "to", title: "Drop me at", action: "Next", height: 180 },
+  { id: "to", title: "Drop me at", action: "Next", height: 220 },
   /* Pick up location */
-  { id: "from", title: "Pick me up from", action: "Next", height: 180 },
+  { id: "from", title: "Pick me up from", action: "Next", height: 220 },
   /* Time of ride */
-  { id: "time", title: "When?", action: "Next", height: 180 },
+  { id: "time", title: "When?", action: "Next", height: 220 },
   /* Choose vehicle */
-  { id: "vehicleSelect", height: 240 },
+  { id: "vehicleSelect", height: 280 },
   /* Confirm order */
-  { id: "confirmation", action: "Confirm and book", height: 400 },
-  { id: "traveling", height: 70 }
+  { id: "confirmation", action: "Confirm and book", height: 440 },
+  { id: "traveling", height: 110 }
 ];
 
 /**
@@ -970,7 +970,6 @@ if (fromStepNo < toStepNo) {
 // initial values for reducer
 const initialState = {
   currStepNo: 0,
-  height: config.ordering.height,
   currStep: ORDERING_STEPS[0],
   /* vehicles displated on the map */
   vehicles: [],

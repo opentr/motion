@@ -177,8 +177,8 @@ class Map extends PureComponent {
       top: 0,
       width: width,
       height:
-        this.props.ordering.currStep.height < 300
-          ? height - this.props.ordering.currStep.height - 40
+        this.props.ordering.currStep.height < 350
+          ? height - this.props.ordering.currStep.height
           : height - config.ordering.height
     };
 
