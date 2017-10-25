@@ -151,7 +151,8 @@ class Ordering extends PureComponent {
 
     // targetH = config.ordering.height - 85 - targetH;
     // if (targetH !== false)
-    this.animatePanelHeight(-(height + 40));
+    const delta = Platform.OS == "ios" ? 20 : 0;
+    this.animatePanelHeight(-(height + 40) + delta);
   }
 
   animatePanelHeight(newHeight) {
