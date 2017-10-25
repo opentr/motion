@@ -193,7 +193,6 @@ class Traveling extends PureComponent {
           alignItems: "center",
           paddingTop: 35
         }}
-        onLayout={this.props.onLayout}
       >
         <Animated.Text
           style={{

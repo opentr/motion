@@ -12,17 +12,17 @@ class VisibleSteps extends Component {
 
   constructor(props) {
     super(props);
-    this.onLayout = this.onLayout.bind(this);
+    // this.onLayout = this.onLayout.bind(this);
     // this.onLayoutFirst = this.onLayoutFirst.bind(this);
     // this.onLayoutSecond = this.onLayoutSecond.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidUpdate() {}
 
-  onLayout(e) {
-    console.log("on layout", e);
-    this.props.onLayoutChange(e.nativeEvent.layout);
-  }
+  // onLayout(height) {
+  //   console.log("on layout", e);
+  //   this.props.onLayoutChange({ height: height });
+  // }
 
   // onLayoutFirst(e) {
   //   console.log("on layout first", this.props, e);
@@ -99,7 +99,7 @@ class VisibleSteps extends Component {
     return (
       <View
         style={{
-          width: width * 2,
+          width: width * 2 + 2,
           height: "auto",
           flexDirection: slideOrder
         }}
@@ -117,8 +117,7 @@ class VisibleSteps extends Component {
               firstSlideStep,
               currStepNo,
               inPrevTransition,
-              inNextTransition,
-              this.onLayout
+              inNextTransition
             )}
           </View>
         )}
@@ -136,8 +135,7 @@ class VisibleSteps extends Component {
               secondSlideStep,
               currStepNo,
               inPrevTransition,
-              inNextTransition,
-              this.onLayout
+              inNextTransition
             )}
           </View>
         )}

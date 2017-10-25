@@ -116,7 +116,6 @@ class Steps extends Component {
           renderStep={renderStep}
           steps={this.props.steps}
           currStepSlide={this.state.currStepSlide}
-          onLayoutChange={this.props.onLayoutChange}
         />
       </Animated.View>
     );

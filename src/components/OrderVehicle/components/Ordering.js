@@ -92,6 +92,8 @@ class Ordering extends PureComponent {
       this.props.onLoadBookingStatuses();
     }
 
+    this.onLayoutChange(this.props.ordering.currStep.height);
+
     this.props.onRecenterMap();
   }
 
@@ -104,6 +106,10 @@ class Ordering extends PureComponent {
     ) {
       // mark that booking statuses was loaded from the API
       this.setState({ loadingBookingStatuses: false });
+    }
+
+    if (nextProps.ordering.currStepNo !== this.props.ordering.currStepNo) {
+      this.onLayoutChange(nextProps.ordering.currStep.height);
     }
 
     // if (nextProps.ordering.currStep.id === "confirmation") {
@@ -123,20 +129,29 @@ class Ordering extends PureComponent {
     // }
   }
 
-  onLayoutChange(layout) {
-    console.log("on layout change ", layout.height);
-    const height = Dimensions.get("window").height; //full width
+  onLayoutChange(height) {
+    // let targetH = false;
+    // switch (step) {
+    //   case "from":
+    //   case "to":
+    //   case "time":
+    //     targetH = 180;
+    //     break;
+    //   case "vehicleSelect":
+    //     targetH = 240;
+    //     break;
+    //   case "confirmation":
+    //   case "addressInput":
+    //     targetH = 400;
+    //     break;
+    //   case "traveling":
+    //     targetH = 70;
+    //     break;
+    // }
 
-    // this.state.panelTranslate.setValue(
-    //   config.ordering.height - 85 - layout.height
-    // );
-    // this.setState({
-    //   targetPanelHeight: config.ordering.height - 85 - layout.height
-    // });
-
-    const targetH = config.ordering.height - 85 - layout.height;
-
-    this.animatePanelHeight(targetH);
+    // targetH = config.ordering.height - 85 - targetH;
+    // if (targetH !== false)
+    this.animatePanelHeight(config.ordering.height - 85 - height);
   }
 
   animatePanelHeight(newHeight) {
@@ -152,42 +167,17 @@ class Ordering extends PureComponent {
     ).start();
   }
 
-  openPanel(force) {
-    return false;
-
-    //console.log("open panel debug now", this.state);
-    // check if panel is on from or to step, if not do not open address input
-    if (this.state.panelAnimating || this.state.panelOpen) {
-      return false;
-    }
+  openPanel() {
+    if (this.state.panelOpen) return;
 
     this.setState({
-      panelAnimating: true,
-      panelOpen: false
+      panelOpen: true
     });
 
-    // determine top position for the panel
-    // slightly closer to the top on address input
-    // and bit more far away from top for confirmation step
-    const targetTranslatePanel =
-      -(Dimensions.get("window").height - 270) +
-      (force || this.props.ordering.currStep.id === "confirmation" ? 100 : 80);
-
-    //console.log("Target translate debug now ", targetTranslatePanel);
+    // this.onLayoutChange("addressInput");
 
     // open panel for inputing address
-
     Animated.parallel([
-      Animated.timing(
-        // Animate over time
-        this.state.panelTranslate, // The animated value to drive
-        {
-          toValue: targetTranslatePanel,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-          duration: 300
-        }
-      ),
       Animated.timing(
         // Animate over time
         this.state.titleTranslate, // The animated value to drive
@@ -222,29 +212,16 @@ class Ordering extends PureComponent {
   }
 
   closePanel() {
-    return false;
+    if (!this.state.panelOpen) return false;
 
-    if (this.state.panelAnimating) return false;
-
-    const toValue = this.props.ordering.currStep.id === "traveling" ? 150 : 0;
+    this.onLayoutChange(this.props.currStep.height);
 
     // set closed state
     this.setState({
-      panelAnimating: true,
       panelOpen: false
     });
 
     Animated.parallel([
-      Animated.timing(
-        // Animate over time
-        this.state.panelTranslate, // The animated value to drive
-        {
-          toValue: toValue,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-          duration: 300
-        }
-      ),
       Animated.timing(
         // Animate over time
         this.state.titleTranslate, // The animated value to drive
@@ -427,14 +404,7 @@ class Ordering extends PureComponent {
     );
   }
 
-  getStep(
-    step,
-    stepNo,
-    currStep,
-    inPrevTransition,
-    inNextTransition,
-    onLayout
-  ) {
+  getStep(step, stepNo, currStep, inPrevTransition, inNextTransition) {
     const currStepId = step.id;
     switch (currStepId) {
       case "from":
@@ -444,7 +414,6 @@ class Ordering extends PureComponent {
           <SelectFromToTime
             key={stepNo}
             {...step.data}
-            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -456,7 +425,6 @@ class Ordering extends PureComponent {
           <SelectVehicle
             key={stepNo}
             {...step.data}
-            onLayout={onLayout}
             isActive={currStep === stepNo}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
@@ -469,7 +437,6 @@ class Ordering extends PureComponent {
           <Confirmation
             key={stepNo}
             {...step.data}
-            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -480,7 +447,6 @@ class Ordering extends PureComponent {
           <Traveling
             key={stepNo}
             {...step.data}
-            onLayout={onLayout}
             inPrevTransition={inPrevTransition && currStep === stepNo}
             inNextTransition={inNextTransition && currStep === stepNo}
           />
@@ -563,7 +529,6 @@ class Ordering extends PureComponent {
 
     return (
       <Steps
-        onLayoutChange={this.onLayoutChange}
         style={{ marginTop: 35 }}
         width={width}
         height={this.state.panelHeight}

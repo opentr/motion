@@ -132,7 +132,6 @@ class SelectVehicle extends PureComponent {
             alignItems: "flex-start",
             flexWrap: "nowrap"
           }}
-          onLayout={this.props.onLayout}
         >
           {[0, 1, 2, 3].map(i => <SelectVehicleItem key={i} index={i} />)}
         </View>
@@ -147,7 +146,6 @@ class SelectVehicle extends PureComponent {
           width: "auto",
           height: "auto"
         }}
-        onLayout={this.props.onLayout}
       >
         <FlatList
           horizontal={true}

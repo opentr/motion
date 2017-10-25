@@ -15,16 +15,16 @@ import { findWithAttr } from "../utils/search";
 // ordering steps, feel free to change titles but DO NOT CHANGE the ids
 export const ORDERING_STEPS = [
   /* Drop off location */
-  { id: "to", title: "Drop me at", action: "Next" },
+  { id: "to", title: "Drop me at", action: "Next", height: 180 },
   /* Pick up location */
-  { id: "from", title: "Pick me up from", action: "Next" },
+  { id: "from", title: "Pick me up from", action: "Next", height: 180 },
   /* Time of ride */
-  { id: "time", title: "When?", action: "Next" },
+  { id: "time", title: "When?", action: "Next", height: 180 },
   /* Choose vehicle */
-  { id: "vehicleSelect" },
+  { id: "vehicleSelect", height: 240 },
   /* Confirm order */
-  { id: "confirmation", action: "Confirm and book" },
-  { id: "traveling" }
+  { id: "confirmation", action: "Confirm and book", height: 400 },
+  { id: "traveling", height: 70 }
 ];
 
 /**
@@ -660,6 +660,7 @@ export function getRoute() {
 
         try {
           const route = json.routes[0];
+
           let points = Polyline.decode(route.overview_polyline.points);
           let coords = points.map((point, index) => {
             return {
@@ -813,7 +814,6 @@ export function simulateOrdering() {
         }
       });
     }, 3000);
-
     // dispatch driver on its way
     setTimeout(() => {
       dispatch({
@@ -823,7 +823,6 @@ export function simulateOrdering() {
         }
       });
     }, 5000);
-
     // dispatch driver arrives info
     setTimeout(() => {
       dispatch({
@@ -842,7 +841,6 @@ export function simulateOrdering() {
         }
       });
     }, 30000);
-
     // dispatch ride completed
     setTimeout(() => {
       dispatch({
@@ -972,6 +970,7 @@ if (fromStepNo < toStepNo) {
 // initial values for reducer
 const initialState = {
   currStepNo: 0,
+  height: config.ordering.height,
   currStep: ORDERING_STEPS[0],
   /* vehicles displated on the map */
   vehicles: [],

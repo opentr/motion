@@ -48,7 +48,7 @@ const config = {
 
   /** ordering steps UI config */
   ordering: {
-    height: 270
+    height: 225
   },
   /** show version number */
   showVersionNumber: true,

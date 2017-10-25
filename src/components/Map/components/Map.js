@@ -177,7 +177,9 @@ class Map extends PureComponent {
       top: 0,
       width: width,
       height:
-        height - config.ordering.height + (this.state.mapExpanded ? 150 : 0)
+        this.props.ordering.currStep.height < 300
+          ? height - this.props.ordering.currStep.height - 40
+          : height - config.ordering.height
     };
 
     // const { myPosition } = this.state;
@@ -334,7 +336,7 @@ class Map extends PureComponent {
                     vehicle.id === this.props.ordering.selectedVehicle.id)
                     ? 1
                     : 0.1,
-                zIndex: 500
+                zIndex: 990
               }}
               coordinate={{
                 latitude: vehicle.position.lat,

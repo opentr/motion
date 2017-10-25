@@ -41,6 +41,6 @@ to clear the old app state in AsyncStorage:
 3. delete the line below
  */
 
-//persistor.purge();
+// persistor.purge();
 
 export default store;

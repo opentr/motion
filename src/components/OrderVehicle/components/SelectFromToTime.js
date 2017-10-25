@@ -33,6 +33,8 @@ class SelectFromToTime extends PureComponent {
     this.onAddressClick = this.onAddressClick.bind(this);
   }
 
+  componentDidMount() {}
+
   componentWillUnmount() {
     timer.clearTimeout("fetchAddresses");
   }
@@ -164,6 +166,10 @@ class SelectFromToTime extends PureComponent {
     );
   }
 
+  onLayout(e) {
+    console.log("on layout from to", e.nativeEvent.layout);
+  }
+
   render() {
     let title = "",
       value = "",
@@ -203,17 +209,17 @@ class SelectFromToTime extends PureComponent {
           justifyContent: "flex-start",
           alignItems: "center"
         }}
-        onLayout={this.props.onLayout}
+        ref={view => this.view}
       >
         {/* Title of the panel */}
         <Animated.Text
           style={[
             styles.baseText,
             {
-              paddingTop: 50,
+              marginTop: 35,
+              paddingBottom: 5,
               textAlignVertical: "center",
               textAlign: "center",
-              height: 80,
               transform: [{ translateY: this.props.animated.titleTranslate }]
             }
           ]}
@@ -237,8 +243,6 @@ class SelectFromToTime extends PureComponent {
               textAlign: "center",
               textAlignVertical: "center",
               marginTop: 15,
-              height: 60,
-
               opacity: this.props.animated.buttonOpacity,
               fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
             }
@@ -250,7 +254,7 @@ class SelectFromToTime extends PureComponent {
           style={[
             styles.baseText,
             styles.buttonText,
-            { paddingTop: 25, opacity: this.props.animated.buttonOpacity }
+            { marginTop: 30, opacity: this.props.animated.buttonOpacity }
           ]}
           onPress={this.props.onNextStep}
         >
