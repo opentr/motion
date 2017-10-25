@@ -70,7 +70,7 @@ class Confirmation extends PureComponent {
           style={{
             marginTop: 18,
             fontSize: 30,
-            width: this.props.width * 0.9,
+            width: this.props.width,
             color: config.colors.alert,
             textAlign: "center"
           }}

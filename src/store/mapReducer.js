@@ -5,15 +5,23 @@ import config from "../config/config";
  */
 export const UPDATE_MAP_DATA = "UPDATE_MAP_DATA";
 export const UPDATE_REGION = "UPDATE_REGION";
+export const UPDATE_ACTION = "UPDATE_ACTION";
 export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 
+import { regionDifferent } from "../utils/numbers";
 /**
  * ACTIONS
  */
 
 export function onRegionChange(region) {
   // dispatch map update with region data
+
   return { type: UPDATE_REGION, payload: region };
+}
+
+export function onMapAction(action) {
+  // dispatch map update with region data
+  return { type: UPDATE_ACTION, payload: action };
 }
 
 /**
@@ -35,14 +43,26 @@ export function reverseGeocodeLocation() {
     })
       .then(
         response => response.json(),
-        error => console.log("An error occured.", error)
+        error => {
+          console.error("An error occured.", error);
+          dispatch({
+            type: UPDATE_ADDRESS,
+            payload: { formatted_address: false }
+          });
+        }
       )
       .then(json => {
-        // console.log("map search", json);
+        console.log("map search", json);
 
-        if (json.results) {
+        if (json.status === "OK" && json.results && json.results.length > 0) {
           // dispatch address update that will be picked up by Ordering reducer
           dispatch({ type: UPDATE_ADDRESS, payload: json.results[0] });
+        } else {
+          dispatch({
+            type: UPDATE_ADDRESS,
+            payload: { formatted_address: false }
+          });
+          console.error("no results geocode", json);
         }
       });
   };
@@ -60,6 +80,10 @@ const ACTION_HANDLERS = {
   [UPDATE_REGION]: (state, action) => ({
     ...state,
     region: action.payload
+  }),
+  [UPDATE_ACTION]: (state, action) => ({
+    ...state,
+    action: action.payload
   })
 };
 
@@ -69,7 +93,8 @@ const initialState = {
     longitude: config.map.startLocation.longitude,
     latitudeDelta: config.map.startLocation.latitudeDelta,
     longitudeDelta: config.map.startLocation.longitudeDelta
-  }
+  },
+  action: {}
 };
 
 export default function mapReducer(state = initialState, action) {

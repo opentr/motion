@@ -15,8 +15,6 @@ import { findWithAttr } from "../../../utils/search";
 const equal = require("fast-deep-equal");
 const timer = require("react-native-timer");
 
-import { compareReal, regionDifferent } from "../../../utils/numbers";
-
 import config from "../../../config/config";
 import styles from "../../../styles/styles";
 
@@ -35,7 +33,6 @@ class Map extends PureComponent {
   constructor(props) {
     super(props);
     this.updateRegion = this.updateRegion.bind(this);
-    this.updateRegionSimple = this.updateRegionSimple.bind(this);
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
     this.restartUpdating = this.restartUpdating.bind(this);
@@ -43,47 +40,17 @@ class Map extends PureComponent {
 
     this.state = {
       mapExpanded: false,
-      myPosition: null,
-      mapAnimating: false
+      myPosition: null
     };
-
-    this.map = false;
-    this.mapReady = false;
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.ordering.currStep.id === "traveling" &&
-      this.props.ordering.currStepNo !== nextProps.ordering.currStepNo
-    ) {
-      this.restartUpdating(true);
+    if (nextProps.ordering.currStep.id === "traveling") {
       // expand map while user is traveling
-      // this.expandMap();
+      this.expandMap();
     } else {
       // return map back to normal
-      // this.contractMap();
-    }
-
-    console.log("map will receive props ", nextProps.region, this.props.region);
-    if (
-      nextProps.mapAction.action &&
-      nextProps.mapAction.action === "fitToCoordinates" &&
-      this.map &&
-      this.mapReady
-    ) {
-      this.map.fitToCoordinates(
-        nextProps.mapAction.coordinates,
-        nextProps.mapAction.options
-      );
-
-      this.props.onMapAction({});
-    } else if (
-      regionDifferent(nextProps.region, this.props.region) &&
-      this.map &&
-      this.mapReady
-    ) {
-      console.log("update map");
-      this.map.animateToRegion(nextProps.region);
+      this.contractMap();
     }
   }
 
@@ -152,34 +119,59 @@ class Map extends PureComponent {
     this.startUpdating(false);
   }
 
-  updateRegionSimple(coordinates, position) {
-    console.log(" drag ", arguments, coordinates, position);
-  }
   updateRegion(region) {
     console.log("updated region !!!", region);
-
-    // if (this.map && this.mapReady)
     // call action for region change
-    if (regionDifferent(region, this.props.region))
-      this.props.onRegionChange(region);
+    this.props.onRegionChange(region);
 
     // restart vehicle updating
     this.restartUpdating();
 
-    if (
-      this.props.ordering.currStep.id === "to" ||
-      this.props.ordering.currStep.id === "from"
-    )
-      // update address if from or to steps in ordering
-      this.props.reverseGeocodeLocation();
+    // update address if from or to steps in ordering
+
+    timer.setTimeout(
+      this,
+      "findNewAddress",
+      () => {
+        this.props.reverseGeocodeLocation();
+      },
+      150
+    );
   }
+
+  // onMapReady() {
+  //   if (Platform.OS === "android") {
+  //     PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //     ).then(granted => {
+  //       if (granted && this.mounted) this.watchLocation();
+  //     });
+  //   } else {
+  //     this.watchLocation();
+  //   }
+  // }
+
+  // watchLocation() {
+  //   // eslint-disable-next-line no-undef
+  //   this.watchID = navigator.geolocation.watchPosition(
+  //     position => {
+  //       const myLastPosition = this.state.myPosition;
+  //       const myPosition = position.coords;
+  //       if (!equal(myPosition, myLastPosition)) {
+  //         this.setState({ myPosition });
+  //       }
+  //     },
+  //     null,
+  //     config.map.geolocation
+  //   );
+  // }
 
   render() {
     // console.log("render", this.state);
 
     const width = Dimensions.get("window").width; //full width
     const height = Dimensions.get("window").height; //full height
-    const delta = Platform.OS == "ios" ? 25 : 0;
+    const delta = Platform.OS == "ios" ? 20 : 0;
 
     let mapHeight;
     if (this.props.ordering.currStep.height < 350) {
@@ -197,30 +189,45 @@ class Map extends PureComponent {
       height: mapHeight
     };
 
-    console.log(
-      "map render ",
-      this.props.ordering.currStepNo,
-      this.state.mapAnimating
-    );
-
-    const platformIOS = Platform.IOS === "ios";
-    const vehiclesList =
-      this.props.ordering.currStep.id === "traveling"
-        ? [this.props.selectedVehicle]
-        : this.props.vehicles;
+    // const { myPosition } = this.state;
+    // if (myPosition) {
+    //   const heading = myPosition.heading;
+    //   const rotate =
+    //     typeof heading === "number" && heading >= 0 ? `${heading}deg` : null;
+    // }
 
     return (
       <View style={mapStyle}>
         <MapView
           style={mapStyle}
           initialRegion={this.props.region}
+          region={this.props.region}
           showsCompass={false}
           showsBuildings={false}
+          onRegionChange={this.updateRegion}
           onRegionChangeComplete={this.updateRegion}
           rotateEnabled={false}
           legalLabelInsets={{ top: 0, left: 0, right: 0, bottom: 100 }}
           onMapReady={() => {
-            this.mapReady = true;
+            // this.map.fitToCoordinates(
+            //   [
+            //     {
+            //       latitude: this.props.region.latitude,
+            //       longitude: this.props.region.longitude
+            //     },
+            //     {
+            //       latitude:
+            //         this.props.region.latitude +
+            //         this.props.region.latitudeDelta,
+            //       longitude:
+            //         this.props.region.longitude +
+            //         this.props.region.longitudeDelta
+            //     }
+            //   ],
+            //   {
+            //     edgePadding: { top: 0, left: 100, right: 0, bottom: 100 }
+            //   }
+            // );
           }}
           ref={map => {
             this.map = map;
@@ -230,7 +237,7 @@ class Map extends PureComponent {
           {this.props.ordering.currStepNo > this.props.ordering.fromStepNo && (
             <MapView.Marker
               key={"fromMarker"}
-              anchor={{ x: 0.5, y: platformIOS ? 0 : 1 }}
+              anchor={{ x: 0.5, y: 1 }}
               coordinate={{
                 latitude: this.props.ordering.fromData.geometry.location.lat,
                 longitude: this.props.ordering.fromData.geometry.location.lng
@@ -242,8 +249,7 @@ class Map extends PureComponent {
                   maxWidth: 160,
                   flexDirection: "column",
                   justifyContent: "flex-start",
-                  alignItems: "center",
-                  transform: [{ translateY: platformIOS ? -30 : 0 }]
+                  alignItems: "center"
                 }}
               >
                 <View
@@ -280,7 +286,7 @@ class Map extends PureComponent {
           {this.props.ordering.currStepNo > this.props.ordering.toStepNo && (
             <MapView.Marker
               key={"toMarker"}
-              anchor={{ x: 0.5, y: platformIOS ? 0 : 1 }}
+              anchor={{ x: 0.5, y: 1 }}
               style={{ zIndex: 1000 }}
               coordinate={{
                 latitude: this.props.ordering.toData.geometry.location.lat,
@@ -292,8 +298,7 @@ class Map extends PureComponent {
                   maxWidth: 160,
                   flexDirection: "column",
                   justifyContent: "flex-start",
-                  alignItems: "center",
-                  transform: [{ translateY: platformIOS ? -30 : 0 }]
+                  alignItems: "center"
                 }}
               >
                 <View
@@ -326,13 +331,18 @@ class Map extends PureComponent {
               </View>
             </MapView.Marker>
           )}
-          {vehiclesList.map((vehicle, index) => (
+          {this.props.vehicles.map((vehicle, index) => (
             <MapView.Marker
               key={index}
               anchor={{ x: 0.5, y: 0.5 }}
               style={{
                 transform: [{ rotateZ: vehicle.heading + "deg" }],
-                opacity: 1,
+                opacity:
+                  !this.state.mapExpanded ||
+                  (this.state.mapExpanded &&
+                    vehicle.id === this.props.ordering.selectedVehicle.id)
+                    ? 1
+                    : 0.1,
                 zIndex: 990
               }}
               coordinate={{
@@ -347,6 +357,26 @@ class Map extends PureComponent {
               coordinates={this.props.ordering.route}
               strokeWidth={3}
               strokeColor="red"
+            />
+          )}
+          {this.state.myPosition && (
+            <MapView.Marker
+              key={index}
+              anchor={{ x: 0.5, y: 0.5 }}
+              style={{
+                transform: [{ rotateZ: vehicle.heading + "deg" }],
+                opacity:
+                  !this.state.mapExpanded ||
+                  (this.state.mapExpanded &&
+                    vehicle.id === this.props.ordering.selectedVehicle.id)
+                    ? 1
+                    : 0.1
+              }}
+              coordinate={{
+                latitude: vehicle.position.lat,
+                longitude: vehicle.position.lng
+              }}
+              image={require("../../../assets/car.png")}
             />
           )}
         </MapView>
@@ -364,8 +394,7 @@ class Map extends PureComponent {
               height: mapStyle.height,
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "transparent",
-              transform: [{ translateY: Platform.OS === "android" ? -20 : 0 }]
+              backgroundColor: "transparent"
             }}
           >
             <Image

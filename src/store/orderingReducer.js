@@ -1,10 +1,11 @@
 import config from "../config/config";
 import { REHYDRATE } from "redux-persist/constants";
+import { Platform, PixelRatio } from "react-native";
 
 const Polyline = require("@mapbox/polyline");
 
 // import function so we can update region from ordering
-import { onRegionChange } from "./mapReducer";
+import { onRegionChange, onMapAction } from "./mapReducer";
 
 import { findWithAttr } from "../utils/search";
 
@@ -192,6 +193,8 @@ export function getBookingUpdate() {
               }
             }
           });
+
+          dispatch(onRecenterMap());
         }
       });
   };
@@ -306,6 +309,8 @@ export function onRecenterMap(stepId) {
 
     const region = Object.assign({}, getState().map.region);
 
+    const pixelRatio = Platform.OS === "ios" ? 1 : PixelRatio.get();
+
     // console.log(
     //   "recenter now ",
     //   "stepId",
@@ -363,60 +368,108 @@ export function onRecenterMap(stepId) {
         "selectedVehicle" in ordering &&
         "position" in ordering.selectedVehicle
       ) {
-        console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
+        // console.log("debug now2 ", "selectedVehicle" in ordering, ordering);
+
         return dispatch(
-          onRegionChange({
-            latitude:
-              (ordering.fromData.geometry.location.lat +
-                ordering.selectedVehicle.position.lat) /
-              2,
-            longitude:
-              (ordering.fromData.geometry.location.lng +
-                ordering.selectedVehicle.position.lng) /
-              2,
-            latitudeDelta: Math.max(
-              0.005,
-              Math.abs(
-                ordering.fromData.geometry.location.lat -
-                  ordering.selectedVehicle.position.lat
-              ) * 1.5
-            ),
-            longitudeDelta: Math.max(
-              0.005,
-              Math.abs(
-                ordering.fromData.geometry.location.lng -
-                  ordering.selectedVehicle.position.lng
-              ) * 1.5
-            )
+          onMapAction({
+            action: "fitToCoordinates",
+            coordinates: [
+              {
+                latitude: ordering.fromData.geometry.location.lat,
+                longitude: ordering.fromData.geometry.location.lng
+              },
+              {
+                latitude: ordering.selectedVehicle.position.lat,
+                longitude: ordering.selectedVehicle.position.lng
+              }
+            ],
+            options: {
+              edgePadding: {
+                top: Math.round(pixelRatio * 85),
+                left: Math.round(pixelRatio * 85),
+                right: Math.round(pixelRatio * 85),
+                bottom: Math.round(pixelRatio * 50)
+              },
+              animated: true
+            }
           })
         );
+        // return dispatch(
+        //   onRegionChange({
+        //     latitude:
+        //       (ordering.fromData.geometry.location.lat +
+        //         ordering.selectedVehicle.position.lat) /
+        //       2,
+        //     longitude:
+        //       (ordering.fromData.geometry.location.lng +
+        //         ordering.selectedVehicle.position.lng) /
+        //       2,
+        //     latitudeDelta: Math.max(
+        //       0.005,
+        //       Math.abs(
+        //         ordering.fromData.geometry.location.lat -
+        //           ordering.selectedVehicle.position.lat
+        //       ) * 1.5
+        //     ),
+        //     longitudeDelta: Math.max(
+        //       0.005,
+        //       Math.abs(
+        //         ordering.fromData.geometry.location.lng -
+        //           ordering.selectedVehicle.position.lng
+        //       ) * 1.5
+        //     )
+        //   })
+        // );
       }
     } else if (ordering.toData && ordering.fromData) {
       // recenter region focusing on pickup and destination
+      // return dispatch(
+      // onRegionChange({
+      //   latitude:
+      //     (ordering.fromData.geometry.location.lat +
+      //       ordering.toData.geometry.location.lat) /
+      //     2,
+      //   longitude:
+      //     (ordering.fromData.geometry.location.lng +
+      //       ordering.toData.geometry.location.lng) /
+      //     2,
+      //   latitudeDelta: Math.max(
+      //     0.005,
+      //     Math.abs(
+      //       ordering.toData.geometry.location.lat -
+      //         ordering.fromData.geometry.location.lat
+      //     ) * 2.2
+      //   ),
+      //   longitudeDelta: Math.max(
+      //     0.005,
+      //     Math.abs(
+      //       ordering.toData.geometry.location.lng -
+      //         ordering.fromData.geometry.location.lng
+      //     ) * 2.2
+      //   )
+      // })
       return dispatch(
-        onRegionChange({
-          latitude:
-            (ordering.fromData.geometry.location.lat +
-              ordering.toData.geometry.location.lat) /
-            2,
-          longitude:
-            (ordering.fromData.geometry.location.lng +
-              ordering.toData.geometry.location.lng) /
-            2,
-          latitudeDelta: Math.max(
-            0.005,
-            Math.abs(
-              ordering.toData.geometry.location.lat -
-                ordering.fromData.geometry.location.lat
-            ) * 2.2
-          ),
-          longitudeDelta: Math.max(
-            0.005,
-            Math.abs(
-              ordering.toData.geometry.location.lng -
-                ordering.fromData.geometry.location.lng
-            ) * 2.2
-          )
+        onMapAction({
+          action: "fitToCoordinates",
+          coordinates: [
+            {
+              latitude: ordering.fromData.geometry.location.lat,
+              longitude: ordering.fromData.geometry.location.lng
+            },
+            {
+              latitude: ordering.toData.geometry.location.lat,
+              longitude: ordering.toData.geometry.location.lng
+            }
+          ],
+          options: {
+            edgePadding: {
+              top: Math.round(pixelRatio * 85),
+              left: Math.round(pixelRatio * 85),
+              right: Math.round(pixelRatio * 85),
+              bottom: Math.round(pixelRatio * 50)
+            },
+            animated: true
+          }
         })
       );
     }
@@ -474,7 +527,9 @@ export function onNextStep() {
       ) {
         dispatch(onRecenterMap("route"));
       } else if (nextStep.id === "traveling") {
-        dispatch(onRecenterMap("traveling"));
+        setTimeout(() => {
+          dispatch(onRecenterMap("traveling"));
+        }, 50);
       }
     }
   };

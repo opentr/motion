@@ -114,6 +114,8 @@ class Ordering extends PureComponent {
         // close input panel
         this.closePanel();
       }
+      if (nextProps.ordering.currStepNo < this.props.ordering.currStepNo)
+        this.props.onRecenterMap();
     }
 
     // if (nextProps.ordering.currStep.id === "confirmation") {
@@ -181,7 +183,8 @@ class Ordering extends PureComponent {
     });
 
     if (type === "address") {
-      this.onLayoutChange(500);
+      const height = Dimensions.get("window").height; //full width
+      this.onLayoutChange(height * 0.75);
       if (this.orderingStep) this.orderingStep.resetAddressList();
     }
 
@@ -282,8 +285,10 @@ class Ordering extends PureComponent {
     this.props.onRegionChange({
       latitude: data.geometry.location.lat,
       longitude: data.geometry.location.lng,
-      latitudeDelta: config.map.startLocation.latitudeDelta,
-      longitudeDelta: config.map.startLocation.longitudeDelta
+      latitudeDelta:
+        this.props.region.latitudeDelta || config.map.recenterZoom.from,
+      longitudeDelta:
+        this.props.region.longitudeDelta || config.map.recenterZoom.from
     });
 
     // call redux action for updating ordering state
@@ -351,7 +356,11 @@ class Ordering extends PureComponent {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={this.onBack}
-        style={{ marginRight: "auto", marginLeft: 6 }}
+        style={{
+          position: "absolute",
+          top: 6,
+          left: 6
+        }}
       >
         <Animated.Image
           pointerEvents="none"
@@ -368,8 +377,11 @@ class Ordering extends PureComponent {
         pointerEvents="none"
         source={require("../../../assets/back.png")}
         style={{
+          position: "absolute",
+          top: 6,
+
+          left: 6,
           width: 32,
-          marginLeft: 6,
           height: 32,
           marginRight: "auto",
           opacity: this.state.backButtonOpacity

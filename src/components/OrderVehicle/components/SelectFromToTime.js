@@ -114,7 +114,7 @@ class SelectFromToTime extends PureComponent {
                 height: Platform.OS === "ios" ? 40 : 60,
                 textAlign: "left",
                 textAlignVertical: "center",
-                marginTop: -5
+                marginTop: 0
               }
             ]}
           />
@@ -183,12 +183,12 @@ class SelectFromToTime extends PureComponent {
     switch (this.props.stepId) {
       case "from":
         title = ORDERING_STEPS[this.props.ordering.fromStepNo].title;
-        value = this.props.ordering.fromAddress || "";
+        value = this.props.ordering.fromAddress || "No address found...";
         action = ORDERING_STEPS[this.props.ordering.fromStepNo].action;
         break;
       case "to":
         title = ORDERING_STEPS[this.props.ordering.toStepNo].title;
-        value = this.props.ordering.toAddress || "";
+        value = this.props.ordering.toAddress || "No address found...";
         action = ORDERING_STEPS[this.props.ordering.toStepNo].action;
         break;
       case "time":

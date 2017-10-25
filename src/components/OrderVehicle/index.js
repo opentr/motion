@@ -19,6 +19,7 @@ import {
 
 const mapDispatchToProps = {
   onRegionChange,
+
   onUpdateOrderingData,
   onNextStep,
   onPrevStep,
@@ -35,7 +36,8 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
   ordering: state.ordering,
-  availableVehicles: state.ordering.availableVehicles
+  availableVehicles: state.ordering.availableVehicles,
+  region: state.map.region
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Ordering);
