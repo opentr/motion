@@ -64,7 +64,8 @@ class Ordering extends PureComponent {
       backButtonOpacity: new Animated.Value(0),
       /* height of the ordering panel */
       panelHeight: 600,
-      showGoogleLogin: false
+      showGoogleLogin: false,
+      showFacebookLogin: true
     };
 
     this.openPanel = this.openPanel.bind(this);
@@ -618,6 +619,53 @@ class Ordering extends PureComponent {
             height: height
           }}
         />
+
+        {this.state.showFacebookLogin && (
+          <FBLogin
+            style={{
+              zIndex: 20,
+              width: "auto",
+              left: 40,
+              height: 30,
+              flex: 0
+            }}
+            ref={fbLogin => {
+              console.log("FBLogin");
+              this.fbLogin = fbLogin;
+            }}
+            permissions={["email", "user_friends"]}
+            loginBehavior={FBLoginManager.LoginBehaviors.Native}
+            onLogin={data => {
+              console.log("Logged in!");
+              console.log(data);
+              this.setState({ user: data.credentials });
+            }}
+            onLogout={() => {
+              console.log("Logged out.");
+              this.setState({ user: null });
+            }}
+            onLoginFound={data => {
+              console.log("Existing login found.");
+              console.log(data);
+              this.setState({ user: data.credentials });
+            }}
+            onLoginNotFound={() => {
+              console.log("No user logged in.");
+              this.setState({ user: null });
+            }}
+            onError={data => {
+              console.log("ERROR");
+              console.log(data);
+            }}
+            onCancel={() => {
+              console.log("User cancelled.");
+            }}
+            onPermissionsMissing={data => {
+              console.log("Check permissions!");
+              console.log(data);
+            }}
+          />
+        )}
 
         {this.state.showGoogleLogin && (
           <GoogleSigninButton
