@@ -8,7 +8,6 @@ import config from "./config/config";
 
 import Map from "./components/Map/index";
 import OrderVehicle from "./components/OrderVehicle/index";
-// import VersionNumber from "react-native-version-number";
 
 const appVersion = "v0.0.8";
 

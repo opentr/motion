@@ -92,15 +92,13 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
-    
     dexOptions {
         javaMaxHeapSize "2g"
     }
-
     defaultConfig {
         applicationId "com.opentransport.openride"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 8
         versionName "0.0.8"
         ndk {
@@ -108,7 +106,7 @@ android {
         }
     }
     signingConfigs {
-       release {
+        release {
             if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
                 storeFile file(MYAPP_RELEASE_STORE_FILE)
                 storePassword MYAPP_RELEASE_STORE_PASSWORD
@@ -137,13 +135,15 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =xc
-                        versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                output.versionCodeOverride = xc
+                versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
         }
+    }
+    productFlavors {
     }
 }
 repositories {
@@ -151,7 +151,6 @@ repositories {
     }
 dependencies {
     compile project(':bugsnag-react-native')
-   
     compile 'com.facebook.android:facebook-android-sdk:4+)'
     compile project(':react-native-facebook-login')
     compile 'com.google.android.gms:play-services-base:10.2.4'

@@ -166,7 +166,8 @@ class Traveling extends PureComponent {
         break;
       case "driver_arriving":
         return "driverAway" in this.props.booking &&
-          typeof this.props.booking.driverAway !== "undefined"
+          typeof this.props.booking.driverAway !== "undefined" &&
+          this.props.booking.driverAway !== -1
           ? `Driver arrives in ${this.props.booking.driverAway} min` +
               (this.props.booking.driverAway > 0 ? "s" : "")
           : "Driver on its way";

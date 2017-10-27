@@ -114,7 +114,10 @@ class Ordering extends PureComponent {
         // close input panel
         this.closePanel();
       }
-      if (nextProps.ordering.currStepNo < this.props.ordering.currStepNo)
+      if (
+        nextProps.ordering.currStepNo < this.props.ordering.currStepNo ||
+        nextProps.ordering.currStep.id === "time"
+      )
         this.props.onRecenterMap();
     }
 
