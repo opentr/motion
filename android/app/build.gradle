@@ -150,17 +150,26 @@ repositories {
         mavenCentral()
     }
 dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    
+    compile(project(":react-native-google-signin")){         
+        exclude group: "com.google.android.gms" // very important
+    }
     compile project(':bugsnag-react-native')
     compile 'com.facebook.android:facebook-android-sdk:4+)'
     compile project(':react-native-facebook-login')
+
     compile 'com.google.android.gms:play-services-base:10.2.4'
     compile 'com.google.android.gms:play-services-maps:10.2.4'
+    compile 'com.google.android.gms:play-services-auth:10.2.4'
     compile project(':react-native-maps')
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.1.1'
+
+   
     compile 'com.facebook.react:react-native:+'
     // From node_modules
 }
+apply plugin: 'com.google.gms.google-services' 
 
 // dependencies {
 //     compile(project(':react-native-maps')) {

@@ -15,6 +15,7 @@ import {
 import PropTypes from "prop-types";
 
 import { FBLogin, FBLoginManager } from "react-native-facebook-login";
+import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
 import Carousel from "react-native-snap-carousel";
 
@@ -62,7 +63,8 @@ class Ordering extends PureComponent {
       buttonOpacity: new Animated.Value(1),
       backButtonOpacity: new Animated.Value(0),
       /* height of the ordering panel */
-      panelHeight: 600
+      panelHeight: 600,
+      showGoogleLogin: false
     };
 
     this.openPanel = this.openPanel.bind(this);
@@ -78,6 +80,7 @@ class Ordering extends PureComponent {
     this.getStepsSlider = this.getStepsSlider.bind(this);
 
     this.onLayoutChange = this.onLayoutChange.bind(this);
+    this.onGoogleSignIn = this.onGoogleSignIn.bind(this);
 
     // reference to ordering step component, will be set once the component is rendered
     this.orderingStep = false;
@@ -95,6 +98,15 @@ class Ordering extends PureComponent {
 
     this.onLayoutChange(this.props.ordering.currStep.height);
     this.props.onRecenterMap();
+
+    GoogleSignin.hasPlayServices({ autoResolve: true })
+      .then(() => {
+        // play services are available. can now configure library
+        this.setState({ showGoogleLogin: true });
+      })
+      .catch(err => {
+        console.log("Play services error", err.code, err.message);
+      });
   }
 
   //
@@ -559,6 +571,20 @@ class Ordering extends PureComponent {
     );
   }
 
+  onGoogleSignIn() {
+    GoogleSignin.configure({}).then(() => {
+      GoogleSignin.signIn()
+        .then(user => {
+          console.log(user);
+          this.setState({ user: user });
+        })
+        .catch(err => {
+          console.log("WRONG SIGNIN", err);
+        })
+        .done();
+    });
+  }
+
   render() {
     //console.log("render ordering ", this.props.ordering);
     const width = Dimensions.get("window").width; //full width
@@ -592,6 +618,21 @@ class Ordering extends PureComponent {
             height: height
           }}
         />
+
+        {this.state.showGoogleLogin && (
+          <GoogleSigninButton
+            style={{
+              width: 48,
+              height: 48,
+              position: "absolute",
+              top: 0,
+              left: 6
+            }}
+            size={GoogleSigninButton.Size.Icon}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={this.onGoogleSignIn}
+          />
+        )}
         {/* Back button for previous steps */}
         {this.getPrevStepButton()}
 

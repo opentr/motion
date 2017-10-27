@@ -1,0 +1,115 @@
+{
+  "project_info": {
+    "project_number": "827634571644",
+    "firebase_url": "https://openride-181912.firebaseio.com",
+    "project_id": "openride-181912",
+    "storage_bucket": "openride-181912.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827634571644:android:417a02e87d1d123c",
+        "android_client_info": {
+          "package_name": "com.opentransport.openride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "827634571644-tq641fg6sl95n6li3co6tt7mbv8qa1co.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.opentransport.openride",
+            "certificate_hash": "4a038130c5fc54103caee5d059e725e56d5ca1dc"
+          }
+        },
+        {
+          "client_id": "827634571644-5m09a30gq329t5pskp1iu39eggn33jo6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKhxn6JlXg61pfdxolYVQk28araK287cY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "827634571644-5m09a30gq329t5pskp1iu39eggn33jo6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "827634571644-v9acs960chuj6ck84n2fqocnol9ei3ik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.opentransport.openride",
+                "app_store_id": "1293407598"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827634571644:android:a0b4895d1eb23feb",
+        "android_client_info": {
+          "package_name": "com.rnfirebasestarter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "827634571644-qppare19drh21eh8drhc0n93qs00772n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rnfirebasestarter",
+            "certificate_hash": "4a038130c5fc54103caee5d059e725e56d5ca1dc"
+          }
+        },
+        {
+          "client_id": "827634571644-5m09a30gq329t5pskp1iu39eggn33jo6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKhxn6JlXg61pfdxolYVQk28araK287cY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "827634571644-5m09a30gq329t5pskp1iu39eggn33jo6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "827634571644-v9acs960chuj6ck84n2fqocnol9ei3ik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.opentransport.openride",
+                "app_store_id": "1293407598"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
