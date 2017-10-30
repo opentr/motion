@@ -93,7 +93,8 @@ class Ordering extends PureComponent {
     }
 
     this.onLayoutChange(this.props.ordering.currStep.height);
-    this.props.onRecenterMap();
+    if (this.props.ordering.currStep.id.indexOf("login") === -1)
+      this.props.onRecenterMap();
   }
 
   //
@@ -115,12 +116,13 @@ class Ordering extends PureComponent {
       }
       if (
         nextProps.ordering.currStepNo < this.props.ordering.currStepNo ||
-        nextProps.ordering.currStep.id === "time"
+        (nextProps.ordering.currStep.id === "time" &&
+          nextProps.ordering.currStep.id.indexOf("login") === -1)
       )
         this.props.onRecenterMap();
     }
 
-    if (nextProps.ordering.hidePanel !== this.props.ordering.hidePanel) {
+    if (nextProps.ordering.hidePanel && !this.props.ordering.hidePanel) {
       this.onLayoutChange(
         nextProps.ordering.hidePanel ? -20 : nextProps.ordering.currStep.height
       );

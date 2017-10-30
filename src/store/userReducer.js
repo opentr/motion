@@ -3,6 +3,76 @@ import { GoogleSignin } from "react-native-google-signin";
 import firebase from "react-native-firebase";
 import { REHYDRATE } from "redux-persist/constants";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOG_OUT = "LOG_OUT";
+export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
+
+export function onLogout() {
+  return (dispatch, getState) => {
+    console.log("on log out");
+    const user = getState().user;
+
+    const result = firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        if (user.credential.providerId === "google.com") {
+          GoogleSignin.configure({}).then(() => {
+            GoogleSignin.hasPlayServices({ autoResolve: true }).then(() => {
+              GoogleSignin.signOut();
+            });
+          });
+        } else if (user.credential.providerId === "facebook.com") {
+          FBLoginManager.logout((error, data) => {})
+            .then(data => {})
+            .catch(error => {
+              console.log(error);
+            });
+        }
+        dispatch({ type: LOG_OUT });
+      })
+      .catch(error => {
+        dispatch({ type: LOG_OUT });
+      });
+
+    // if (user.providerData[0].providerId === "google.com") {
+    //   GoogleSignin.configure({}).then(() => {
+    //     GoogleSignin.hasPlayServices({ autoResolve: true }).then(() => {
+    //       GoogleSignin.signOut().then(result => {
+    //         console.log("sign out ", result);
+    //       });
+    //     });
+    //   });
+    // }
+  };
+}
+
+export function onLoginReturningUser() {
+  return (dispatch, getState) => {
+    const user = getState().user;
+    if (user.credential) {
+      firebase
+        .auth()
+        .signInWithCredential(user.credential)
+        .then(user => {
+          console.log("user firebase ", user);
+          if (user._authObj.authenticated) {
+            dispatch({
+              type: LOGIN_SUCCESS,
+              payload: {
+                ...user._user,
+                loggedIn: true,
+                loadingInProgress: false
+              }
+            });
+          } else {
+            dispatch({
+              type: LOG_OUT
+            });
+          }
+        });
+    }
+  };
+}
 
 export function onLoginFacebook() {
   return (dispatch, getState) => {
@@ -24,6 +94,11 @@ export function onLoginFacebook() {
         );
 
         console.log("credential firebase", credential);
+
+        dispatch({
+          type: UPDATE_USER_DATA,
+          payload: { credential: credential, loadingInProgress: true }
+        });
 
         firebase
           .auth()
@@ -58,6 +133,11 @@ export function onLoginGoogle() {
                 user.accessToken
               );
 
+              dispatch({
+                type: UPDATE_USER_DATA,
+                payload: { credential: credential, loadingInProgress: true }
+              });
+
               firebase
                 .auth()
                 .signInWithCredential(credential)
@@ -66,7 +146,11 @@ export function onLoginGoogle() {
                   if (user._authObj.authenticated)
                     dispatch({
                       type: LOGIN_SUCCESS,
-                      payload: { ...user._user, loggedIn: true }
+                      payload: {
+                        ...user._user,
+                        loggedIn: true,
+                        loadingInProgress: false
+                      }
                     });
                 });
             })
@@ -83,13 +167,36 @@ export function onLoginGoogle() {
 }
 
 const ACTION_HANDLERS = {
-  [LOGIN_SUCCESS]: (state, action) => ({ ...state, ...action.payload })
+  [UPDATE_USER_DATA]: (state, action) => ({
+    ...state,
+    ...action.payload
+  }),
+  [LOG_OUT]: (state, action) => ({
+    loggedIn: false
+  }),
+  [LOGIN_SUCCESS]: (state, action) => ({ ...state, ...action.payload }),
+  [REHYDRATE]: (state, action) => {
+    let incoming = action.payload.user;
+    if (incoming) {
+      incoming.loadingInProgress = false;
+
+      if (incoming.credential && incoming.loggedIn) {
+        incoming.loginOnStart = true;
+      }
+
+      return {
+        ...state,
+        ...incoming
+      };
+    }
+    return state;
+  }
 };
 
 const initialState = {
   loggedIn: false
 };
-export default function rehydrateReducer(state = initialState, action) {
+export default function userReducer(state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type];
 
   return handler ? handler(state, action) : state;

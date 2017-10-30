@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { View, Platform, Text } from "react-native";
+import { View, Platform, Text, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { FBLogin, FBLoginManager } from "react-native-facebook-login";
 
@@ -18,9 +18,25 @@ class Login extends PureComponent {
   constructor(props) {
     super(props);
   }
+  componentDidMount() {}
 
   render() {
-    if (this.props.showButtons) {
+    if (this.props.showButtons && this.props.user.loadingInProgress) {
+      return (
+        <View
+          style={{
+            flexDirection: "column",
+            width: "100%",
+            height: "auto",
+            height: 140,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <ActivityIndicator size="large" color={config.colors.primary} />
+        </View>
+      );
+    } else if (this.props.showButtons) {
       return (
         <View
           style={{

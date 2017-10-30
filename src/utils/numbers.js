@@ -1,5 +1,5 @@
 export function compareReal(a, b, margin) {
-  if (Math.abs((a - b) * 10000) > margin * 1000) {
+  if (Math.abs((a - b) * 10000) > margin * 10000) {
     return true;
   }
   return false;

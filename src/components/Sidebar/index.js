@@ -1,12 +1,13 @@
 import { connect } from "react-redux";
 
-import { onLogout } from "../../store/userReducer";
+import { onLogout, onLoginReturningUser } from "../../store/userReducer";
 import { onSideBar } from "../../store/orderingReducer";
 import Sidebar from "./Sidebar";
 
 const mapDispatchToProps = {
   onLogout,
-  onSideBar
+  onSideBar,
+  onLoginReturningUser
 };
 
 const mapStateToProps = state => ({

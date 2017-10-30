@@ -34,7 +34,7 @@ export const ORDERING_STEPS = config.ordering.withAuth
     ].concat(orderingSteps)
   : orderingSteps;
 
-console.log("ORDERING STEPS ", ORDERING_STEPS);
+//console.log("ORDERING STEPS ", ORDERING_STEPS);
 // is pickup step before destination step
 const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
 const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
@@ -50,6 +50,7 @@ export const UPDATE_ORDERING_DATA = "UPDATE_ORDERING_DATA";
 // update from or to address, this action reducer is dispatch by map reducer
 export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOG_OUT = "LOG_OUT";
 
 /**
  * ACTIONS
@@ -346,7 +347,10 @@ export function onRecenterMap(stepId) {
     //   metersToRadius(1000)
     // );
 
-    if (stepId === "to" && ordering.toData) {
+    if (
+      (stepId.indexOf("login") !== -1 || stepId === "to") &&
+      ordering.toData
+    ) {
       return dispatch(
         onRegionChange({
           latitude: region.latitude,
@@ -364,7 +368,10 @@ export function onRecenterMap(stepId) {
           longitudeDelta: config.map.recenterZoom.to //region.longitudeDelta
         })
       );
-    } else if (stepId === "from" && ordering.fromData) {
+    } else if (
+      (stepId.indexOf("login") !== -1 || stepId === "from") &&
+      ordering.fromData
+    ) {
       dispatch(
         onRegionChange({
           latitude: region.latitude,
@@ -972,6 +979,13 @@ const ACTION_HANDLERS = {
     ...action.payload
   }),
 
+  [LOG_OUT]: (state, action) => ({
+    ...state,
+    ...initialState,
+    currStepNo: 0,
+    currStep: ORDERING_STEPS[0]
+  }),
+
   [LOGIN_SUCCESS]: (state, action) => ({
     ...state,
     currStepNo: 2,
@@ -981,7 +995,11 @@ const ACTION_HANDLERS = {
   /* make sure some data on reload of the app are not  in loaded from local storage */
   [REHYDRATE]: (state, action) => {
     const incoming = action.payload.ordering;
+    const userIncoming = action.payload.user;
     if (incoming) {
+      if (!userIncoming.loggedIn && config.ordering.withAuth) {
+        incoming.currStepNo = 0;
+      }
       // is pickup step before destination step
       const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
       const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");

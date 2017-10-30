@@ -192,6 +192,7 @@ class Map extends PureComponent {
     } else {
       mapHeight = this.mapHeight = height - config.ordering.height;
     }
+
     const mapStyle = {
       position: "absolute",
       top: 0,

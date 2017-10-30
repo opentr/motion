@@ -16,7 +16,11 @@ import { regionDifferent } from "../utils/numbers";
 export function onRegionChange(region) {
   // dispatch map update with region data
 
-  return { type: UPDATE_REGION, payload: region };
+  return (dispatch, getState) => {
+    const regionState = getState().map.region;
+    if (regionDifferent(regionState, region))
+      dispatch({ type: UPDATE_REGION, payload: region });
+  };
 }
 
 export function onMapAction(action) {
