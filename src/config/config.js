@@ -48,7 +48,9 @@ const config = {
 
   /** ordering steps UI config */
   ordering: {
-    height: 225
+    height: 225,
+    /* this will force first step to be authorization */
+    withAuth: true
   },
   /** show version number */
   showVersionNumber: true,

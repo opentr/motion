@@ -5,6 +5,7 @@ import android.app.Application;
 
 
 import com.facebook.react.ReactApplication;
+import io.invertase.firebase.RNFirebasePackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.magus.fblogin.FacebookLoginPackage;
@@ -13,6 +14,12 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+
+// ...
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.auth.RNFirebaseAuthPackage; // <-- Add this line
+
+
 
 import co.apptailor.googlesignin.RNGoogleSigninPackage; 
 
@@ -34,7 +41,9 @@ public class MainApplication extends Application implements ReactApplication {
           new RNGoogleSigninPackage(),
           BugsnagReactNative.getPackage(),
           new MapsPackage(),
-          new FacebookLoginPackage()
+          new FacebookLoginPackage(),
+          new RNFirebasePackage(),
+          new RNFirebaseAuthPackage()
       );
     }
   };

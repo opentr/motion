@@ -1,12 +1,13 @@
 import React, { PureComponent } from "react";
 import { connect } from "react-redux";
-import { View, BackHandler, Text, Platform } from "react-native";
+import { View, BackHandler, Text, Platform, Image } from "react-native";
 import { Provider } from "react-redux";
 
 import styles from "./styles/styles";
 import config from "./config/config";
 
 import Map from "./components/Map/index";
+import Sidebar from "./components/Sidebar/index";
 import OrderVehicle from "./components/OrderVehicle/index";
 
 const appVersion = "v0.0.8";
@@ -34,6 +35,8 @@ class AppView extends PureComponent {
     // wait for local storage data to load, like user if he is logged in and other options
     if (!this.props.rehydrate.done) return null;
 
+    const { user } = this.props;
+
     // if data is loaded proceed with rendering
     return (
       <View style={styles.app}>
@@ -52,6 +55,12 @@ class AppView extends PureComponent {
         >
           {appVersion}
         </Text>
+        {user.loggedIn && (
+          <Sidebar
+            style={{ position: "absolute", top: 0, left: 0 }}
+            user={user}
+          />
+        )}
       </View>
     );
   }
@@ -59,7 +68,8 @@ class AppView extends PureComponent {
 
 const mapStateToProps = state => ({
   currStepNo: state.ordering.currStepNo,
-  rehydrate: state.rehydrate
+  rehydrate: state.rehydrate,
+  user: state.user
 });
 
 import { onPrevStep } from "./store/orderingReducer";

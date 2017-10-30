@@ -37,7 +37,8 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
   ordering: state.ordering,
   availableVehicles: state.ordering.availableVehicles,
-  region: state.map.region
+  region: state.map.region,
+  user: state.user
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Ordering);

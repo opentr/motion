@@ -17,6 +17,7 @@
     "react-native-app-info": "0.0.6",
     "react-native-device-info": "^0.12.1",
     "react-native-facebook-login": "^1.6.0",
+    "react-native-firebase": "^3.0.5",
     "react-native-google-places-autocomplete": "^1.3.6",
     "react-native-google-places-web": "0.0.5",
     "react-native-google-signin": "^0.12.0",

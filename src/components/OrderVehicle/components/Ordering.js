@@ -14,11 +14,9 @@ import {
 } from "react-native";
 import PropTypes from "prop-types";
 
-import { FBLogin, FBLoginManager } from "react-native-facebook-login";
-import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
-
 import Carousel from "react-native-snap-carousel";
 
+import Login from "../../Login/";
 import SelectFromToTime from "./SelectFromToTime/";
 import SelectVehicle from "./SelectVehicle";
 import Confirmation from "./Confirmation";
@@ -63,9 +61,7 @@ class Ordering extends PureComponent {
       buttonOpacity: new Animated.Value(1),
       backButtonOpacity: new Animated.Value(0),
       /* height of the ordering panel */
-      panelHeight: 600,
-      showGoogleLogin: false,
-      showFacebookLogin: true
+      panelHeight: 600
     };
 
     this.openPanel = this.openPanel.bind(this);
@@ -81,7 +77,6 @@ class Ordering extends PureComponent {
     this.getStepsSlider = this.getStepsSlider.bind(this);
 
     this.onLayoutChange = this.onLayoutChange.bind(this);
-    this.onGoogleSignIn = this.onGoogleSignIn.bind(this);
 
     // reference to ordering step component, will be set once the component is rendered
     this.orderingStep = false;
@@ -99,15 +94,6 @@ class Ordering extends PureComponent {
 
     this.onLayoutChange(this.props.ordering.currStep.height);
     this.props.onRecenterMap();
-
-    GoogleSignin.hasPlayServices({ autoResolve: true })
-      .then(() => {
-        // play services are available. can now configure library
-        this.setState({ showGoogleLogin: true });
-      })
-      .catch(err => {
-        console.log("Play services error", err.code, err.message);
-      });
   }
 
   //
@@ -132,6 +118,12 @@ class Ordering extends PureComponent {
         nextProps.ordering.currStep.id === "time"
       )
         this.props.onRecenterMap();
+    }
+
+    if (nextProps.ordering.hidePanel !== this.props.ordering.hidePanel) {
+      this.onLayoutChange(
+        nextProps.ordering.hidePanel ? -20 : nextProps.ordering.currStep.height
+      );
     }
 
     // if (nextProps.ordering.currStep.id === "confirmation") {
@@ -173,6 +165,8 @@ class Ordering extends PureComponent {
 
     // targetH = config.ordering.height - 85 - targetH;
     // if (targetH !== false)
+
+    console.log("Height ", height);
     const delta = Platform.OS == "ios" ? 20 : 0;
     this.animatePanelHeight(-(height + 40) + delta);
   }
@@ -407,7 +401,10 @@ class Ordering extends PureComponent {
   }
   getPrevStepButton() {
     return (
-      this.props.ordering.currStep.id !== "traveling" &&
+      this.props.user.loggedIn &&
+      this.props.ordering.currStepNo > 2 &&
+      this.props.ordering.currStepNo >= this.props.ordering.currStep.id !==
+        "traveling" &&
       !this.state.panelOpen &&
       this.props.ordering.currStep.id !== "confirmation" &&
       this.props.ordering.currStepNo > 0 && (
@@ -437,6 +434,27 @@ class Ordering extends PureComponent {
   getStep(step, stepNo, currStep, inPrevTransition, inNextTransition) {
     const currStepId = step.id;
     switch (currStepId) {
+      case "loginStart":
+        return (
+          <Login
+            key={stepNo}
+            ref={step => (this.orderingStep = step)}
+            {...step.data}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
+          />
+        );
+      case "loginButtons":
+        return (
+          <Login
+            key={stepNo}
+            showButtons={true}
+            ref={step => (this.orderingStep = step)}
+            {...step.data}
+            inPrevTransition={inPrevTransition && currStep === stepNo}
+            inNextTransition={inNextTransition && currStep === stepNo}
+          />
+        );
       case "from":
       case "to":
       case "time":
@@ -493,6 +511,13 @@ class Ordering extends PureComponent {
     return ORDERING_STEPS.slice(0).map((stepOrig, index) => {
       let step = Object.assign({}, stepOrig);
       switch (step.id) {
+        case "loginStart":
+        case "loginButtons":
+          step.data = {
+            width: width,
+            stepId: step.id,
+            onNextStep: this.onNextStep
+          };
         case "from":
         case "to":
         case "time":
@@ -572,20 +597,6 @@ class Ordering extends PureComponent {
     );
   }
 
-  onGoogleSignIn() {
-    GoogleSignin.configure({}).then(() => {
-      GoogleSignin.signIn()
-        .then(user => {
-          console.log(user);
-          this.setState({ user: user });
-        })
-        .catch(err => {
-          console.log("WRONG SIGNIN", err);
-        })
-        .done();
-    });
-  }
-
   render() {
     //console.log("render ordering ", this.props.ordering);
     const width = Dimensions.get("window").width; //full width
@@ -620,67 +631,6 @@ class Ordering extends PureComponent {
           }}
         />
 
-        {this.state.showFacebookLogin && (
-          <FBLogin
-            style={{
-              zIndex: 20,
-              width: "auto",
-              left: 40,
-              height: 30,
-              flex: 0
-            }}
-            ref={fbLogin => {
-              console.log("FBLogin");
-              this.fbLogin = fbLogin;
-            }}
-            permissions={["email", "user_friends"]}
-            loginBehavior={FBLoginManager.LoginBehaviors.Native}
-            onLogin={data => {
-              console.log("Logged in!");
-              console.log(data);
-              this.setState({ user: data.credentials });
-            }}
-            onLogout={() => {
-              console.log("Logged out.");
-              this.setState({ user: null });
-            }}
-            onLoginFound={data => {
-              console.log("Existing login found.");
-              console.log(data);
-              this.setState({ user: data.credentials });
-            }}
-            onLoginNotFound={() => {
-              console.log("No user logged in.");
-              this.setState({ user: null });
-            }}
-            onError={data => {
-              console.log("ERROR");
-              console.log(data);
-            }}
-            onCancel={() => {
-              console.log("User cancelled.");
-            }}
-            onPermissionsMissing={data => {
-              console.log("Check permissions!");
-              console.log(data);
-            }}
-          />
-        )}
-
-        {this.state.showGoogleLogin && (
-          <GoogleSigninButton
-            style={{
-              width: 48,
-              height: 48,
-              position: "absolute",
-              top: 0,
-              left: 6
-            }}
-            size={GoogleSigninButton.Size.Icon}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={this.onGoogleSignIn}
-          />
-        )}
         {/* Back button for previous steps */}
         {this.getPrevStepButton()}
 

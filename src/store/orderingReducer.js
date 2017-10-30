@@ -13,8 +13,7 @@ import { findWithAttr } from "../utils/search";
  * CONSTANTS USED
  */
 
-// ordering steps, feel free to change titles but DO NOT CHANGE the ids
-export const ORDERING_STEPS = [
+const orderingSteps = [
   /* Drop off location */
   { id: "to", title: "Drop me at", action: "Next", height: 220 },
   /* Pick up location */
@@ -27,6 +26,21 @@ export const ORDERING_STEPS = [
   { id: "confirmation", action: "Confirm and book", height: 410 },
   { id: "traveling", height: 110 }
 ];
+// ordering steps, feel free to change titles but DO NOT CHANGE the ids
+export const ORDERING_STEPS = config.ordering.withAuth
+  ? [
+      { id: "loginStart", title: "", action: "Login", height: 110 },
+      { id: "loginButtons", title: "", action: "Login", height: 160 }
+    ].concat(orderingSteps)
+  : orderingSteps;
+
+console.log("ORDERING STEPS ", ORDERING_STEPS);
+// is pickup step before destination step
+const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
+const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
+const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
+const vehicleSelectStepNo = findWithAttr(ORDERING_STEPS, "id", "vehicleSelect");
+const confirmationStepNo = findWithAttr(ORDERING_STEPS, "id", "confirmation");
 
 /**
  * ACTION TYPES
@@ -35,10 +49,16 @@ export const ORDERING_STEPS = [
 export const UPDATE_ORDERING_DATA = "UPDATE_ORDERING_DATA";
 // update from or to address, this action reducer is dispatch by map reducer
 export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 
 /**
  * ACTIONS
  */
+
+/** action that handles sidebar open / close, and is used to hide and reveal ordeing panel */
+export function onSideBar(sidebarOpen = true) {
+  return { type: UPDATE_ORDERING_DATA, payload: { hidePanel: !sidebarOpen } };
+}
 
 /** simple action to update ordering data */
 export function onUpdateOrderingData(data = {}) {
@@ -952,10 +972,34 @@ const ACTION_HANDLERS = {
     ...action.payload
   }),
 
+  [LOGIN_SUCCESS]: (state, action) => ({
+    ...state,
+    currStepNo: 2,
+    currStep: ORDERING_STEPS[2]
+  }),
+
   /* make sure some data on reload of the app are not  in loaded from local storage */
   [REHYDRATE]: (state, action) => {
     const incoming = action.payload.ordering;
     if (incoming) {
+      // is pickup step before destination step
+      const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
+      const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
+      const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
+      const vehicleSelectStepNo = findWithAttr(
+        ORDERING_STEPS,
+        "id",
+        "vehicleSelect"
+      );
+      const confirmationStepNo = findWithAttr(
+        ORDERING_STEPS,
+        "id",
+        "confirmation"
+      );
+
+      incoming.hidePanel = false;
+      incoming.currStep = ORDERING_STEPS[incoming.currStepNo];
+
       if (
         incoming.currStep.id === "traveling" &&
         (!("selectedVehicle" in incoming) ||
@@ -966,18 +1010,21 @@ const ACTION_HANDLERS = {
           ...initialState
         };
       }
-      return { ...state, ...incoming, availableVehicles: [] };
+      return {
+        ...state,
+        ...incoming,
+        availableVehicles: [],
+        fromStepNo: fromStepNo,
+        toStepNo: toStepNo,
+        timeStepNo: timeStepNo,
+        vehicleSelectStepNo: vehicleSelectStepNo,
+        confirmationStepNo: confirmationStepNo
+      };
     }
     return state;
   }
 };
 
-// is pickup step before destination step
-const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
-const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
-const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
-const vehicleSelectStepNo = findWithAttr(ORDERING_STEPS, "id", "vehicleSelect");
-const confirmationStepNo = findWithAttr(ORDERING_STEPS, "id", "confirmation");
 //console.log("from to", fromStepNo, toStepNo);
 // variable to store initial address information for first step on the map
 // fromStepNo stores step
@@ -1025,6 +1072,7 @@ if (fromStepNo < toStepNo) {
 
 // initial values for reducer
 const initialState = {
+  hidePanel: false,
   currStepNo: 0,
   currStep: ORDERING_STEPS[0],
   /* vehicles displated on the map */

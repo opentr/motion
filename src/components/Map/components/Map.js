@@ -182,7 +182,9 @@ class Map extends PureComponent {
     const delta = Platform.OS == "ios" ? 25 : 0;
 
     let mapHeight;
-    if (this.props.ordering.currStep.height < 350) {
+    if (this.props.ordering.hidePanel) {
+      mapHeight = height;
+    } else if (this.props.ordering.currStep.height < 350) {
       mapHeight = this.mapHeight =
         height - this.props.ordering.currStep.height + delta;
     } else if (this.mapHeight) {
