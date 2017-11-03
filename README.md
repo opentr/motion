@@ -71,7 +71,7 @@ public void logout(final Callback callback) {
   * for iOS
     * run `react-native run-ios`
   * for Android
-    * Run Genymotion
+    * Run Genymotion or Android Studio Phone Emulator
     * run `react-native run-android`
 
 
