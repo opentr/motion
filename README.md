@@ -26,7 +26,7 @@ This is a fix for some markers staying in top left corner of a screen. To fix th
 CGPoint center = (CGPoint){ self.center.x -100, self.center.y - dy };
 ```
 
-***Android fix for logging out of Facebook***
+**Android fix for logging out of Facebook**
 
 This is a fix for Facebook log out. Apply change below to make user fully log out when using Facebook login.
 
