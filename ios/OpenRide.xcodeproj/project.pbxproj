@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -66,6 +67,7 @@
 		6BB964BE1F9E5F0000772BEC /* Icon-Small-50x50@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BB964A61F9E5F0000772BEC /* Icon-Small-50x50@1x.png */; };
 		6BB964BF1F9E5F0000772BEC /* Icon-Small-50x50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BB964A71F9E5F0000772BEC /* Icon-Small-50x50@2x.png */; };
 		6BB964C01F9E5F0000772BEC /* ItunesArtwork@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BB964A81F9E5F0000772BEC /* ItunesArtwork@2x.png */; };
+		710C8101B84542DF92978E1B /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABF90FDD93614358BE956323 /* libRNFirebase.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		83C9964A838A465298FB289B /* libBugsnagReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BCA2D8A6EC64C6184FE3366 /* libBugsnagReactNative.a */; };
 		A1F1241E1F7440DB868351AE /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CBFCE62F5B484012B48F6024 /* libAirMaps.a */; };
@@ -75,7 +77,6 @@
 		C47E66290D7D41DAAD17E373 /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE8415C91A9D43E19F99B235 /* libRNGoogleSignin.a */; };
 		DDAB214A4222D90B651830D0 /* libPods-OpenRide-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8829B01D4489CB1E22C0F188 /* libPods-OpenRide-tvOS.a */; };
 		E0F46F9F2BA043B5B5A1916E /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C6B86DE2314BCAB5A93647 /* SafariServices.framework */; };
-		710C8101B84542DF92978E1B /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABF90FDD93614358BE956323 /* libRNFirebase.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -408,6 +409,7 @@
 		6BB964A61F9E5F0000772BEC /* Icon-Small-50x50@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-Small-50x50@1x.png"; sourceTree = "<group>"; };
 		6BB964A71F9E5F0000772BEC /* Icon-Small-50x50@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-Small-50x50@2x.png"; sourceTree = "<group>"; };
 		6BB964A81F9E5F0000772BEC /* ItunesArtwork@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ItunesArtwork@2x.png"; sourceTree = "<group>"; };
+		726342AA640C4A36916B6266 /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		768298C8983647B1BF931C5F /* BugsnagReactNative.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BugsnagReactNative.xcodeproj; path = "../node_modules/bugsnag-react-native/cocoa/BugsnagReactNative.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		795F001A7AD840DA52BF513C /* Pods-OpenRideTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenRideTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenRideTests/Pods-OpenRideTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -420,6 +422,7 @@
 		9D377B3241CE411E23E51EAE /* Pods-OpenRide-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenRide-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenRide-tvOS/Pods-OpenRide-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A218A0D846EC4BF3A3466C23 /* RNVersionNumber.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVersionNumber.xcodeproj; path = "../node_modules/react-native-version-number/ios/RNVersionNumber.xcodeproj"; sourceTree = "<group>"; };
 		A493990BB34C21F344B01B1E /* Pods-OpenRide-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenRide-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-OpenRide-tvOS/Pods-OpenRide-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		ABF90FDD93614358BE956323 /* libRNFirebase.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFirebase.a; sourceTree = "<group>"; };
 		ACB62262BFE7CFD3B60948BF /* libPods-OpenRide-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-OpenRide-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B3421BD4E17F43FBB5F2BED6 /* libRNVersionNumber.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVersionNumber.a; sourceTree = "<group>"; };
@@ -432,8 +435,6 @@
 		E54D3C1F4BE545FA87268E3A /* AirMaps.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		ECE8673A91274278BE89A2F4 /* SystemConfiguration.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		EE8415C91A9D43E19F99B235 /* libRNGoogleSignin.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGoogleSignin.a; sourceTree = "<group>"; };
-		726342AA640C4A36916B6266 /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; name = "RNFirebase.xcodeproj"; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		ABF90FDD93614358BE956323 /* libRNFirebase.a */ = {isa = PBXFileReference; name = "libRNFirebase.a"; path = "libRNFirebase.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -672,6 +673,7 @@
 				B3421BD4E17F43FBB5F2BED6 /* libRNVersionNumber.a */,
 				0BCA2D8A6EC64C6184FE3366 /* libBugsnagReactNative.a */,
 				EE8415C91A9D43E19F99B235 /* libRNGoogleSignin.a */,
+				ABF90FDD93614358BE956323 /* libRNFirebase.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
