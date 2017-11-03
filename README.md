@@ -1,8 +1,7 @@
-#  Motion - OpenTransport Open Source Mobile App in React Native
+#  Motion - Open Source Mobile App in React Native based on OpenTransport API
 
-* Standard compliant React Native App Utilizing [Ignite](https://github.com/infinitered/ignite)
 
-## :arrow_up: How to Setup
+## How to Setup
 
 **Step 1:** git clone this repo:
 
@@ -65,7 +64,7 @@ public void logout(final Callback callback) {
 
 
 
-## :arrow_forward: How to Run App
+## How to Run App
 
 1. cd to the repo
 2. Run Build for either OS
