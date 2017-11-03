@@ -3,15 +3,15 @@
 
 ## How to Setup
 
-**Step 1:** git clone this repo:
+### **Step 1:** git clone this repo:
 
-**Step 2:** cd to the cloned repo:
+### **Step 2:** cd to the cloned repo:
 
-**Step 3:** Install the Application with `npm install`
+### **Step 3:** Install the Application with `npm install`
 
-**Step 4:** Add your OpenTransport and Google API keys at `src/config/config.js`
+### **Step 4:** Add your OpenTransport and Google API keys at `src/config/config.js`
 
-**Step 5:** Edit sources of node modules specified here
+### **Step 5:** Edit sources of node modules specified here
 
 **iOS react-native-maps fix** 
 
