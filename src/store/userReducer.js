@@ -6,6 +6,13 @@ export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOG_OUT = "LOG_OUT";
 export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
 
+export function resetErrors() {
+  return {
+    type: UPDATE_USER_DATA,
+    payload: { error: undefined, logoutResult: undefined }
+  };
+}
+
 export function onLogout() {
   return (dispatch, getState) => {
     console.log("on log out");
@@ -17,20 +24,59 @@ export function onLogout() {
       .then(() => {
         if (user.credential.providerId === "google.com") {
           GoogleSignin.configure({}).then(() => {
-            GoogleSignin.hasPlayServices({ autoResolve: true }).then(() => {
-              GoogleSignin.signOut();
-            });
+            GoogleSignin.hasPlayServices({ autoResolve: true })
+              .then(() => {
+                GoogleSignin.signOut().then(result => {
+                  dispatch({
+                    type: UPDATE_USER_DATA,
+                    payload: {
+                      logoutResult: "google logout: " + result
+                    }
+                  });
+                  dispatch({ type: LOG_OUT });
+                });
+              })
+              .catch(error => {
+                dispatch({
+                  type: UPDATE_USER_DATA,
+                  payload: {
+                    error: "error google logout: " + error,
+                    loadingInProgress: false
+                  }
+                });
+              });
           });
         } else if (user.credential.providerId === "facebook.com") {
-          FBLoginManager.logout((error, data) => {})
-            .then(data => {})
-            .catch(error => {
-              console.log(error);
-            });
+          FBLoginManager.logout((error, data) => {
+            if (error) {
+              dispatch({
+                type: UPDATE_USER_DATA,
+                payload: {
+                  error: "fb logout error: " + error,
+                  loadingInProgress: false
+                }
+              });
+            } else {
+              dispatch({
+                type: UPDATE_USER_DATA,
+                payload: {
+                  logoutResult: "fb logout data: " + error,
+                  loadingInProgress: false
+                }
+              });
+              dispatch({ type: LOG_OUT });
+            }
+          });
         }
-        dispatch({ type: LOG_OUT });
       })
       .catch(error => {
+        dispatch({
+          type: UPDATE_USER_DATA,
+          payload: {
+            error: "logout error: " + error,
+            loadingInProgress: false
+          }
+        });
         dispatch({ type: LOG_OUT });
       });
 
@@ -49,12 +95,17 @@ export function onLogout() {
 export function onLoginReturningUser() {
   return (dispatch, getState) => {
     const user = getState().user;
+
     if (user.credential) {
+      dispatch({
+        type: UPDATE_USER_DATA,
+        payload: { loadingInProgress: true }
+      });
+
       firebase
         .auth()
         .signInWithCredential(user.credential)
         .then(user => {
-          console.log("user firebase ", user);
           if (user._authObj.authenticated) {
             dispatch({
               type: LOGIN_SUCCESS,
@@ -66,9 +117,25 @@ export function onLoginReturningUser() {
             });
           } else {
             dispatch({
+              type: UPDATE_USER_DATA,
+              payload: {
+                error: "login returning user not authenticated: " + error,
+                loadingInProgress: false
+              }
+            });
+            dispatch({
               type: LOG_OUT
             });
           }
+        })
+        .catch(error => {
+          dispatch({
+            type: UPDATE_USER_DATA,
+            payload: {
+              error: "login returning user: " + error,
+              loadingInProgress: false
+            }
+          });
         });
     }
   };
@@ -76,6 +143,10 @@ export function onLoginReturningUser() {
 
 export function onLoginFacebook() {
   return (dispatch, getState) => {
+    dispatch({
+      type: UPDATE_USER_DATA,
+      payload: { loadingInProgress: true }
+    });
     console.log("login with facebook");
     FBLoginManager.loginWithPermissions(["email", "public_profile"], function(
       error,
@@ -87,32 +158,52 @@ export function onLoginFacebook() {
           if (!error) {
             console.log("credentials ", data);
           }
-        });
 
-        const credential = firebase.auth.FacebookAuthProvider.credential(
-          data.credentials.token
-        );
+          const credential = firebase.auth.FacebookAuthProvider.credential(
+            data.credentials.token
+          );
 
-        console.log("credential firebase", credential);
+          console.log("credential firebase", credential);
 
-        dispatch({
-          type: UPDATE_USER_DATA,
-          payload: { credential: credential, loadingInProgress: true }
-        });
-
-        firebase
-          .auth()
-          .signInWithCredential(credential)
-          .then(user => {
-            console.log("user firebase ", user);
-            if (user._authObj.authenticated)
-              dispatch({
-                type: LOGIN_SUCCESS,
-                payload: { ...user._user, loggedIn: true }
-              });
+          dispatch({
+            type: UPDATE_USER_DATA,
+            payload: { credential: credential, loadingInProgress: true }
           });
+
+          firebase
+            .auth()
+            .signInWithCredential(credential)
+            .then(user => {
+              console.log("user firebase ", user);
+              if (user._authObj.authenticated)
+                dispatch({
+                  type: LOGIN_SUCCESS,
+                  payload: {
+                    ...user._user,
+                    loggedIn: true,
+                    loadingInProgress: false
+                  }
+                });
+            })
+            .catch(error => {
+              dispatch({
+                type: UPDATE_USER_DATA,
+                payload: {
+                  error: "fb login firebase auth error: " + error,
+                  loadingInProgress: false
+                }
+              });
+            });
+        });
       } else {
         console.log("Error: ", error);
+        dispatch({
+          type: UPDATE_USER_DATA,
+          payload: {
+            error: "fb login error: " + error,
+            loadingInProgress: false
+          }
+        });
       }
     });
   };
@@ -120,49 +211,80 @@ export function onLoginFacebook() {
 
 export function onLoginGoogle() {
   return (dispatch, getState) => {
+    dispatch({
+      type: UPDATE_USER_DATA,
+      payload: { loadingInProgress: true }
+    });
+
     console.log("login with google");
-    GoogleSignin.configure({}).then(() => {
-      GoogleSignin.hasPlayServices({ autoResolve: true })
-        .then(() => {
-          GoogleSignin.signIn()
-            .then(user => {
-              console.log(user);
+    GoogleSignin.configure({})
+      .then(() => {
+        GoogleSignin.hasPlayServices({ autoResolve: true })
+          .then(() => {
+            GoogleSignin.signIn()
+              .then(user => {
+                console.log(user);
 
-              const credential = firebase.auth.GoogleAuthProvider.credential(
-                user.idToken,
-                user.accessToken
-              );
+                const credential = firebase.auth.GoogleAuthProvider.credential(
+                  user.idToken,
+                  user.accessToken
+                );
 
-              dispatch({
-                type: UPDATE_USER_DATA,
-                payload: { credential: credential, loadingInProgress: true }
-              });
+                dispatch({
+                  type: UPDATE_USER_DATA,
+                  payload: { credential: credential, loadingInProgress: true }
+                });
 
-              firebase
-                .auth()
-                .signInWithCredential(credential)
-                .then(user => {
-                  console.log("user firebase ", user);
-                  if (user._authObj.authenticated)
+                firebase
+                  .auth()
+                  .signInWithCredential(credential)
+                  .then(user => {
+                    console.log("user firebase ", user);
+                    if (user._authObj.authenticated)
+                      dispatch({
+                        type: LOGIN_SUCCESS,
+                        payload: {
+                          ...user._user,
+                          loggedIn: true,
+                          loadingInProgress: false
+                        }
+                      });
+                  })
+                  .catch(error => {
                     dispatch({
-                      type: LOGIN_SUCCESS,
+                      type: UPDATE_USER_DATA,
                       payload: {
-                        ...user._user,
-                        loggedIn: true,
+                        error: "google login firebase signin error: " + error,
                         loadingInProgress: false
                       }
                     });
+                  });
+              })
+              .catch(err => {
+                console.log("WRONG SIGNIN", err);
+                dispatch({
+                  type: UPDATE_USER_DATA,
+                  payload: {
+                    error: "google signin error: " + err,
+                    loadingInProgress: false
+                  }
                 });
-            })
-            .catch(err => {
-              console.log("WRONG SIGNIN", err);
-            })
-            .done();
-        })
-        .catch(err => {
-          console.log("Play services error", err.code, err.message);
+              })
+              .done();
+          })
+          .catch(err => {
+            console.log("Play services error", err.code, err.message);
+          });
+      })
+      .catch(error => {
+        dispatch({
+          type: UPDATE_USER_DATA,
+          payload: {
+            error: "google configure error: " + error,
+            loadingInProgress: false
+          }
         });
-    });
+      });
   };
 }
 

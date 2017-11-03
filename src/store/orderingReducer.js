@@ -231,6 +231,11 @@ export function onLoadVehicles() {
 
   //console.log("load vehicles");
   return (dispatch, getState) => {
+    const user = getState().user;
+    if (user && user.loggedIn && user.loadingInProgress) {
+      // skip updating if user is logging in
+      return false;
+    }
     // get current region
     const region = getState().map.region;
     // get ordering info
@@ -995,7 +1000,7 @@ const ACTION_HANDLERS = {
   /* make sure some data on reload of the app are not  in loaded from local storage */
   [REHYDRATE]: (state, action) => {
     const incoming = action.payload.ordering;
-    const userIncoming = action.payload.user;
+    const userIncoming = action.payload.user || { loggedIn: false };
     if (incoming) {
       if (!userIncoming.loggedIn && config.ordering.withAuth) {
         incoming.currStepNo = 0;

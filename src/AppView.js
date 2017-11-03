@@ -1,6 +1,15 @@
 import React, { PureComponent } from "react";
 import { connect } from "react-redux";
-import { View, BackHandler, Text, Platform, Image } from "react-native";
+import {
+  View,
+  BackHandler,
+  Text,
+  Platform,
+  Image,
+  Alert,
+  Modal,
+  TouchableHighlight
+} from "react-native";
 import { Provider } from "react-redux";
 
 import styles from "./styles/styles";
@@ -10,7 +19,7 @@ import Map from "./components/Map/index";
 import Sidebar from "./components/Sidebar/index";
 import OrderVehicle from "./components/OrderVehicle/index";
 
-const appVersion = "v0.0.8";
+const appVersion = "v0.1.2";
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();
@@ -61,6 +70,41 @@ class AppView extends PureComponent {
             user={user}
           />
         )}
+        {(user.error || user.logoutResult) && (
+          <Modal
+            animationType="slide"
+            transparent={false}
+            onRequestClose={() => {}}
+          >
+            <View style={{ marginTop: 22 }}>
+              <View>
+                {user.error && <Text>Error: {user.error}</Text>}
+                {user.logoutResult && (
+                  <Text>Logout result: {user.logoutResult}</Text>
+                )}
+
+                <TouchableHighlight
+                  onPress={() => {
+                    this.props.resetErrors();
+                  }}
+                  style={{
+                    width: "100%",
+                    marginTop: 20
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      textAlign: "center"
+                    }}
+                  >
+                    Hide errors
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </Modal>
+        )}
       </View>
     );
   }
@@ -73,8 +117,10 @@ const mapStateToProps = state => ({
 });
 
 import { onPrevStep } from "./store/orderingReducer";
+import { resetErrors } from "./store/userReducer";
 const mapDispatchToProps = {
-  onPrevStep
+  onPrevStep,
+  resetErrors
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppView);

@@ -99,20 +99,20 @@ android {
         applicationId "com.opentransport.openride"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 8
-        versionName "0.0.8"
+        versionCode 12
+        versionName "0.1.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
     }
     signingConfigs {
         release {
-            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
-                storeFile file(MYAPP_RELEASE_STORE_FILE)
-                storePassword MYAPP_RELEASE_STORE_PASSWORD
-                keyAlias MYAPP_RELEASE_KEY_ALIAS
-                keyPassword MYAPP_RELEASE_KEY_PASSWORD
-            }
+        
+            storeFile file(MYAPP_RELEASE_STORE_FILE)
+            storePassword MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias MYAPP_RELEASE_KEY_ALIAS
+            keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            
         }
     }
     splits {
@@ -150,29 +150,33 @@ repositories {
         mavenCentral()
     }
 dependencies {
-    compile(project(':react-native-firebase')) {
-        transitive = false
-    }
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    
-    compile(project(":react-native-google-signin")){         
-        exclude group: "com.google.android.gms" // very important
-    }
 
-    
-    compile project(':bugsnag-react-native')
-    compile 'com.facebook.android:facebook-android-sdk:4+)'
-    compile project(':react-native-facebook-login')
 
-        
+
     compile 'com.google.android.gms:play-services-base:11.0.4'
     compile 'com.google.android.gms:play-services-maps:11.0.4'
     compile 'com.google.android.gms:play-services-auth:11.0.4'
     compile 'com.google.firebase:firebase-auth:11.0.4'
-    compile project(':react-native-maps')
+
+
+    compile 'com.android.support:appcompat-v7:23.1.1'
+
+    compile(project(':react-native-firebase')) {
+        transitive = false
+    }
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+   
+    compile(project(':react-native-google-signin')) {
+        exclude group: "com.google.android.gms" // very important
+    }
+    compile project(':bugsnag-react-native')
+    compile 'com.facebook.android:facebook-android-sdk:4+)'
+    compile project(':react-native-facebook-login')
+
 
    
+
+    compile project(':react-native-maps')
     compile 'com.facebook.react:react-native:+'
     // From node_modules
 }

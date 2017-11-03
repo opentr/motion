@@ -117,7 +117,8 @@ class Ordering extends PureComponent {
       if (
         nextProps.ordering.currStepNo < this.props.ordering.currStepNo ||
         (nextProps.ordering.currStep.id === "time" &&
-          nextProps.ordering.currStep.id.indexOf("login") === -1)
+          nextProps.ordering.currStep.id.indexOf("login") === -1) ||
+        nextProps.ordering.currStep.id === "traveling"
       )
         this.props.onRecenterMap();
     }
@@ -196,7 +197,7 @@ class Ordering extends PureComponent {
 
     if (type === "address") {
       const height = Dimensions.get("window").height; //full width
-      this.onLayoutChange(height * 0.75);
+      this.onLayoutChange(height * 0.9);
       if (this.orderingStep) this.orderingStep.resetAddressList();
     }
 
@@ -405,8 +406,7 @@ class Ordering extends PureComponent {
     return (
       this.props.user.loggedIn &&
       this.props.ordering.currStepNo > 2 &&
-      this.props.ordering.currStepNo >= this.props.ordering.currStep.id !==
-        "traveling" &&
+      this.props.ordering.currStep.id !== "traveling" &&
       !this.state.panelOpen &&
       this.props.ordering.currStep.id !== "confirmation" &&
       this.props.ordering.currStepNo > 0 && (
