@@ -1,6 +1,0 @@
-framework module Pods_OpenRideTests {
-  umbrella header "Pods-OpenRideTests-umbrella.h"
-
-  export *
-  module * { export * }
-}

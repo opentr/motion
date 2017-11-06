@@ -75,6 +75,43 @@ public void logout(final Callback callback) {
     * run `react-native run-android`
 
 
+## Configuration
+
+You can configure the app by modifying the values of config object located in `config/config.js` file.
+
+| API config               ||
+|----------|:-------------|
+|OpenTransport|
+|key       | your OpenTransport API key |
+|url       | OpenTransport API url |
+|apiPrefix | OpenTransport API prefix, used for API versioning |
+|searchRadius | radius for which vehicles will be searched |
+|refreshInterval | how often vehicles position and info will be updated |
+|refreshBooking | how often booked vehicle location will be updated |
+|Google|
+|urlTextSearch       | URL for Text Search API |
+|urlReverseGeocode       |  URL for Reverse Geocode API |
+|key | Your Google API key |
+|radius | radius for location search with Text Search API |
+|Map configuration|
+|forceStartLocation       | open the app map with start location from the config |
+|startLocation       | longitude and latitude of the start location  |
+|geolocation       | geolocation default configuration  |
+|recenterZoom       | default zoom for recentering in latitude and longitude delta  |
+|Ordering configuration|
+|height       | default height of the ordering panel, only used if there is a problem with individual step height |
+|steps       | list of steps in the ordering process, for example you can switch from and to steps, or turn on/off time step.  |
+|withAuth       | if enabled only logged in users will be able to see ordering  |
+|Other config|
+|showVersionNumber       | if enable it will overflow app with the version number in top right  |
+|Colors|
+|primary       | primary app color used for actions|   |
+|secondary       | secondary app color used for secondary actions and important information|   
+|alert       | alert color used for errors and issues|   
+|text       | default text color|   
+
+
+
 
 
 

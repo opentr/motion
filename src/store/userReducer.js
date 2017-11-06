@@ -6,6 +6,58 @@ export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOG_OUT = "LOG_OUT";
 export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
 
+export function onLoginReturningUser() {
+  return (dispatch, getState) => {
+    const user = getState().user;
+
+    if (user.credential) {
+      dispatch({
+        type: UPDATE_USER_DATA,
+        payload: { loadingInProgress: true }
+      });
+
+      firebase
+        .auth()
+        .signInWithCredential(user.credential)
+        .then(user => {
+          if (user._authObj.authenticated) {
+            dispatch({
+              type: LOGIN_SUCCESS,
+              payload: {
+                ...user._user,
+                loggedIn: true,
+                loadingInProgress: false
+              }
+            });
+          } else {
+            dispatch({
+              type: UPDATE_USER_DATA,
+              payload: {
+                error: "login returning user not authenticated: " + error,
+                loadingInProgress: false
+              }
+            });
+            dispatch({
+              type: LOG_OUT
+            });
+          }
+        })
+        .catch(error => {
+          dispatch({
+            type: UPDATE_USER_DATA,
+            payload: {
+              error: "login returning user: " + error,
+              loadingInProgress: false
+            }
+          });
+          dispatch({
+            type: LOG_OUT
+          });
+        });
+    }
+  };
+}
+
 export function resetErrors() {
   return {
     type: UPDATE_USER_DATA,
@@ -89,55 +141,6 @@ export function onLogout() {
     //     });
     //   });
     // }
-  };
-}
-
-export function onLoginReturningUser() {
-  return (dispatch, getState) => {
-    const user = getState().user;
-
-    if (user.credential) {
-      dispatch({
-        type: UPDATE_USER_DATA,
-        payload: { loadingInProgress: true }
-      });
-
-      firebase
-        .auth()
-        .signInWithCredential(user.credential)
-        .then(user => {
-          if (user._authObj.authenticated) {
-            dispatch({
-              type: LOGIN_SUCCESS,
-              payload: {
-                ...user._user,
-                loggedIn: true,
-                loadingInProgress: false
-              }
-            });
-          } else {
-            dispatch({
-              type: UPDATE_USER_DATA,
-              payload: {
-                error: "login returning user not authenticated: " + error,
-                loadingInProgress: false
-              }
-            });
-            dispatch({
-              type: LOG_OUT
-            });
-          }
-        })
-        .catch(error => {
-          dispatch({
-            type: UPDATE_USER_DATA,
-            payload: {
-              error: "login returning user: " + error,
-              loadingInProgress: false
-            }
-          });
-        });
-    }
   };
 }
 

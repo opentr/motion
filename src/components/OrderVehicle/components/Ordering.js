@@ -123,7 +123,7 @@ class Ordering extends PureComponent {
         this.props.onRecenterMap();
     }
 
-    if (nextProps.ordering.hidePanel && !this.props.ordering.hidePanel) {
+    if (nextProps.ordering.hidePanel !== this.props.ordering.hidePanel) {
       this.onLayoutChange(
         nextProps.ordering.hidePanel ? -20 : nextProps.ordering.currStep.height
       );
@@ -197,7 +197,7 @@ class Ordering extends PureComponent {
 
     if (type === "address") {
       const height = Dimensions.get("window").height; //full width
-      this.onLayoutChange(height * 0.9);
+      this.onLayoutChange(height * 0.86);
       if (this.orderingStep) this.orderingStep.resetAddressList();
     }
 

@@ -13,26 +13,12 @@ import { findWithAttr } from "../utils/search";
  * CONSTANTS USED
  */
 
-const orderingSteps = [
-  /* Drop off location */
-  { id: "to", title: "Drop me at", action: "Next", height: 220 },
-  /* Pick up location */
-  { id: "from", title: "Pick me up from", action: "Next", height: 220 },
-  /* Time of ride */
-  { id: "time", title: "When?", action: "Next", height: 220 },
-  /* Choose vehicle */
-  { id: "vehicleSelect", height: 280 },
-  /* Confirm order */
-  { id: "confirmation", action: "Confirm and book", height: 410 },
-  { id: "traveling", height: 110 }
-];
-// ordering steps, feel free to change titles but DO NOT CHANGE the ids
 export const ORDERING_STEPS = config.ordering.withAuth
   ? [
       { id: "loginStart", title: "", action: "Login", height: 110 },
       { id: "loginButtons", title: "", action: "Login", height: 160 }
-    ].concat(orderingSteps)
-  : orderingSteps;
+    ].concat(config.ordering.steps)
+  : config.ordering.step;
 
 //console.log("ORDERING STEPS ", ORDERING_STEPS);
 // is pickup step before destination step

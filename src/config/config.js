@@ -48,7 +48,22 @@ const config = {
 
   /** ordering steps UI config */
   ordering: {
+    /* default height of the ordering panel, only used if there is a problem */
     height: 225,
+    // ordering steps, feel free to change titles but DO NOT CHANGE the ids
+    steps: [
+      /* Drop off location */
+      { id: "to", title: "Drop me at", action: "Next", height: 220 },
+      /* Pick up location */
+      { id: "from", title: "Pick me up from", action: "Next", height: 220 },
+      /* Time of ride */
+      // { id: "time", title: "When?", action: "Next", height: 220 },
+      /* Choose vehicle */
+      { id: "vehicleSelect", height: 280 },
+      /* Confirm order */
+      { id: "confirmation", action: "Confirm and book", height: 410 },
+      { id: "traveling", height: 110 }
+    ],
     /* this will force first step to be authorization */
     withAuth: true
   },

@@ -19,7 +19,7 @@ import Map from "./components/Map/index";
 import Sidebar from "./components/Sidebar/index";
 import OrderVehicle from "./components/OrderVehicle/index";
 
-const appVersion = "v0.1.2";
+const appVersion = "v0.1.3";
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();
