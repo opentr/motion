@@ -5,11 +5,11 @@ export function compareReal(a, b, margin) {
   return false;
 }
 
-export function regionDifferent(a, b) {
+export function regionDifferent(a, b, diff = 0.0002) {
   return (
-    compareReal(a.latitude, b.latitude, 0.0002) ||
-    compareReal(a.longitude, b.longitude, 0.0002) ||
-    compareReal(a.latitudeDelta, b.latitudeDelta, 0.0001) ||
-    compareReal(a.longitudeDelta, b.longitudeDelta, 0.0001)
+    compareReal(a.latitude, b.latitude, diff) ||
+    compareReal(a.longitude, b.longitude, diff) ||
+    compareReal(a.latitudeDelta, b.latitudeDelta, diff / 2) ||
+    compareReal(a.longitudeDelta, b.longitudeDelta, diff / 2)
   );
 }

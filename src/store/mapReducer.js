@@ -31,9 +31,23 @@ export function onMapAction(action) {
 /**
  * Async action to determine reverse geocoded location from the map
  */
+
 export function reverseGeocodeLocation() {
   return (dispatch, getState) => {
     const region = getState().map.region;
+    const lastGeocodedRegion = getState().map.lastGeocodedRegion || false;
+
+    if (
+      lastGeocodedRegion &&
+      !regionDifferent(region, lastGeocodedRegion, 0.00001)
+    ) {
+      return false;
+    }
+
+    dispatch({
+      type: UPDATE_MAP_DATA,
+      payload: { loadingGeocoding: true, lastGeocodedRegion: region }
+    });
 
     const url =
       config.api.google.urlReverseGeocode +
@@ -58,13 +72,18 @@ export function reverseGeocodeLocation() {
       .then(json => {
         console.log("map search", json);
 
+        dispatch({
+          type: UPDATE_MAP_DATA,
+          payload: { loadingGeocoding: false }
+        });
+
         if (json.status === "OK" && json.results && json.results.length > 0) {
           // dispatch address update that will be picked up by Ordering reducer
           dispatch({ type: UPDATE_ADDRESS, payload: json.results[0] });
         } else {
           dispatch({
             type: UPDATE_ADDRESS,
-            payload: { formatted_address: false }
+            payload: { formatted_address: "" }
           });
           console.error("no results geocode", json);
         }

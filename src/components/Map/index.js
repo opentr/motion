@@ -17,6 +17,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
   region: state.map.region,
+  loadingGeocoding: state.map.loadingGeocoding,
   mapAction: state.map.action,
   vehicles: state.ordering.vehicles,
   selectedVehicle: state.ordering.selectedVehicle,

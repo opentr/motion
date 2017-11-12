@@ -11,6 +11,7 @@ import {
 import MapView from "react-native-maps";
 import PropTypes from "prop-types";
 import { findWithAttr } from "../../../utils/search";
+import Marker from "./MarkerFromTo";
 
 const equal = require("fast-deep-equal");
 const timer = require("react-native-timer");
@@ -35,7 +36,7 @@ class Map extends PureComponent {
   constructor(props) {
     super(props);
     this.updateRegion = this.updateRegion.bind(this);
-    this.updateRegionSimple = this.updateRegionSimple.bind(this);
+    // this.updateRegionSimple = this.updateRegionSimple.bind(this);
     this.startUpdating = this.startUpdating.bind(this);
     this.stopUpdating = this.stopUpdating.bind(this);
     this.restartUpdating = this.restartUpdating.bind(this);
@@ -152,9 +153,10 @@ class Map extends PureComponent {
     this.startUpdating(false);
   }
 
-  updateRegionSimple(coordinates, position) {
-    console.log(" drag ", arguments, coordinates, position);
-  }
+  // updateRegionSimple(coordinates, position) {
+  //   console.log(" drag ", arguments, coordinates, position);
+  // }
+
   updateRegion(region) {
     console.log("updated region !!!", region);
 
@@ -240,43 +242,12 @@ class Map extends PureComponent {
               }}
               style={{ zIndex: 1000 }}
             >
-              <View
-                style={{
-                  maxWidth: 160,
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  transform: [{ translateY: platformIOS ? -30 : 0 }]
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: config.colors.secondary,
-                    padding: 3,
-                    borderRadius: 5
-                  }}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      color: "white",
-                      fontSize:
-                        this.props.region.latitudeDelta < 0.002 ? 14 : 16,
-                      padding: 3
-                    }}
-                  >
-                    {this.props.ordering.fromAddress}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: 3,
-                    maxWidth: 3,
-                    height: 28,
-                    backgroundColor: config.colors.secondary
-                  }}
-                />
-              </View>
+              <Marker
+                platformIOS={platformIOS}
+                region={this.props.region}
+                address={this.props.ordering.fromAddress}
+                backgroundColor={config.colors.secondary}
+              />
             </MapView.Marker>
           )}
           {/* if we passed destination step show destination marker */}
@@ -290,43 +261,12 @@ class Map extends PureComponent {
                 longitude: this.props.ordering.toData.geometry.location.lng
               }}
             >
-              <View
-                style={{
-                  maxWidth: 160,
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  transform: [{ translateY: platformIOS ? -30 : 0 }]
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: "red",
-                    padding: 3,
-                    borderRadius: 5
-                  }}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      color: "white",
-                      fontSize:
-                        this.props.region.latitudeDelta < 0.002 ? 14 : 16,
-                      padding: 3
-                    }}
-                  >
-                    {this.props.ordering.toAddress}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: 3,
-                    maxWidth: 3,
-                    height: 28,
-                    backgroundColor: "red"
-                  }}
-                />
-              </View>
+              <Marker
+                platformIOS={platformIOS}
+                region={this.props.region}
+                address={this.props.ordering.toAddress}
+                backgroundColor="red"
+              />
             </MapView.Marker>
           )}
           {vehiclesList.map((vehicle, index) => (
@@ -371,9 +311,24 @@ class Map extends PureComponent {
               transform: [{ translateY: Platform.OS === "android" ? -20 : 0 }]
             }}
           >
-            <Image
+            {/* <Image
               pointerEvents="none"
               source={require("../../../assets/pinScaled.png")}
+            /> */}
+            <Marker
+              platformIOS={platformIOS}
+              region={this.props.region}
+              loadingGeocoding={this.props.loadingGeocoding}
+              address={
+                this.props.ordering.currStep.id === "from"
+                  ? this.props.ordering.fromAddress
+                  : this.props.ordering.toAddress
+              }
+              backgroundColor={
+                this.props.ordering.currStep.id === "from"
+                  ? config.colors.secondary
+                  : "red"
+              }
             />
           </View>
         )}
