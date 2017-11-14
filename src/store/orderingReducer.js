@@ -64,11 +64,13 @@ function metersToRadius(value) {
  * RESET APP
  */
 export function onResetApp() {
+  const resetStep = config.ordering.withAuth ? 2 : 0;
+
   return {
     type: UPDATE_ORDERING_DATA,
     payload: {
-      currStepNo: 0,
-      currStep: ORDERING_STEPS[0],
+      currStepNo: resetStep,
+      currStep: ORDERING_STEPS[resetStep],
       selectedVehicle: {},
       route: [],
       routeLength: undefined,
@@ -506,19 +508,26 @@ export function onNextStep() {
       const nextStepNo = ordering.currStepNo + 1;
       const nextStep = ORDERING_STEPS[nextStepNo];
 
+      // add to recently selected addresses
+      let recentAddresses = ordering.recentAddresses || [];
+
       // add to address data if next step is destination, and no data is present
       let addToData = {};
       if (!ordering.toFirst && nextStepNo === ordering.toStepNo) {
+        //
+
         addToData = {
           toAddress: ordering.fromAddress,
-          toData: ordering.fromData
+          toData: ordering.fromData,
+          recentAddresses: [ordering.fromData].concat(recentAddresses.slice(0))
         };
       }
 
       if (ordering.toFirst && nextStepNo === ordering.fromStepNo) {
         addToData = {
           fromAddress: ordering.toAddress,
-          fromData: ordering.toData
+          fromData: ordering.toData,
+          recentAddresses: [ordering.toData].concat(recentAddresses.slice(0))
         };
       }
 
@@ -945,6 +954,7 @@ const ACTION_HANDLERS = {
   // update from or to address that changed
   [UPDATE_ADDRESS]: (state, action) => {
     // console.log("UPDATE ADDRESS ");
+
     if (state.currStep.id === "from") {
       // return updated from address on map move
       return {
@@ -995,6 +1005,7 @@ const ACTION_HANDLERS = {
       const fromStepNo = findWithAttr(ORDERING_STEPS, "id", "from");
       const toStepNo = findWithAttr(ORDERING_STEPS, "id", "to");
       const timeStepNo = findWithAttr(ORDERING_STEPS, "id", "time");
+
       const vehicleSelectStepNo = findWithAttr(
         ORDERING_STEPS,
         "id",

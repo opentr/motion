@@ -26,30 +26,31 @@ export function onLoginReturningUser() {
               payload: {
                 ...user._user,
                 loggedIn: true,
+                returningUser: true,
                 loadingInProgress: false
               }
             });
           } else {
-            dispatch({
-              type: UPDATE_USER_DATA,
-              payload: {
-                error: "login returning user not authenticated: " + error,
-                loadingInProgress: false
-              }
-            });
+            // dispatch({
+            //   type: UPDATE_USER_DATA,
+            //   payload: {
+            //     error: "login returning user not authenticated: " + error,
+            //     loadingInProgress: false
+            //   }
+            // });
             dispatch({
               type: LOG_OUT
             });
           }
         })
         .catch(error => {
-          dispatch({
-            type: UPDATE_USER_DATA,
-            payload: {
-              error: "login returning user: " + error,
-              loadingInProgress: false
-            }
-          });
+          // dispatch({
+          //   type: UPDATE_USER_DATA,
+          //   payload: {
+          //     error: "login returning user: " + error,
+          //     loadingInProgress: false
+          //   }
+          // });
           dispatch({
             type: LOG_OUT
           });

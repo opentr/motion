@@ -11,7 +11,8 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = state => ({
-  user: state.user
+  user: state.user,
+  inputOpen: state.ordering.inputOpen || false
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);

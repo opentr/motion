@@ -197,8 +197,10 @@ class Ordering extends PureComponent {
 
     if (type === "address") {
       const height = Dimensions.get("window").height; //full width
-      this.onLayoutChange(height * 0.86);
+      this.onLayoutChange(height - 60);
       if (this.orderingStep) this.orderingStep.resetAddressList();
+
+      this.props.onUpdateOrderingData({ inputOpen: true });
     }
 
     // this.onLayoutChange("addressInput");
@@ -241,8 +243,10 @@ class Ordering extends PureComponent {
   closePanel() {
     if (!this.state.panelOpen) return false;
 
-    if (this.state.panelType === "address")
+    if (this.state.panelType === "address") {
       this.onLayoutChange(this.props.ordering.currStep.height);
+      this.props.onUpdateOrderingData({ inputOpen: false });
+    }
 
     // set closed state
     this.setState({
@@ -328,6 +332,7 @@ class Ordering extends PureComponent {
    * Back from input panel click 
    */
   onBack() {
+    console.log("onBack", "");
     Keyboard.dismiss();
     this.closePanel();
     if (this.state.panelType === "confirmation") this.props.onPrevStep();
@@ -352,12 +357,12 @@ class Ordering extends PureComponent {
           zIndex: 20
         }}
       >
-        <Image
+        <Animated.Image
           source={require("../../../assets/recenter.png")}
           style={{
             width: 24,
             height: 24,
-            opacity: 1
+            opacity: this.state.buttonOpacity
           }}
         />
       </TouchableOpacity>
@@ -416,8 +421,7 @@ class Ordering extends PureComponent {
           style={{
             position: "absolute",
             top: 50,
-            left: 6,
-            zIndex: 20
+            left: 6
           }}
         >
           <Animated.Image
@@ -611,9 +615,9 @@ class Ordering extends PureComponent {
     return (
       <Animated.View
         style={{
+          ...this.props.style,
           position: "absolute",
           top: height - 1,
-          zIndex: 1000,
           backgroundColor: "rgba(0,0,0,0)",
           width: width,
           height: this.state.panelHeight,

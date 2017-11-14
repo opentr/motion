@@ -239,7 +239,7 @@ class SelectFromToTime extends PureComponent {
               textAlign: "center",
               textAlignVertical: "center",
               marginTop: 15,
-              height: 24,
+              height: 30,
               opacity: this.props.animated.buttonOpacity,
               fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
             }

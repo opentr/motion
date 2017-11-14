@@ -23,7 +23,8 @@ class Sidebar extends PureComponent {
     super(props);
     this.state = {
       open: false,
-      panelTranslateX: new Animated.Value(-200)
+      panelTranslateX: new Animated.Value(-200),
+      panelOpacity: new Animated.Value(1)
     };
   }
 
@@ -33,6 +34,21 @@ class Sidebar extends PureComponent {
 
     if (this.props.user.loginOnStart) {
       this.props.onLoginReturningUser();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("sidebar cmwp", nextProps, this.props);
+    if (nextProps.inputOpen !== this.props.inputOpen) {
+      Animated.timing(
+        this.state.panelOpacity, // The animated value to drive
+        {
+          toValue: nextProps.inputOpen ? 0 : 1,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+          duration: 200
+        }
+      ).start();
     }
   }
 
@@ -114,15 +130,17 @@ class Sidebar extends PureComponent {
               left: 10
             }}
             onPress={e => {
+              if (this.props.inputOpen) return false;
               this.props.onSideBar(this.state.open);
               this.setState({ open: !this.state.open });
             }}
           >
-            <Image
+            <Animated.Image
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 24
+                borderRadius: 24,
+                opacity: this.state.panelOpacity
               }}
               source={{ uri: user.photoURL }}
             />
