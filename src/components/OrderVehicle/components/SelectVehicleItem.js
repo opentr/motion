@@ -173,7 +173,7 @@ class SelectVehicleItem extends PureComponent {
                   paddingBottom: 4,
                   paddingLeft: 6,
                   paddingRight: 6,
-                  backgroundColor: config.colors.secondary
+                  backgroundColor: config.colors.green
                 }}
               >
                 <Text

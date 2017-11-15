@@ -24,7 +24,7 @@ class Sidebar extends PureComponent {
     this.state = {
       open: false,
       panelTranslateX: new Animated.Value(-200),
-      panelOpacity: new Animated.Value(1)
+      panelOpacity: new Animated.Value(this.props.orderingInProgress ? 0 : 1)
     };
   }
 
@@ -39,14 +39,17 @@ class Sidebar extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     console.log("sidebar cmwp", nextProps, this.props);
-    if (nextProps.inputOpen !== this.props.inputOpen) {
+    if (
+      nextProps.inputOpen !== this.props.inputOpen ||
+      nextProps.orderingInProgress !== this.props.orderingInProgress
+    ) {
       Animated.timing(
         this.state.panelOpacity, // The animated value to drive
         {
-          toValue: nextProps.inputOpen ? 0 : 1,
+          toValue: nextProps.inputOpen || nextProps.orderingInProgress ? 0 : 1,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 200
+          duration: 150
         }
       ).start();
     }
@@ -129,8 +132,10 @@ class Sidebar extends PureComponent {
               top: 10,
               left: 10
             }}
+            activeOpacity={0.8}
             onPress={e => {
-              if (this.props.inputOpen) return false;
+              if (this.props.inputOpen || this.props.orderingInProgress)
+                return false;
               this.props.onSideBar(this.state.open);
               this.setState({ open: !this.state.open });
             }}

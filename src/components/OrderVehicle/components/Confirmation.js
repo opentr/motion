@@ -71,7 +71,7 @@ class Confirmation extends PureComponent {
             marginTop: 18,
             fontSize: 30,
             width: this.props.width,
-            color: config.colors.alert,
+            color: config.colors.primary,
             textAlign: "center"
           }}
           onPress={this.props.onConfirmBooking}

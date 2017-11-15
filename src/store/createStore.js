@@ -31,7 +31,7 @@ const store = createStore(
   composeEnhancers(applyMiddleware(thunkMiddleware), autoRehydrate())
 );
 
-// react-native
+// react-native persist storage
 const persistor = persistStore(store, {
   storage: AsyncStorage,
   debounce: 2000

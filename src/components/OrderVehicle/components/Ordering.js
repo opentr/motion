@@ -129,6 +129,10 @@ class Ordering extends PureComponent {
       );
     }
 
+    if (!nextProps.ordering.inputOpen && this.props.ordering.inputOpen) {
+      this.onBack();
+    }
+
     // if (nextProps.ordering.currStep.id === "confirmation") {
     //   this.openPanel(true);
     // } else if (nextProps.ordering.currStep.id === "vehicleSelect") {
@@ -197,7 +201,7 @@ class Ordering extends PureComponent {
 
     if (type === "address") {
       const height = Dimensions.get("window").height; //full width
-      this.onLayoutChange(height - 60);
+      this.onLayoutChange(height - 50);
       if (this.orderingStep) this.orderingStep.resetAddressList();
 
       this.props.onUpdateOrderingData({ inputOpen: true });
@@ -335,7 +339,7 @@ class Ordering extends PureComponent {
     console.log("onBack", "");
     Keyboard.dismiss();
     this.closePanel();
-    if (this.state.panelType === "confirmation") this.props.onPrevStep();
+    // if (this.state.panelType === "confirmation") this.props.onPrevStep();
   }
 
   /**
@@ -405,35 +409,6 @@ class Ordering extends PureComponent {
           opacity: this.state.backButtonOpacity
         }}
       />
-    );
-  }
-  getPrevStepButton() {
-    return (
-      this.props.user.loggedIn &&
-      this.props.ordering.currStepNo > 2 &&
-      this.props.ordering.currStep.id !== "traveling" &&
-      !this.state.panelOpen &&
-      this.props.ordering.currStep.id !== "confirmation" &&
-      this.props.ordering.currStepNo > 0 && (
-        <TouchableOpacity
-          onPress={this.props.onPrevStep}
-          activeOpacity={0.8}
-          style={{
-            position: "absolute",
-            top: 50,
-            left: 6
-          }}
-        >
-          <Animated.Image
-            source={require("../../../assets/back.png")}
-            style={{
-              width: 32,
-              height: 32,
-              opacity: this.state.buttonOpacity
-            }}
-          />
-        </TouchableOpacity>
-      )
     );
   }
 
@@ -618,6 +593,7 @@ class Ordering extends PureComponent {
           ...this.props.style,
           position: "absolute",
           top: height - 1,
+
           backgroundColor: "rgba(0,0,0,0)",
           width: width,
           height: this.state.panelHeight,
@@ -638,10 +614,10 @@ class Ordering extends PureComponent {
         />
 
         {/* Back button for previous steps */}
-        {this.getPrevStepButton()}
+        {/* {this.getPrevStepButton()} */}
 
         {/* Back icon for closing input panel */}
-        {this.getBackPanelButton()}
+        {/* {this.getBackPanelButton()} */}
 
         {/* Button to recenter map with context  */}
         {this.getRecenterButton()}

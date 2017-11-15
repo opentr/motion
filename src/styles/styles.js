@@ -14,16 +14,16 @@ const styles = {
     height: 20
   },
   baseText: {
-    fontSize: 20,
+    fontSize: 18,
     backgroundColor: "rgba(0,0,0,0)",
     color: config.colors.text
   },
   buttonText: {
-    fontSize: 30,
+    fontSize: 20,
     color: config.colors.primary
   },
   actionText: {
-    fontSize: 24,
+    fontSize: 20,
     color: config.colors.secondary
   },
   inputUnderline: {

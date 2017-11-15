@@ -1,17 +1,14 @@
 import { connect } from "react-redux";
 
-import { onLogout, onLoginReturningUser } from "../../store/userReducer";
-import { onSideBar, onPrevStep } from "../../store/orderingReducer";
-import Sidebar from "./Sidebar";
-
-import config from "../../config/config";
+import { onPrevStep, onUpdateOrderingData } from "../../store/orderingReducer";
+import BackButton from "./BackButton";
 
 const mapDispatchToProps = {
-  onLogout,
-  onSideBar,
   onPrevStep,
-  onLoginReturningUser
+  onUpdateOrderingData
 };
+
+import config from "../../config/config";
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -22,4 +19,4 @@ const mapStateToProps = state => ({
       (!config.ordering.withAuth && state.ordering.currStepNo > 0))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
+export default connect(mapStateToProps, mapDispatchToProps)(BackButton);

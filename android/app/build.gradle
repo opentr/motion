@@ -99,8 +99,8 @@ android {
         applicationId "com.opentransport.openride"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 14
-        versionName "0.1.4"
+        versionCode 17
+        versionName "0.1.7"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

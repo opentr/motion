@@ -246,7 +246,7 @@ class Map extends PureComponent {
                 platformIOS={platformIOS}
                 region={this.props.region}
                 address={this.props.ordering.fromAddress}
-                backgroundColor={config.colors.secondary}
+                backgroundColor={config.colors.green}
               />
             </MapView.Marker>
           )}
@@ -326,7 +326,7 @@ class Map extends PureComponent {
               }
               backgroundColor={
                 this.props.ordering.currStep.id === "from"
-                  ? config.colors.secondary
+                  ? config.colors.green
                   : "red"
               }
             />

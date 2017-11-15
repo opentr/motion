@@ -9,6 +9,8 @@ import { onRegionChange, onMapAction } from "./mapReducer";
 
 import { findWithAttr } from "../utils/search";
 
+import moment from "moment";
+
 /**
  * CONSTANTS USED
  */
@@ -509,7 +511,7 @@ export function onNextStep() {
       const nextStep = ORDERING_STEPS[nextStepNo];
 
       // add to recently selected addresses
-      let recentAddresses = ordering.recentAddresses || [];
+      let newRecentAddress = false;
 
       // add to address data if next step is destination, and no data is present
       let addToData = {};
@@ -518,17 +520,35 @@ export function onNextStep() {
 
         addToData = {
           toAddress: ordering.fromAddress,
-          toData: ordering.fromData,
-          recentAddresses: [ordering.fromData].concat(recentAddresses.slice(0))
+          toData: ordering.fromData
         };
+
+        newRecentAddress = ordering.fromData;
       }
 
       if (ordering.toFirst && nextStepNo === ordering.fromStepNo) {
         addToData = {
           fromAddress: ordering.toAddress,
-          fromData: ordering.toData,
-          recentAddresses: [ordering.toData].concat(recentAddresses.slice(0))
+          fromData: ordering.toData
         };
+
+        newRecentAddress = ordering.toData;
+      }
+
+      // insert new recent address if one is in
+      if (newRecentAddress !== false && newRecentAddress.formatted_address) {
+        let recentAddresses = ordering.recentAddresses || [];
+
+        // keep last X addresses, based on config and
+        recentAddresses = recentAddresses.slice(0, config.ordering.keepRecent);
+
+        // then remove all that have same ID as we will insert it
+        if (newRecentAddress.place_id)
+          recentAddresses = recentAddresses.filter(
+            addr => addr.place_id && addr.place_id !== newRecentAddress.place_id
+          );
+
+        addToData.recentAddresses = [newRecentAddress].concat(recentAddresses);
       }
 
       // reset data about available vehicles, not to diplsay vehicles for last ordering location
@@ -564,13 +584,19 @@ export function onNextStep() {
 
 /** handles click on the prev step */
 export function onPrevStep() {
+  console.log("on prev step ");
   return (dispatch, getState) => {
     // check if prev step is from or to, to recenter map
     const ordering = getState().ordering;
     const region = getState().map.region;
 
+    console.log("PREV STEP", config.ordering.withAuth, ordering.currStepNo);
+
     // check if previous step will be from or to location to recenter map there
-    if (ordering.currStepNo > 0) {
+    if (
+      (config.ordering.withAuth && ordering.currStepNo > 2) ||
+      (!config.ordering.withAuth && ordering.currStepNo > 0)
+    ) {
       const prevStepNo = ordering.currStepNo - 1;
       const prevStep = ORDERING_STEPS[prevStepNo];
 
@@ -989,8 +1015,8 @@ const ACTION_HANDLERS = {
 
   [LOGIN_SUCCESS]: (state, action) => ({
     ...state,
-    currStepNo: 2,
-    currStep: ORDERING_STEPS[2]
+    currStepNo: Math.max(state.currStepNo, 2),
+    currStep: ORDERING_STEPS[Math.max(state.currStepNo, 2)]
   }),
 
   /* make sure some data on reload of the app are not  in loaded from local storage */
@@ -1037,6 +1063,7 @@ const ACTION_HANDLERS = {
         fromStepNo: fromStepNo,
         toStepNo: toStepNo,
         timeStepNo: timeStepNo,
+        inputOpen: false,
         vehicleSelectStepNo: vehicleSelectStepNo,
         confirmationStepNo: confirmationStepNo
       };

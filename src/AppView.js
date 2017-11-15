@@ -15,16 +15,22 @@ import { Provider } from "react-redux";
 import styles from "./styles/styles";
 import config from "./config/config";
 
-import Map from "./components/Map/index";
-import Sidebar from "./components/Sidebar/index";
-import OrderVehicle from "./components/OrderVehicle/index";
+import Map from "./components/Map/";
+import Sidebar from "./components/Sidebar/";
+import BackButton from "./components/BackButton/";
+import OrderVehicle from "./components/OrderVehicle/";
 
-const appVersion = "v0.1.4";
+const appVersion = "v0.1.7";
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();
 
 class AppView extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.ordering = null;
+  }
   componentDidMount() {
     // add listener for Android
     BackHandler.addEventListener("hardwareBackPress", () => {
@@ -50,6 +56,7 @@ class AppView extends PureComponent {
     return (
       <View style={styles.app}>
         <Map />
+
         {user.loggedIn && (
           <Sidebar
             style={{ position: "absolute", top: 0, left: 0, zIndex: 5 }}
@@ -57,6 +64,7 @@ class AppView extends PureComponent {
           />
         )}
         <OrderVehicle style={{ zIndex: 10 }} />
+        <BackButton />
         <Text
           style={{
             position: "absolute",

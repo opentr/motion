@@ -53,19 +53,21 @@ const config = {
     // ordering steps, feel free to change titles but DO NOT CHANGE the ids
     steps: [
       /* Drop off location */
-      { id: "to", title: "Drop me at", action: "Next", height: 220 },
+      { id: "to", title: "I want to go to", action: "Next", height: 200 },
       /* Pick up location */
-      { id: "from", title: "Pick me up from", action: "Next", height: 220 },
+      { id: "from", title: "Pick me up from", action: "Next", height: 200 },
       /* Time of ride */
-      // { id: "time", title: "When?", action: "Next", height: 220 },
+      // { id: "time", title: "When?", action: "Next", height: 200 },
       /* Choose vehicle */
-      { id: "vehicleSelect", height: 280 },
+      { id: "vehicleSelect", height: 245 },
       /* Confirm order */
       { id: "confirmation", action: "Confirm and book", height: 410 },
       { id: "traveling", height: 110 }
     ],
     /* this will force first step to be authorization */
-    withAuth: true
+    withAuth: true,
+    /* remember how many addresses in recent list */
+    keepRecent: 40
   },
   /** show version number */
   showVersionNumber: true,
@@ -74,7 +76,8 @@ const config = {
    */
   colors: {
     primary: "#0076ff",
-    secondary: "#44db5e",
+    secondary: "#000000",
+    green: "#44db5e",
     alert: "#ff2851",
     text: "#8e8e93"
   }

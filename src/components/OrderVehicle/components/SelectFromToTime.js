@@ -23,6 +23,8 @@ class SelectFromToTime extends PureComponent {
     super(props);
 
     this.state = {
+      /* current search text */
+      searchText: "",
       /* list of Google returned addresses for search */
       addresses: []
     };
@@ -31,6 +33,7 @@ class SelectFromToTime extends PureComponent {
     this.resetAddressList = this.resetAddressList.bind(this);
     this.fetchAddress = this.fetchAddress.bind(this);
     this.onAddressClick = this.onAddressClick.bind(this);
+    this.onRecentAddressClick = this.onRecentAddressClick.bind(this);
   }
 
   componentDidMount() {}
@@ -57,6 +60,7 @@ class SelectFromToTime extends PureComponent {
 
   /** fetch search addresses using Google API */
   async fetchAddress(text) {
+    this.setState({ searchText: text });
     // form the url for API call
     const url =
       config.api.google.urlTextSearch +
@@ -86,6 +90,17 @@ class SelectFromToTime extends PureComponent {
     //console.log("geocode", responseJson);
   }
 
+  onRecentAddressClick(place_id) {
+    const clickedRecent = this.props.ordering.recentAddresses
+      .slice(0)
+      .filter(addr => addr.place_id === place_id);
+    if (clickedRecent.length > 0) {
+      this.props.onSelectAddress(
+        clickedRecent[0].formatted_address,
+        clickedRecent[0]
+      );
+    }
+  }
   onAddressClick(index) {
     this.props.onSelectAddress(
       this.state.addresses[index].formatted_address,
@@ -96,73 +111,143 @@ class SelectFromToTime extends PureComponent {
   getExpandedAddressInput() {
     const width = this.props.width;
 
+    if (!this.props.panelOpen) return null;
+
+    let recentAddresses = (this.props.ordering.recentAddresses || []).slice(0);
+    // filter out if search text
+    if (this.state.searchText !== "") {
+      recentAddresses = recentAddresses.filter(
+        addr => addr.formatted_address.indexOf(this.state.searchText) > -1
+      );
+    }
+
+    if (this.state.addresses.length > 0) {
+      recentAddresses = recentAddresses.slice(0, 3);
+    } else {
+      recentAddresses = recentAddresses.slice(0, 5);
+    }
+
     return (
-      this.props.panelOpen && (
-        <View style={{ ...this.props.style, flexDirection: "column" }}>
-          <TextInput
-            autoFocus={true}
-            multiline={false}
-            clearButtonMode={"while-editing"}
-            underlineColorAndroid={config.colors.secondary}
-            spellCheck={false}
-            onChangeText={this.onInputChange}
+      <View style={{ ...this.props.style, flexDirection: "column" }}>
+        <TextInput
+          autoFocus={true}
+          multiline={false}
+          clearButtonMode={"while-editing"}
+          underlineColorAndroid={config.colors.secondary}
+          spellCheck={false}
+          onChangeText={this.onInputChange}
+          style={[
+            styles.baseText,
+            styles.actionText,
+            {
+              fontSize: 20,
+              width: 0.9 * width,
+              height: Platform.OS === "ios" ? 32 : 42,
+              textAlign: "left",
+              textAlignVertical: "center",
+              marginTop: 0
+            }
+          ]}
+        />
+        {Platform.OS === "ios" && (
+          <View
             style={[
-              styles.baseText,
-              styles.actionText,
+              styles.inputUnderline,
               {
-                width: 0.9 * width,
-                height: Platform.OS === "ios" ? 40 : 60,
-                textAlign: "left",
-                textAlignVertical: "center",
-                marginTop: 0
+                width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
+                marginTop: 4
               }
             ]}
           />
-          {Platform.OS === "ios" && (
-            <View
+        )}
+        {recentAddresses.length > 0 && (
+          <View
+            style={{
+              marginTop: 10,
+              width: 0.9 * width,
+              paddingLeft: 4
+            }}
+          >
+            <Text style={{ fontSize: 12, letterSpacing: 2, marginBottom: 3 }}>
+              RECENT LOCATIONS
+            </Text>
+            {recentAddresses.map((addr, index) => {
+              //console.log("render", addr, index);
+
+              const types = addr.types.join(",");
+              const text =
+                types.indexOf("street_address") === -1 && addr.name
+                  ? addr.name + ", " + addr.formatted_address
+                  : addr.formatted_address;
+              return (
+                <Text
+                  key={index}
+                  onPress={() => {
+                    this.onRecentAddressClick(addr.place_id);
+                  }}
+                  style={[
+                    styles.baseText,
+                    {
+                      width: 0.9 * width,
+                      fontSize: 16,
+                      marginTop:
+                        index === 0 ? (Platform.OS === "ios" ? 12 : 6) : 6,
+                      marginBottom: 3
+                    }
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode={"tail"}
+                >
+                  {text}
+                </Text>
+              );
+            })}
+            {this.state.addresses.length > 0 && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginTop: 10,
+                  letterSpacing: 2,
+                  marginBottom: 3
+                }}
+              >
+                SEARCH RESULTS
+              </Text>
+            )}
+          </View>
+        )}
+        {this.state.addresses.slice(0, 5).map((addr, index) => {
+          //console.log("render", addr, index);
+
+          const types = addr.types.join(",");
+          const text =
+            types.indexOf("street_address") === -1
+              ? addr.name + ", " + addr.formatted_address
+              : addr.formatted_address;
+          return (
+            <Text
+              key={index}
+              onPress={() => {
+                this.onAddressClick(index);
+              }}
               style={[
-                styles.inputUnderline,
+                styles.baseText,
                 {
-                  width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
-                  marginTop: 4
+                  width: 0.9 * width,
+                  paddingLeft: 4,
+                  fontSize: 16,
+                  marginTop: index === 0 ? (Platform.OS === "ios" ? 12 : 6) : 6,
+                  marginBottom: 3
                 }
               ]}
-            />
-          )}
-          {this.state.addresses.slice(0, 5).map((addr, index) => {
-            //console.log("render", addr, index);
-
-            const types = addr.types.join(",");
-            const text =
-              types.indexOf("street_address") === -1
-                ? addr.name + ", " + addr.formatted_address
-                : add.formatted_address;
-            return (
-              <Text
-                key={index}
-                onPress={() => {
-                  this.onAddressClick(index);
-                }}
-                style={[
-                  styles.baseText,
-                  {
-                    width: 0.9 * width,
-                    paddingLeft: 4,
-                    fontSize: 16,
-                    marginTop:
-                      index === 0 ? (Platform.OS === "ios" ? 20 : 10) : 10,
-                    marginBottom: 5
-                  }
-                ]}
-                numberOfLines={1}
-                ellipsizeMode={"tail"}
-              >
-                {text}
-              </Text>
-            );
-          })}
-        </View>
-      )
+              numberOfLines={1}
+              ellipsizeMode={"tail"}
+            >
+              {text}
+            </Text>
+          );
+        })}
+      </View>
     );
   }
 
@@ -238,10 +323,8 @@ class SelectFromToTime extends PureComponent {
               width: 0.9 * this.props.width,
               textAlign: "center",
               textAlignVertical: "center",
-              marginTop: 15,
-              height: 30,
-              opacity: this.props.animated.buttonOpacity,
-              fontSize: value.length > 30 ? 18 : value.length > 20 ? 20 : 24
+              marginTop: 20,
+              opacity: this.props.animated.buttonOpacity
             }
           ]}
         >
@@ -251,7 +334,10 @@ class SelectFromToTime extends PureComponent {
           style={[
             styles.baseText,
             styles.buttonText,
-            { marginTop: 30, opacity: this.props.animated.buttonOpacity }
+            {
+              marginTop: 20,
+              opacity: this.props.animated.buttonOpacity
+            }
           ]}
           onPress={this.props.onNextStep}
         >

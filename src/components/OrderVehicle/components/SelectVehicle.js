@@ -123,7 +123,7 @@ class SelectVehicle extends PureComponent {
       return (
         <View
           style={{
-            paddingTop: 48,
+            paddingTop: 20,
             paddingBottom: 0,
             width: "auto",
             height: "auto",
@@ -142,7 +142,7 @@ class SelectVehicle extends PureComponent {
     return (
       <View
         style={{
-          paddingTop: 38,
+          paddingTop: 10,
           width: "auto",
           height: "auto"
         }}
