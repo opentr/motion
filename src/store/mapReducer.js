@@ -9,9 +9,47 @@ export const UPDATE_ACTION = "UPDATE_ACTION";
 export const UPDATE_ADDRESS = "UPDATE_ADDRESS";
 
 import { regionDifferent } from "../utils/numbers";
+
+import { PermissionsAndroid, Platform } from "react-native";
+
 /**
  * ACTIONS
  */
+
+export function onAskForLocationPermission() {
+  return dispatch => {
+    if (Platform.OS === "ios") {
+      dispatch({
+        type: UPDATE_MAP_DATA,
+        payload: { locationPermission: true }
+      });
+    } else {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Permission to access your location ",
+          message:
+            "We need this permission so you could easier choose your ride pick up and destination"
+        }
+      )
+        .then(granted => {
+          if (
+            granted === PermissionsAndroid.RESULTS.GRANTED ||
+            granted === true
+          ) {
+            console.log("GRANTED PERMISSION");
+            dispatch({
+              type: UPDATE_MAP_DATA,
+              payload: { locationPermission: true }
+            });
+          }
+        })
+        .catch(error => {
+          console.log("ERROR ", error);
+        });
+    }
+  };
+}
 
 export function onRegionChange(region) {
   // dispatch map update with region data

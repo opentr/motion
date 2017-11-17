@@ -106,6 +106,7 @@ class Map extends PureComponent {
 
   componentDidMount() {
     this.startUpdating();
+    this.props.onAskForLocationPermission();
   }
 
   componentWillUnmount() {
@@ -215,7 +216,9 @@ class Map extends PureComponent {
     return (
       <View style={mapStyle}>
         <MapView
+          key={this.props.locationPermission + "-"}
           style={mapStyle}
+          showsUserLocation={this.props.locationPermission}
           initialRegion={this.props.region}
           showsCompass={false}
           showsBuildings={false}

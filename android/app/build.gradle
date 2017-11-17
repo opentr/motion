@@ -98,7 +98,8 @@ android {
     defaultConfig {
         applicationId "com.opentransport.openride"
         minSdkVersion 16
-        targetSdkVersion 23
+        //noinspection OldTargetApi
+        targetSdkVersion 25
         versionCode 17
         versionName "0.1.7"
         ndk {
