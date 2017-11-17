@@ -16,6 +16,9 @@ import { PermissionsAndroid, Platform } from "react-native";
  * ACTIONS
  */
 
+/**
+ * ask user for location permission 
+ */
 export function onAskForLocationPermission() {
   return dispatch => {
     if (Platform.OS === "ios") {

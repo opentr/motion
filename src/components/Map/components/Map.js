@@ -201,11 +201,11 @@ class Map extends PureComponent {
       height: mapHeight
     });
 
-    console.log(
-      "map render ",
-      this.props.ordering.currStepNo,
-      this.state.mapAnimating
-    );
+    // console.log(
+    //   "map render ",
+    //   this.props.ordering.currStepNo,
+    //   this.state.mapAnimating
+    // );
 
     const platformIOS = Platform.IOS === "ios";
     const vehiclesList =
