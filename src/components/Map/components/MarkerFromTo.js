@@ -2,6 +2,8 @@ import React, { PureComponent } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 
+import styles from "../../../styles/styles";
+
 class MapMarker extends PureComponent {
   static propTypes = {
     platformIOS: PropTypes.bool.isRequired,
@@ -25,46 +27,40 @@ class MapMarker extends PureComponent {
       loadingGeocoding
     } = this.props;
     return (
-      <View
-        style={{
-          maxWidth: 160,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          transform: [{ translateY: platformIOS ? -30 : 0 }]
-        }}
-      >
+      <View style={styles.map.markerFromTo.holder}>
         <View
-          style={{
-            backgroundColor: backgroundColor,
-            padding: 3,
-            borderRadius: 5
-          }}
+          style={[
+            styles.map.markerFromTo.label,
+            {
+              backgroundColor: backgroundColor
+            }
+          ]}
         >
           {!loadingGeocoding ? (
             <Text
               numberOfLines={1}
-              style={{
-                color: "white",
-                fontSize: region.latitudeDelta < 0.002 ? 14 : 16,
-                padding: 3
-              }}
+              style={[
+                styles.map.markerFromTo.labelText,
+                {
+                  fontSize: region.latitudeDelta < 0.002 ? 14 : 16
+                }
+              ]}
             >
               {address}
             </Text>
           ) : (
-            <View style={{ width: 160, paddingTop: 4, paddingBottom: 3 }}>
+            <View style={styles.map.markerFromTo.activityHolder}>
               <ActivityIndicator size="small" color="white" />
             </View>
           )}
         </View>
         <View
-          style={{
-            width: 3,
-            maxWidth: 3,
-            height: 28,
-            backgroundColor: backgroundColor
-          }}
+          style={[
+            styles.map.markerFromTo.pinLine,
+            {
+              backgroundColor: backgroundColor
+            }
+          ]}
         />
       </View>
     );

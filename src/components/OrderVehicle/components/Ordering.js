@@ -51,7 +51,6 @@ class Ordering extends PureComponent {
       /* is panel opening/closing */
       panelAnimating: false,
 
-      panelType: "address",
       /**
        * Animation values to be used on panel open/close
        */
@@ -191,21 +190,18 @@ class Ordering extends PureComponent {
     ).start();
   }
 
-  openPanel(type = "address") {
+  openPanel() {
     if (this.state.panelOpen) return;
 
     this.setState({
-      panelOpen: true,
-      panelType: type
+      panelOpen: true
     });
 
-    if (type === "address") {
-      const height = Dimensions.get("window").height; //full width
-      this.onLayoutChange(height - 50);
-      if (this.orderingStep) this.orderingStep.resetAddressList();
+    const height = Dimensions.get("window").height; //full width
+    this.onLayoutChange(height - 50);
+    if (this.orderingStep) this.orderingStep.resetAddressList();
 
-      this.props.onUpdateOrderingData({ inputOpen: true });
-    }
+    this.props.onUpdateOrderingData({ inputOpen: true });
 
     // this.onLayoutChange("addressInput");
 
@@ -218,7 +214,7 @@ class Ordering extends PureComponent {
           toValue: -10,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ),
       Animated.timing(
@@ -228,7 +224,7 @@ class Ordering extends PureComponent {
           toValue: 0,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ),
       Animated.timing(
@@ -238,7 +234,7 @@ class Ordering extends PureComponent {
           toValue: 1,
           easing: Easing.out(Easing.bezier(0.76, 0.2, 0.84, 0.46)),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       )
     ]).start(this.onOpenPanel);
@@ -247,10 +243,8 @@ class Ordering extends PureComponent {
   closePanel() {
     if (!this.state.panelOpen) return false;
 
-    if (this.state.panelType === "address") {
-      this.onLayoutChange(this.props.ordering.currStep.height);
-      this.props.onUpdateOrderingData({ inputOpen: false });
-    }
+    this.onLayoutChange(this.props.ordering.currStep.height);
+    this.props.onUpdateOrderingData({ inputOpen: false });
 
     // set closed state
     this.setState({
@@ -265,7 +259,7 @@ class Ordering extends PureComponent {
           toValue: 0,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 500
+          duration: 300
         }
       ),
       Animated.timing(
@@ -339,7 +333,6 @@ class Ordering extends PureComponent {
     console.log("onBack", "");
     Keyboard.dismiss();
     this.closePanel();
-    // if (this.state.panelType === "confirmation") this.props.onPrevStep();
   }
 
   /**
@@ -354,61 +347,18 @@ class Ordering extends PureComponent {
       <TouchableOpacity
         onPress={this.props.onRecenterMap}
         activeOpacity={0.8}
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          zIndex: 20
-        }}
+        style={styles.map.recenterButton.holder}
       >
         <Animated.Image
           source={require("../../../assets/recenter.png")}
-          style={{
-            width: 24,
-            height: 24,
-            opacity: this.state.buttonOpacity
-          }}
+          style={[
+            styles.map.recenterButton.image,
+            {
+              opacity: this.state.buttonOpacity
+            }
+          ]}
         />
       </TouchableOpacity>
-    );
-  }
-
-  getBackPanelButton() {
-    return this.state.panelOpen ? (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={this.onBack}
-        style={{
-          position: "absolute",
-          top: 6,
-          left: 6
-        }}
-      >
-        <Animated.Image
-          pointerEvents="none"
-          source={require("../../../assets/back.png")}
-          style={{
-            width: 32,
-            height: 32,
-            opacity: this.state.backButtonOpacity
-          }}
-        />
-      </TouchableOpacity>
-    ) : (
-      <Animated.Image
-        pointerEvents="none"
-        source={require("../../../assets/back.png")}
-        style={{
-          position: "absolute",
-          top: 6,
-
-          left: 6,
-          width: 32,
-          height: 32,
-          marginRight: "auto",
-          opacity: this.state.backButtonOpacity
-        }}
-      />
     );
   }
 
@@ -567,7 +517,7 @@ class Ordering extends PureComponent {
 
     return (
       <Steps
-        style={{ marginTop: 35 }}
+        style={styles.ordering.steps}
         width={width}
         height={this.state.panelHeight}
         currStepNo={currStepNo}
@@ -589,35 +539,25 @@ class Ordering extends PureComponent {
 
     return (
       <Animated.View
-        style={{
-          ...this.props.style,
-          position: "absolute",
-          top: height - 1,
-
-          backgroundColor: "rgba(0,0,0,0)",
-          width: width,
-          height: this.state.panelHeight,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          transform: [{ translateY: this.state.panelTranslate }]
-        }}
+        style={[
+          styles.ordering.holder,
+          {
+            top: height - 1,
+            width: width,
+            height: this.state.panelHeight,
+            transform: [{ translateY: this.state.panelTranslate }]
+          }
+        ]}
       >
         <View
-          style={{
-            position: "absolute",
-            top: 40,
-            width: width,
-            backgroundColor: "white",
-            height: height
-          }}
+          style={[
+            styles.ordering.background,
+            {
+              width: width,
+              height: height
+            }
+          ]}
         />
-
-        {/* Back button for previous steps */}
-        {/* {this.getPrevStepButton()} */}
-
-        {/* Back icon for closing input panel */}
-        {/* {this.getBackPanelButton()} */}
 
         {/* Button to recenter map with context  */}
         {this.getRecenterButton()}

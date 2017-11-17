@@ -121,18 +121,7 @@ class SelectVehicle extends PureComponent {
 
     if (inNextTransition || inPrevTransition || this.state.waitingForTimes) {
       return (
-        <View
-          style={{
-            paddingTop: 20,
-            paddingBottom: 0,
-            width: "auto",
-            height: "auto",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            flexWrap: "nowrap"
-          }}
-        >
+        <View style={styles.ordering.vehicleSelect.holderLoading}>
           {[0, 1, 2, 3].map(i => <SelectVehicleItem key={i} index={i} />)}
         </View>
       );
@@ -140,13 +129,7 @@ class SelectVehicle extends PureComponent {
 
     //console.log("render select vehicles debug now SHOW ", this.state);
     return (
-      <View
-        style={{
-          paddingTop: 10,
-          width: "auto",
-          height: "auto"
-        }}
-      >
+      <View style={styles.ordering.vehicleSelect.holder}>
         <FlatList
           horizontal={true}
           legacyImplementation={false}

@@ -128,7 +128,7 @@ class SelectFromToTime extends PureComponent {
     }
 
     return (
-      <View style={{ ...this.props.style, flexDirection: "column" }}>
+      <View style={[this.props.style, styles.ordering.addressInput.holder]}>
         <TextInput
           autoFocus={true}
           multiline={false}
@@ -137,38 +137,32 @@ class SelectFromToTime extends PureComponent {
           spellCheck={false}
           onChangeText={this.onInputChange}
           style={[
-            styles.baseText,
-            styles.actionText,
+            styles.ordering.addressInput.inputText,
             {
-              fontSize: 20,
-              width: 0.9 * width,
-              height: Platform.OS === "ios" ? 32 : 42,
-              textAlign: "left",
-              textAlignVertical: "center",
-              marginTop: 0
+              width: 0.9 * width
             }
           ]}
         />
         {Platform.OS === "ios" && (
           <View
             style={[
-              styles.inputUnderline,
+              styles.ordering.addressInput.inputUnderline,
               {
-                width: (Platform.OS === "ios" ? 0.9 : 0.86) * width,
-                marginTop: 4
+                width: (Platform.OS === "ios" ? 0.9 : 0.86) * width
               }
             ]}
           />
         )}
         {recentAddresses.length > 0 && (
           <View
-            style={{
-              marginTop: 10,
-              width: 0.9 * width,
-              paddingLeft: 4
-            }}
+            style={[
+              styles.ordering.addressInput.resultsHolder,
+              {
+                width: 0.9 * width
+              }
+            ]}
           >
-            <Text style={{ fontSize: 12, letterSpacing: 2, marginBottom: 3 }}>
+            <Text style={styles.ordering.addressInput.label}>
               RECENT LOCATIONS
             </Text>
             {recentAddresses.map((addr, index) => {
@@ -186,13 +180,11 @@ class SelectFromToTime extends PureComponent {
                     this.onRecentAddressClick(addr.place_id);
                   }}
                   style={[
-                    styles.baseText,
+                    styles.ordering.addressInput.result,
                     {
                       width: 0.9 * width,
-                      fontSize: 16,
                       marginTop:
-                        index === 0 ? (Platform.OS === "ios" ? 12 : 6) : 6,
-                      marginBottom: 3
+                        index === 0 ? (Platform.OS === "ios" ? 12 : 6) : 6
                     }
                   ]}
                   numberOfLines={1}
@@ -204,12 +196,10 @@ class SelectFromToTime extends PureComponent {
             })}
             {this.state.addresses.length > 0 && (
               <Text
-                style={{
-                  fontSize: 12,
-                  marginTop: 10,
-                  letterSpacing: 2,
-                  marginBottom: 3
-                }}
+                style={[
+                  styles.ordering.addressInput.label,
+                  styles.ordering.addressInput.labelSearch
+                ]}
               >
                 SEARCH RESULTS
               </Text>
@@ -231,13 +221,11 @@ class SelectFromToTime extends PureComponent {
                 this.onAddressClick(index);
               }}
               style={[
-                styles.baseText,
+                styles.ordering.addressInput.result,
                 {
-                  width: 0.9 * width,
-                  paddingLeft: 4,
-                  fontSize: 16,
                   marginTop: index === 0 ? (Platform.OS === "ios" ? 12 : 6) : 6,
-                  marginBottom: 3
+                  width: 0.9 * width,
+                  paddingLeft: 4
                 }
               ]}
               numberOfLines={1}
@@ -284,22 +272,13 @@ class SelectFromToTime extends PureComponent {
     }
 
     return (
-      <View
-        style={{
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "center"
-        }}
-        ref={view => this.view}
-      >
+      <View style={styles.ordering.fromToTime.holder} ref={view => this.view}>
         {/* Title of the panel */}
         <Animated.Text
           style={[
             styles.baseText,
+            styles.ordering.fromToTime.title,
             {
-              marginTop: 35,
-              textAlignVertical: "center",
-              textAlign: "center",
               transform: [{ translateY: this.props.animated.titleTranslate }]
             }
           ]}
@@ -317,13 +296,10 @@ class SelectFromToTime extends PureComponent {
           ellipsizeMode={"tail"}
           numberOfLines={1}
           style={[
-            styles.baseText,
             styles.actionText,
+            styles.ordering.fromToTime.value,
             {
               width: 0.9 * this.props.width,
-              textAlign: "center",
-              textAlignVertical: "center",
-              marginTop: 20,
               opacity: this.props.animated.buttonOpacity
             }
           ]}
@@ -332,10 +308,9 @@ class SelectFromToTime extends PureComponent {
         </Animated.Text>
         <Animated.Text
           style={[
-            styles.baseText,
             styles.buttonText,
+            styles.ordering.fromToTime.button,
             {
-              marginTop: 20,
               opacity: this.props.animated.buttonOpacity
             }
           ]}

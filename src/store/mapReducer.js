@@ -1,5 +1,5 @@
 import config from "../config/config";
-
+import { REHYDRATE } from "redux-persist/constants";
 /**
  * ACTION TYPES
  */
@@ -107,6 +107,9 @@ const ACTION_HANDLERS = {
   [UPDATE_ACTION]: (state, action) => ({
     ...state,
     action: action.payload
+  }),
+  [REHYDRATE]: (state, action) => ({
+    ...state
   })
 };
 

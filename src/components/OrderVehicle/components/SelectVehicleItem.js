@@ -64,27 +64,14 @@ class SelectVehicleItem extends PureComponent {
           this.props.onPressItem(this.props.index);
         }}
       >
-        <View
-          style={{
-            flexDirection: "column",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 10
-          }}
-        >
+        <View style={styles.ordering.vehicleSelect.vehicle.holder}>
           <Text
-            style={{
-              height: placeholder ? 30 : 40,
-              fontSize: 15,
-              marginTop: placeholder ? 0 : 10,
-              width: 83,
-              color: config.colors.primary,
-              textAlignVertical: "center",
-              textAlign: "center",
-              backgroundColor: placeholder ? "#f2f2f2" : "white"
-            }}
+            style={[
+              styles.ordering.vehicleSelect.vehicle.make,
+              placeholder
+                ? styles.ordering.vehicleSelect.vehicle.makePlaceholder
+                : {}
+            ]}
           >
             {placeholder ? "     " : make}
           </Text>
@@ -97,40 +84,32 @@ class SelectVehicleItem extends PureComponent {
                   }
             }
             resizeMode="contain"
-            style={{
-              width: placeholder ? 100 : 105,
-              height: 60,
-              marginTop: placeholder ? 15 : 5
-            }}
+            style={[
+              styles.ordering.vehicleSelect.vehicle.image,
+              placeholder
+                ? styles.ordering.vehicleSelect.vehicle.imagePlaceholder
+                : {}
+            ]}
           />
           <Text
-            style={{
-              fontSize: 15,
-              lineHeight: placeholder ? 16 : 24,
-              width: placeholder ? 60 : 85,
-              marginTop: placeholder ? 8 : 0,
-              color: config.colors.text,
-              textAlignVertical: "center",
-              textAlign: "center",
-              backgroundColor: placeholder ? "#f2f2f2" : "white"
-            }}
+            style={[
+              styles.ordering.vehicleSelect.vehicle.time,
+              placeholder
+                ? styles.ordering.vehicleSelect.vehicle.timePlaceholder
+                : {}
+            ]}
           >
             {placeholder || !("routeTime" in this.props.data)
               ? "     "
               : routeTime === -1 ? "N/A" : "in " + routeTime + "  min"}
           </Text>
           <Text
-            style={{
-              fontSize: 20,
-              lineHeight: placeholder ? 20 : 30,
-              marginTop: placeholder ? 10 : 0,
-              width: placeholder ? 60 : 85,
-              color: config.colors.text,
-              textAlignVertical: "center",
-              textAlign: "center",
-              fontWeight: "bold",
-              backgroundColor: placeholder ? "#f2f2f2" : "white"
-            }}
+            style={[
+              styles.ordering.vehicleSelect.vehicle.price,
+              placeholder
+                ? styles.ordering.vehicleSelect.vehicle.pricePlaceholder
+                : {}
+            ]}
           >
             {placeholder
               ? "     "
@@ -140,49 +119,18 @@ class SelectVehicleItem extends PureComponent {
           </Text>
           {placeholder ? (
             <View
-              style={{
-                flexDirection: "row",
-                width: placeholder ? 60 : 105,
-                height: 24,
-                paddingTop: placeholder ? 0 : 10,
-                marginTop: placeholder ? 10 : 4,
-                backgroundColor: placeholder ? "#f2f2f2" : "white"
-              }}
+              style={styles.ordering.vehicleSelect.vehicle.rating.placeholder}
             />
           ) : (
-            <View
-              style={{
-                flexDirection: "row",
-                width: 105,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingTop: 10
-              }}
-            >
+            <View style={styles.ordering.vehicleSelect.vehicle.rating.holder}>
               <Image
                 source={require("../../../assets/heart.png")}
-                style={{
-                  width: 24,
-                  height: 20,
-                  marginRight: 5
-                }}
+                style={styles.ordering.vehicleSelect.vehicle.rating.heart}
               />
               <View
-                style={{
-                  paddingTop: 2,
-                  paddingBottom: 4,
-                  paddingLeft: 6,
-                  paddingRight: 6,
-                  backgroundColor: config.colors.green
-                }}
+                style={styles.ordering.vehicleSelect.vehicle.rating.textHolder}
               >
-                <Text
-                  style={{
-                    color: "white",
-                    lineHeight: 18,
-                    fontSize: 18
-                  }}
-                >
+                <Text style={styles.ordering.vehicleSelect.vehicle.rating.text}>
                   8
                 </Text>
               </View>

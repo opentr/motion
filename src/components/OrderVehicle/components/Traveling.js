@@ -184,26 +184,15 @@ class Traveling extends PureComponent {
   render() {
     //console.log("Traveling ", this.props);
     return (
-      <View
-        style={{
-          width: "100%",
-          height: "auto",
-          minHeight: 70,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          paddingTop: 35
-        }}
-      >
+      <View style={styles.ordering.traveling.holder}>
         <Animated.Text
-          style={{
-            fontSize: 20,
-            color: config.colors.secondary,
-            textAlign: "center",
-            textAlignVertical: "center",
-            width: this.props.width * 0.9,
-            opacity: this.state.opacityText
-          }}
+          style={[
+            styles.ordering.traveling.text,
+            {
+              width: this.props.width * 0.9,
+              opacity: this.state.opacityText
+            }
+          ]}
           onPress={() => {
             if (this.props.booking.status === "completed") {
               this.props.onResetApp();

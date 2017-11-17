@@ -56,29 +56,10 @@ class AppView extends PureComponent {
     return (
       <View style={styles.app}>
         <Map />
-
-        {user.loggedIn && (
-          <Sidebar
-            style={{ position: "absolute", top: 0, left: 0, zIndex: 5 }}
-            user={user}
-          />
-        )}
-        <OrderVehicle style={{ zIndex: 10 }} />
+        {user.loggedIn && <Sidebar user={user} />}
+        <OrderVehicle />
         <BackButton />
-        <Text
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            color: "white",
-            paddingLeft: 3,
-            paddingRight: 3,
-            backgroundColor: "rgba(0,0,0,.5)"
-          }}
-        >
-          {appVersion}
-        </Text>
-
+        <Text style={styles.appVersion}>{appVersion}</Text>
         {(user.error || user.logoutResult) && (
           <Modal
             animationType="slide"

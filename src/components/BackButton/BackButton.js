@@ -2,6 +2,8 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Animated, TouchableOpacity } from "react-native";
 
+import styles from "../../styles/styles";
+
 class BackButton extends PureComponent {
   static propTypes = {};
 
@@ -25,19 +27,11 @@ class BackButton extends PureComponent {
           }
         }}
         activeOpacity={0.8}
-        style={{
-          position: "absolute",
-          top: 12,
-          left: 8,
-          zIndex: 100
-        }}
+        style={styles.backButton.holder}
       >
         <Animated.Image
           source={require("../../assets/back.png")}
-          style={{
-            width: 32,
-            height: 32
-          }}
+          style={styles.backButton.icon}
         />
       </TouchableOpacity>
     ) : null;

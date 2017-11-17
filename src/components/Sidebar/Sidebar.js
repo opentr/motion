@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import config from "../../config/config";
+import styles from "../../styles/styles";
 
 class Sidebar extends PureComponent {
   static propTypes = {};
@@ -64,7 +65,7 @@ class Sidebar extends PureComponent {
           toValue: 0,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
-          duration: 200
+          duration: 150
         }
       ).start();
     }
@@ -76,47 +77,48 @@ class Sidebar extends PureComponent {
     const height = Dimensions.get("window").height; //full height
 
     return (
-      <View style={{ position: "absolute", top: 0, left: 0 }}>
+      <View
+        style={[
+          styles.sidebar.holder,
+          {
+            width: this.state.open ? 200 : 60,
+            height: this.state.open ? height : 60
+          }
+        ]}
+      >
         {this.state.open && (
           <Animated.View
-            style={{
-              backgroundColor: "white",
-              width: 200,
-              height: height,
-              transform: [{ translateX: this.state.panelTranslateX }]
-            }}
+            style={[
+              styles.sidebar.panel,
+              {
+                height: height,
+                transform: [{ translateX: this.state.panelTranslateX }]
+              }
+            ]}
           >
             <Text
-              style={{
-                position: "absolute",
-                top: 120,
-                left: 20,
-                fontSize: 30,
-                color: config.colors.primary
-              }}
+              style={[
+                styles.sidebar.button,
+                {
+                  top: 120
+                }
+              ]}
             >
               Trips
             </Text>
             <Text
-              style={{
-                position: "absolute",
-                top: 170,
-                left: 20,
-                fontSize: 30,
-                color: config.colors.primary
-              }}
+              style={[
+                styles.sidebar.button,
+                {
+                  top: 170
+                }
+              ]}
             >
               Payment
             </Text>
 
             <Text
-              style={{
-                position: "absolute",
-                bottom: 60,
-                left: 20,
-                fontSize: 24,
-                color: config.colors.text
-              }}
+              style={styles.sidebar.buttonLogout}
               onPress={() => {
                 this.props.onLogout();
               }}
@@ -127,11 +129,7 @@ class Sidebar extends PureComponent {
         )}
         {user.loggedIn && (
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              top: 10,
-              left: 10
-            }}
+            style={styles.sidebar.profile.holder}
             activeOpacity={0.8}
             onPress={e => {
               if (this.props.inputOpen || this.props.orderingInProgress)
@@ -141,12 +139,12 @@ class Sidebar extends PureComponent {
             }}
           >
             <Animated.Image
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 24,
-                opacity: this.state.panelOpacity
-              }}
+              style={[
+                styles.sidebar.profile.image,
+                {
+                  opacity: this.state.panelOpacity
+                }
+              ]}
               source={{ uri: user.photoURL }}
             />
           </TouchableOpacity>

@@ -545,7 +545,7 @@ export function onNextStep() {
         // then remove all that have same ID as we will insert it
         if (newRecentAddress.place_id)
           recentAddresses = recentAddresses.filter(
-            addr => addr.place_id && addr.place_id !== newRecentAddress.place_id
+            addr => addr.place_id && addr.place_id != newRecentAddress.place_id
           );
 
         addToData.recentAddresses = [newRecentAddress].concat(recentAddresses);

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { FBLogin, FBLoginManager } from "react-native-facebook-login";
 
 import config from "../../config/config";
+import styles from "../../styles/styles";
 
 class Login extends PureComponent {
   static propTypes = {
@@ -23,40 +24,15 @@ class Login extends PureComponent {
   render() {
     if (this.props.showButtons && this.props.user.loadingInProgress) {
       return (
-        <View
-          style={{
-            flexDirection: "column",
-            width: "100%",
-            height: "auto",
-            height: 140,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
+        <View style={styles.login.holder}>
           <ActivityIndicator size="large" color={config.colors.primary} />
         </View>
       );
     } else if (this.props.showButtons) {
       return (
-        <View
-          style={{
-            flexDirection: "column",
-            width: "100%",
-            height: "auto",
-            height: 140,
-            justifyContent: "center"
-          }}
-        >
+        <View style={styles.login.holder}>
           <Text
-            style={{
-              fontSize: 24,
-              color: config.colors.primary,
-              textAlign: "center",
-              textAlignVertical: "center",
-              width: this.props.width,
-              paddingTop: 8,
-              paddingBottom: 8
-            }}
+            style={[styles.login.button]}
             onPress={() => {
               this.props.onLoginGoogle();
             }}
@@ -65,15 +41,7 @@ class Login extends PureComponent {
             Google
           </Text>
           <Text
-            style={{
-              fontSize: 24,
-              color: config.colors.primary,
-              textAlign: "center",
-              textAlignVertical: "center",
-              width: this.props.width,
-              paddingTop: 8,
-              paddingBottom: 8
-            }}
+            style={[styles.login.button]}
             onPress={() => {
               this.props.onLoginFacebook();
             }}
@@ -85,22 +53,9 @@ class Login extends PureComponent {
       );
     }
     return (
-      <View
-        style={{
-          width: "100%",
-          height: "auto",
-          height: 90
-        }}
-      >
+      <View style={[styles.login.holder, styles.login.firstStep]}>
         <Text
-          style={{
-            fontSize: 24,
-            color: config.colors.primary,
-            textAlign: "center",
-            textAlignVertical: "center",
-            width: this.props.width,
-            height: 90
-          }}
+          style={[styles.login.button, styles.login.loginButton]}
           onPress={() => {
             this.props.onNextStep();
           }}

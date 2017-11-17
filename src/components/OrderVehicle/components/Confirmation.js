@@ -31,49 +31,36 @@ class Confirmation extends PureComponent {
     super(props);
   }
 
-  componentDidMount() {
-    if (this.props.isActive) this.props.openPanel("confirmation");
-  }
-
   render() {
     //console.log("COnfirmation ", this.props);
     return (
-      <View
-        style={{
-          marginTop: 10,
-          width: "auto",
-          height: "auto",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          alignItems: "flex-start",
-          paddingLeft: 10,
-          paddingRight: 10
-        }}
-      >
-        <Text style={styles.ordering.label}>You will be picked in</Text>
-        <Text style={styles.ordering.confirmationInfo} numberOfLines={1}>
+      <View style={styles.ordering.confirmation.holder}>
+        <Text style={styles.ordering.confirmation.label}>
+          You will be picked in
+        </Text>
+        <Text style={styles.ordering.confirmation.info} numberOfLines={1}>
           {this.props.fromAddress}
         </Text>
-        <Text style={styles.ordering.label}>and drop me at</Text>
-        <Text style={styles.ordering.confirmationInfo} numberOfLines={1}>
+        <Text style={styles.ordering.confirmation.label}>and drop me at</Text>
+        <Text style={styles.ordering.confirmation.info} numberOfLines={1}>
           {this.props.toAddress}
         </Text>
-        <Text style={styles.ordering.label}>in</Text>
-        <Text style={styles.ordering.confirmationInfo}>
+        <Text style={styles.ordering.confirmation.label}>in</Text>
+        <Text style={styles.ordering.confirmation.info}>
           {this.props.vehicle.make || ""}
         </Text>
-        <Text style={styles.ordering.label}>You will be charged</Text>
-        <Text style={styles.ordering.confirmationInfo}>{this.props.price}</Text>
-        <Text style={styles.ordering.label}>The card XYZ will be charged</Text>
+        <Text style={styles.ordering.confirmation.label}>
+          You will be charged
+        </Text>
+        <Text style={styles.ordering.confirmation.info}>
+          {this.props.price}
+        </Text>
+        <Text style={styles.ordering.confirmation.label}>
+          The card XYZ will be charged
+        </Text>
 
         <Text
-          style={{
-            marginTop: 18,
-            fontSize: 30,
-            width: this.props.width,
-            color: config.colors.primary,
-            textAlign: "center"
-          }}
+          style={styles.ordering.confirmation.button}
           onPress={this.props.onConfirmBooking}
         >
           {this.props.actionText}

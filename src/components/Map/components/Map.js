@@ -195,12 +195,10 @@ class Map extends PureComponent {
       mapHeight = this.mapHeight = height - config.ordering.height;
     }
 
-    const mapStyle = {
-      position: "absolute",
-      top: 0,
+    const mapStyle = Object.assign({}, styles.map.holder, {
       width: width,
       height: mapHeight
-    };
+    });
 
     console.log(
       "map render ",
@@ -240,7 +238,7 @@ class Map extends PureComponent {
                 latitude: this.props.ordering.fromData.geometry.location.lat,
                 longitude: this.props.ordering.fromData.geometry.location.lng
               }}
-              style={{ zIndex: 1000 }}
+              style={styles.map.marker}
             >
               <Marker
                 platformIOS={platformIOS}
@@ -255,7 +253,7 @@ class Map extends PureComponent {
             <MapView.Marker
               key={"toMarker"}
               anchor={{ x: 0.5, y: platformIOS ? 0 : 1 }}
-              style={{ zIndex: 1000 }}
+              style={styles.map.marker}
               coordinate={{
                 latitude: this.props.ordering.toData.geometry.location.lat,
                 longitude: this.props.ordering.toData.geometry.location.lng
@@ -273,11 +271,12 @@ class Map extends PureComponent {
             <MapView.Marker
               key={index}
               anchor={{ x: 0.5, y: 0.5 }}
-              style={{
-                transform: [{ rotateZ: vehicle.heading + "deg" }],
-                opacity: 1,
-                zIndex: 990
-              }}
+              style={[
+                styles.map.vehicle,
+                {
+                  transform: [{ rotateZ: vehicle.heading + "deg" }]
+                }
+              ]}
               coordinate={{
                 latitude: vehicle.position.lat,
                 longitude: vehicle.position.lng
@@ -298,18 +297,13 @@ class Map extends PureComponent {
           this.props.ordering.currStep.id === "to") && (
           <View
             pointerEvents="none"
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: mapStyle.height,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "transparent",
-              transform: [{ translateY: Platform.OS === "android" ? -20 : 0 }]
-            }}
+            style={[
+              styles.map.overlay,
+              {
+                height: mapStyle.height,
+                transform: [{ translateY: Platform.OS === "android" ? -20 : 0 }]
+              }
+            ]}
           >
             {/* <Image
               pointerEvents="none"
