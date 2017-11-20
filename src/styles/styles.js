@@ -45,9 +45,15 @@ const styles = {
       top: 0,
       left: 0
     },
-    panel: {
+    panelBackground: {
+      position: "absolute",
+      top: 0,
       backgroundColor: "white",
-      width: 200
+      zIndex: 2
+    },
+    menu: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 500
     },
     profile: {
       holder: {
@@ -73,6 +79,41 @@ const styles = {
       left: 20,
       fontSize: 24,
       color: config.colors.text
+    },
+    expanded: {
+      backIcon: {
+        left: -4,
+        marginBottom: 40
+      },
+      holder: {
+        zIndex: 400,
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        ...StyleSheet.absoluteFillObject,
+        padding: 30
+      }
+    }
+  },
+  trips: {
+    holder: { width: "100%" },
+    item: {
+      flex: 1,
+      marginBottom: 5,
+      flexDirection: "row",
+      justifyContent: "space-between"
+    },
+    text: {
+      fontSize: 20,
+
+      color: config.colors.secondary
+    },
+    textLocation: {
+      width: "60%"
+    },
+    textDate: {
+      textAlign: "right",
+      color: "#7a7a7a"
     }
   },
   login: {

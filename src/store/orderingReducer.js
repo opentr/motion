@@ -11,6 +11,8 @@ import { findWithAttr } from "../utils/search";
 
 import moment from "moment";
 
+const timer = require("react-native-timer");
+
 /**
  * CONSTANTS USED
  */
@@ -66,6 +68,14 @@ function metersToRadius(value) {
  * RESET APP
  */
 export function onResetApp() {
+  try {
+    timer.clearTimeout("traveling1");
+    timer.clearTimeout("traveling2");
+    timer.clearTimeout("traveling3");
+    timer.clearTimeout("traveling4");
+    timer.clearTimeout("traveling5");
+  } catch (error) {}
+
   const resetStep = config.ordering.withAuth ? 2 : 0;
 
   return {
@@ -574,9 +584,29 @@ export function onNextStep() {
       ) {
         dispatch(onRecenterMap("route"));
       } else if (nextStep.id === "traveling") {
-        setTimeout(() => {
-          dispatch(onRecenterMap("traveling"));
-        }, 50);
+        const lastTrip = {
+          address: ordering.toAddress,
+          date: moment().format("DD/MM/YYYY")
+        };
+
+        // add destination to list of previous trips
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            recentTrips: [lastTrip].concat(
+              (ordering.recentTrips || []).slice(0, 39)
+            ),
+            lastTrip: lastTrip
+          }
+        });
+
+        timer.setTimeout(
+          "recenterMap",
+          () => {
+            dispatch(onRecenterMap("traveling"));
+          },
+          50
+        );
       }
     }
   };
@@ -915,50 +945,76 @@ export function onSelectVehicle(index) {
 export function simulateOrdering() {
   return (dispatch, getState) => {
     // dispatch booking is accepted
-    setTimeout(() => {
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: {
-          booking: { ...getState().ordering.booking, status: "accepted" }
-        }
-      });
-    }, 3000);
+    timer.setTimeout(
+      "traveling1",
+      () => {
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            booking: { ...getState().ordering.booking, status: "accepted" }
+          }
+        });
+      },
+      3000
+    );
     // dispatch driver on its way
-    setTimeout(() => {
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: {
-          booking: { ...getState().ordering.booking, status: "driver_on_way" }
-        }
-      });
-    }, 5000);
+    timer.setTimeout(
+      "traveling2",
+      () => {
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            booking: { ...getState().ordering.booking, status: "driver_on_way" }
+          }
+        });
+      },
+      5000
+    );
     // dispatch driver arrives info
-    setTimeout(() => {
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: {
-          booking: { ...getState().ordering.booking, status: "driver_arriving" }
-        }
-      });
-    }, 12000);
+    timer.setTimeout(
+      "traveling3",
+      () => {
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            booking: {
+              ...getState().ordering.booking,
+              status: "driver_arriving"
+            }
+          }
+        });
+      },
+      12000
+    );
     // dispatch driver arrived
-    setTimeout(() => {
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: {
-          booking: { ...getState().ordering.booking, status: "driver_arrived" }
-        }
-      });
-    }, 30000);
+    timer.setTimeout(
+      "traveling4",
+      () => {
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            booking: {
+              ...getState().ordering.booking,
+              status: "driver_arrived"
+            }
+          }
+        });
+      },
+      30000
+    );
     // dispatch ride completed
-    setTimeout(() => {
-      dispatch({
-        type: UPDATE_ORDERING_DATA,
-        payload: {
-          booking: { ...getState().ordering.booking, status: "completed" }
-        }
-      });
-    }, 50000);
+    timer.setTimeout(
+      "traveling5",
+      () => {
+        dispatch({
+          type: UPDATE_ORDERING_DATA,
+          payload: {
+            booking: { ...getState().ordering.booking, status: "completed" }
+          }
+        });
+      },
+      50000
+    );
   };
 }
 

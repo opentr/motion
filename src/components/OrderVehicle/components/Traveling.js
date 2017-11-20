@@ -194,9 +194,7 @@ class Traveling extends PureComponent {
             }
           ]}
           onPress={() => {
-            if (this.props.booking.status === "completed") {
-              this.props.onResetApp();
-            }
+            this.props.onResetApp();
           }}
           numberOfLines={1}
         >
