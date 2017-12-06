@@ -150,7 +150,7 @@ const styles = {
     },
     markerFromTo: {
       holder: {
-        maxWidth: 160,
+        maxWidth: 120,
         flexDirection: "column",
         justifyContent: "flex-start",
         alignItems: "center",
@@ -158,21 +158,28 @@ const styles = {
       },
       label: {
         padding: 3,
-        borderRadius: 5
+        borderRadius: 5,
+        maxWidth: 120
       },
       labelText: {
         color: "white",
-        padding: 3
+        padding: 3,
+        maxWidth: 110,
+        fontSize: 12
       },
       activityHolder: {
-        width: 160,
-        paddingTop: 4,
-        paddingBottom: 3
+        width: 110,
+        marginLeft: "auto",
+        marginRight: "auto",
+        justifyContent: "center",
+        paddingTop: 1,
+        paddingBottom: 1,
+        borderRadius: 5
       },
       pinLine: {
         width: 3,
         maxWidth: 3,
-        height: 28
+        height: 20
       }
     },
     vehicle: {

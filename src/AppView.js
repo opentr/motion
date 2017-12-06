@@ -20,7 +20,7 @@ import Sidebar from "./components/Sidebar/";
 import BackButton from "./components/BackButton/";
 import OrderVehicle from "./components/OrderVehicle/";
 
-const appVersion = "v0.1.9";
+const appVersion = "v0.2.1";
 
 //var DeviceInfo = require("react-native-device-info");
 // let versionNumber = ""; //DeviceInfo.getVersion();

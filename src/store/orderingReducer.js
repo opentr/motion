@@ -123,7 +123,7 @@ export function onLoadBookingStatuses() {
 }
 
 /**
- * CREATE A BOOKING 
+ * CREATE A BOOKING
  */
 export function onCreateBooking() {
   return (dispatch, getState) => {
@@ -222,8 +222,8 @@ export function getBookingUpdate() {
 }
 
 /**
- * LOAD VEHICLES LIST FROM API 
- * WHEN NOT IN BOOKING - FOR THE REGION WE ARE IN 
+ * LOAD VEHICLES LIST FROM API
+ * WHEN NOT IN BOOKING - FOR THE REGION WE ARE IN
  * WHEN IN BOOKING - LOADING ONLY ONE VEHICLE THAT IS BOOKED
  */
 export function onLoadVehicles() {
@@ -324,7 +324,7 @@ export function onLoadVehicles() {
 
 /**
  * Contextually recenters the map based on the step in ordering process
- * @param {*String} stepId 
+ * @param {*String} stepId
  */
 export function onRecenterMap(stepId) {
   //console.log("on recenter map now", stepId);
@@ -564,7 +564,13 @@ export function onNextStep() {
       // reset data about available vehicles, not to diplsay vehicles for last ordering location
       if (nextStep.id === "vehicleSelect") {
         addToData.availableVehicles = [];
-      } else if (nextStep.id === "time") {
+      }
+      if (
+        (ordering.currStep.id === "to" &&
+          ordering.toStepNo > ordering.fromStepNo) ||
+        (ordering.currStep.id === "from" &&
+          ordering.fromStepNo > ordering.toStepNo)
+      ) {
         dispatch(getRoute());
         addToData.route = [];
       }
@@ -658,7 +664,7 @@ export function onPrevStep() {
 }
 
 /**
- * get vehicle time 
+ * get vehicle time
  */
 export function onGetVehicleTime(id, location) {
   return (dispatch, getState) => {
@@ -667,8 +673,11 @@ export function onGetVehicleTime(id, location) {
     const fromData = getState().ordering.fromData;
 
     fetch(
-      `https://maps.googleapis.com/maps/api/directions/json?origin=${location.lat},${location.lng}&destination=${fromData
-        .geometry.location.lat},${fromData.geometry.location.lng}`
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${
+        location.lat
+      },${location.lng}&destination=${fromData.geometry.location.lat},${
+        fromData.geometry.location.lng
+      }`
     )
       .then(
         response => response.json(),
@@ -782,10 +791,18 @@ export function getRoute() {
       return false;
     }
 
-    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${fromData
-      .geometry.location.lat},${fromData.geometry.location
-      .lng}&destination=${toData.geometry.location.lat},${toData.geometry
-      .location.lng}`;
+    dispatch({
+      type: UPDATE_ORDERING_DATA,
+      payload: { getRoute: (getState().ordering.getRoute || 0) + 1 }
+    });
+
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${
+      fromData.geometry.location.lat
+    },${fromData.geometry.location.lng}&destination=${
+      toData.geometry.location.lat
+    },${toData.geometry.location.lng}`;
+
+    console.log("GET ROUTE", url);
 
     fetch(url)
       .then(
@@ -916,8 +933,8 @@ export function onSearchForVehicle() {
   };
 }
 
-/** 
- * handles selecting a vehicle for booking 
+/**
+ * handles selecting a vehicle for booking
  */
 export function onSelectVehicle(index) {
   return (dispatch, getState) => {
@@ -1019,7 +1036,7 @@ export function simulateOrdering() {
 }
 
 /**
- * action when user confirms booking and 
+ * action when user confirms booking and
  */
 export function onConfirmBooking() {
   return dispatch => {

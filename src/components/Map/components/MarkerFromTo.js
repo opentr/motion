@@ -26,6 +26,7 @@ class MapMarker extends PureComponent {
       backgroundColor,
       loadingGeocoding
     } = this.props;
+
     return (
       <View style={styles.map.markerFromTo.holder}>
         <View
@@ -40,10 +41,10 @@ class MapMarker extends PureComponent {
             <Text
               numberOfLines={1}
               style={[
-                styles.map.markerFromTo.labelText,
-                {
-                  fontSize: region.latitudeDelta < 0.002 ? 14 : 16
-                }
+                styles.map.markerFromTo.labelText
+                // {
+                //   fontSize: region.latitudeDelta < 0.002 ? 14 : 16
+                // }
               ]}
             >
               {address}
